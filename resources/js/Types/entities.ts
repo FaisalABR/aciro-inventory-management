@@ -14,6 +14,16 @@ export type TSatuan = {
     description: string;
 };
 
+export type TSupplier = {
+    uuid: string;
+    name: string;
+    contactPerson: string;
+    noWhatsapp: string;
+    email: string;
+    alamat: string;
+    kota: string;
+};
+
 type TRoles = {
     id: number;
     name: string;

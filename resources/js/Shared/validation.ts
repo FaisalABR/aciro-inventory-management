@@ -50,3 +50,43 @@ export const CreateSatuanSchema = z.object({
         .min(3, { message: "Deskripsi minimal 3 karakter" })
         .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
 });
+
+export const CreateSupplierSchema = z.object({
+    name: z
+        .string({
+            required_error: "Nama harus diisi",
+        })
+        .min(3, { message: "Nama minimal 3 karakter" })
+        .max(20, { message: "Nama maximal dari 20 karakter" }),
+    contactPerson: z
+        .string({
+            required_error: "Contact Person harus diisi",
+        })
+        .min(3, { message: "Contact Person minimal 3 karakter" })
+        .max(20, { message: "Contact Person maximal dari 20 karakter" }),
+    noWhatsapp: z
+        .string({
+            required_error: "No Whatsapp harus diisi",
+        })
+        .min(10, { message: "No Whatsapp minimal 10 karakter" })
+        .max(13, { message: "No Whatsapp maksimal 13 karakter" }),
+    email: z
+        .string({
+            required_error: "email wajib diisi",
+        })
+        .email("Format email tidak valid")
+        .min(3, { message: "Email minimal 3 karakter" })
+        .max(255, { message: "Email maximal dari 255 karakter" }),
+    kota: z
+        .string({
+            required_error: "Nama harus diisi",
+        })
+        .min(3, { message: "Nama minimal 3 karakter" })
+        .max(20, { message: "Nama maximal dari 20 karakter" }),
+    alamat: z
+        .string({
+            required_error: "Deskripsi harus diisi",
+        })
+        .min(3, { message: "Deskripsi minimal 3 karakter" })
+        .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
+});

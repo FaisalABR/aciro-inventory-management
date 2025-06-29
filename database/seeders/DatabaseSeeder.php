@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             UserRoleSeeder::class,
             PermissionRoleSeeder::class,
             SatuanSeeder::class,
+            SupplierSeeder::class,
         ]);
     }
 }

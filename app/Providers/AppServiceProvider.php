@@ -7,6 +7,8 @@ use App\Services\AuthService;
 use App\Services\AuthServiceInterface;
 use App\Services\SatuanService;
 use App\Services\SatuanServiceInterface;
+use App\Services\SupplierService;
+use App\Services\SupplierServiceInterface;
 use App\Services\UserService;
 use App\Services\UserServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             SatuanServiceInterface::class,
             SatuanService::class,
+        );
+        $this->app->bind(
+            SupplierServiceInterface::class,
+            SupplierService::class,
         );
     }
 

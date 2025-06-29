@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SatuanController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,6 +47,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/master/satuan/edit/{uuid}', [SatuanController::class, 'update']);
     Route::delete('/master/satuan/delete/{uuid}', [SatuanController::class, 'destroy']);
 
+    // Kelola Master Satuan
+    Route::get('/master/supplier', [SupplierController::class, 'index'])->middleware("permission:view-master-supplier");;
+    Route::get('/master/supplier/create', [SupplierController::class, 'showCreate']);
+    Route::post('/master/supplier/create', [SupplierController::class, 'create']);
+    Route::get('/master/supplier/edit/{uuid}', [SupplierController::class, 'showEdit']);
+    Route::put('/master/supplier/edit/{uuid}', [SupplierController::class, 'update']);
+    Route::delete('/master/supplier/delete/{uuid}', [SupplierController::class, 'destroy']);
+
 
     Route::get('/logout', [AuthController::class, "logout"]);
 
@@ -73,11 +82,7 @@ Route::middleware(['auth'])->group(function () {
         return redirect("/master/satuan");
     });
 
-    Route::get('/master/supplier', function () {
-        return Inertia::render('Master/Supplier', [
-            'name' => 'Faisal',
-        ]);
-    });
+
 
     Route::get('/master/kategori', function () {
         return Inertia::render('Master/Kategori', [

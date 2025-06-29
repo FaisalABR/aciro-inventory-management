@@ -51,12 +51,6 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_DASHBOARD,
     },
     {
-        key: Route.Order,
-        icon: <MoneyCollectOutlined />,
-        label: <Link href={Route.Order}>Order</Link>,
-        permission: PERMISSIONS_VIEW_ORDER,
-    },
-    {
         key: Route.BarangMasuk,
         icon: <RightSquareOutlined />,
         label: <Link href={Route.BarangMasuk}>Barang Masuk</Link>,
@@ -73,6 +67,12 @@ const items: MenuItem[] = [
         icon: <LeftSquareOutlined />,
         label: <Link href={Route.BarangKeluar}>Barang Keluar</Link>,
         permission: PERMISSIONS_VIEW_BARANG_KELUAR,
+    },
+    {
+        key: Route.Order,
+        icon: <MoneyCollectOutlined />,
+        label: <Link href={Route.Order}>Order</Link>,
+        permission: PERMISSIONS_VIEW_ORDER,
     },
     {
         key: Route.KelolaUser,
