@@ -35,6 +35,10 @@ class PermissionSeeder extends Seeder
                 "description" => "Buka Menu Stock Barang",
             ],
             [
+                "name" => "view-laporan-deadstock",
+                "description" => "Buka Menu Laporan Barang Deadstock",
+            ],
+            [
                 "name" => "view-master",
                 "description" => "Buka Menu Root Master Data",
             ],

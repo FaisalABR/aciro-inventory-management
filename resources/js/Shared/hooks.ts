@@ -1,4 +1,4 @@
-import { notification } from "antd";
+import { Modal, ModalFuncProps, notification } from "antd";
 import { ArgsProps } from "antd/es/notification";
 
 type TNotifData = ArgsProps;
@@ -23,4 +23,14 @@ export const useNotification = () => {
         contextHolder,
         notifDestroy: (): void => api.destroy(),
     };
+};
+
+export const useModal = (props: ModalFuncProps) => {
+    if (!props.type) {
+        return;
+    }
+
+    return Modal[props.type]({
+        ...props,
+    });
 };

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,8 +27,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/kelola-user/create", [UserController::class, 'showCreate']);
     Route::post("/kelola-user/create", [UserController::class, 'create']);
     Route::get("/kelola-user/edit/{uuid}", [UserController::class, 'showEdit']);
-    Route::delete("/kelola-user/delete/{uuid}", [UserController::class, 'destroy']);
     Route::put("/kelola-user/edit/{uuid}", [UserController::class, 'update']);
+    Route::delete("/kelola-user/delete/{uuid}", [UserController::class, 'destroy']);
 
     // Kelola Barang Masuk
     Route::get('/barang-masuk', function () {
@@ -36,6 +37,14 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->middleware("permission:view-barang-masuk");
 
+
+    // Kelola Master Satuan
+    Route::get('/master/satuan', [SatuanController::class, 'index'])->middleware("permission:view-master-satuan");;
+    Route::get('/master/satuan/create', [SatuanController::class, 'showCreate']);
+    Route::post('/master/satuan/create', [SatuanController::class, 'create']);
+    Route::get('/master/satuan/edit/{uuid}', [SatuanController::class, 'showEdit']);
+    Route::put('/master/satuan/edit/{uuid}', [SatuanController::class, 'update']);
+    Route::delete('/master/satuan/delete/{uuid}', [SatuanController::class, 'destroy']);
 
 
     Route::get('/logout', [AuthController::class, "logout"]);
@@ -62,12 +71,6 @@ Route::middleware(['auth'])->group(function () {
     // Master Page
     Route::get('/master', function () {
         return redirect("/master/satuan");
-    });
-
-    Route::get('/master/satuan', function () {
-        return Inertia::render('Master/Satuan', [
-            'name' => 'Faisal',
-        ]);
     });
 
     Route::get('/master/supplier', function () {

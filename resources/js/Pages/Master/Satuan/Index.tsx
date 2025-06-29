@@ -1,5 +1,8 @@
-import { Button, Input, Table } from "antd";
 import React from "react";
+import RootLayout from "../../../Layouts/RootLayout";
+import { route, Route } from "../../../Common/Route";
+import { Link, router } from "@inertiajs/react";
+import { Button, Input, Table } from "antd";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -7,24 +10,24 @@ import {
     PlusSquareOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
-import { Link, router } from "@inertiajs/react";
-import { route, Route } from "../../Common/Route";
 import { ColumnsType } from "antd/es/table";
-import { TUser } from "../../Types/entities";
-import { generateRolesName } from "../../Shared/utils";
-import RootLayout from "../../Layouts/RootLayout";
-import { useModal } from "../../Shared/hooks";
+import { TSatuan } from "../../../Types/entities";
+import { useModal } from "../../../Shared/hooks";
 
-type TUserIndexProps = {
-    data: TUser[];
+type TSatuanIndexProps = {
+    data: TSatuan[];
 };
 
-const Index: React.FC<TUserIndexProps> = ({ data }) => {
-    const handleDeleteUser = (uuid: string) => {
+const Satuan: React.FC<TSatuanIndexProps> = (props) => {
+    const handleDeleteSatuan = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
             title: "Konfirmasi",
-            content: "Apakah anda yakin ingin menghapus?",
+            content: (
+                <p>
+                    Apakah anda yakin ingin menghapus <b>{name}</b>?
+                </p>
+            ),
             okText: "Yes",
             cancelText: "Batal",
             okButtonProps: {
@@ -33,7 +36,7 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
             },
             onOk: () => {
                 router.delete(
-                    route(Route.DeleteUser, {
+                    route(Route.DeleteMasterSatuan, {
                         uuid,
                     }),
                 );
@@ -48,23 +51,14 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
             key: "name",
         },
         {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
+            title: "Deskripsi",
+            dataIndex: "description",
+            key: "description",
         },
         {
-            title: "No Whatsapp",
-            dataIndex: "noWhatsapp",
-            key: "noWhatsapp",
-        },
-        {
-            title: "Roles",
-            dataIndex: "roles",
-            key: "roles",
-            render: (_, record) => {
-                const role = record.roles[0].name || "";
-                return generateRolesName(role);
-            },
+            title: "Kode",
+            dataIndex: "code",
+            key: "code",
         },
         {
             title: "Actions",
@@ -74,7 +68,7 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
                         <Link
-                            href={route(Route.EditUser, {
+                            href={route(Route.EditMasterSatuan, {
                                 uuid: record.uuid,
                             })}
                         >
@@ -83,7 +77,9 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
                             </Button>
                         </Link>
                         <Button
-                            onClick={() => handleDeleteUser(record.uuid)}
+                            onClick={() =>
+                                handleDeleteSatuan(record.uuid, record.name)
+                            }
                             type="primary"
                             danger
                         >
@@ -96,22 +92,22 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
         },
     ];
 
-    const userData = data?.map((item) => {
+    const satuanData = props.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
 
     return (
         <RootLayout
             type="main"
-            title="Kelola User"
+            title="Master Satuan"
             actions={[
-                <Link href={Route.CreateUser}>
+                <Link href={Route.CreateMasterSatuan}>
                     <Button
                         icon={<PlusSquareOutlined />}
                         type="primary"
                         size="large"
                     >
-                        Tambah User
+                        Tambah Satuan
                     </Button>
                 </Link>,
             ]}
@@ -119,12 +115,15 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
             <Input
                 size="large"
                 prefix={<SearchOutlined />}
-                placeholder="Cari orang berdasarkan nama"
+                placeholder="Cari satuan berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
             />
-            <Table dataSource={userData ? userData : []} columns={columns} />;
+            <Table
+                dataSource={satuanData ? satuanData : []}
+                columns={columns}
+            />
         </RootLayout>
     );
 };
 
-export default Index;
+export default Satuan;

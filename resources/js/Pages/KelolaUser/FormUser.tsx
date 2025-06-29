@@ -19,7 +19,6 @@ const FormUser: React.FC<TUserFormProps> = (props) => {
         props.isUpdate ? EditUserSchema : CreateUserSchema,
     );
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
     const [form] = Form.useForm();
 
     const onFinish = async () => {

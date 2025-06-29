@@ -29,3 +29,24 @@ export const CreateUserSchema = z.object({
 });
 
 export const EditUserSchema = CreateUserSchema.omit({ password: true });
+
+export const CreateSatuanSchema = z.object({
+    name: z
+        .string({
+            required_error: "Nama harus diisi",
+        })
+        .min(3, { message: "Nama minimal 3 karakter" })
+        .max(20, { message: "Nama maximal dari 20 karakter" }),
+    code: z
+        .string({
+            required_error: "Kode harus diisi",
+        })
+        .min(3, { message: "Kode minimal 3 karakter" })
+        .max(20, { message: "Kode maximal dari 20 karakter" }),
+    description: z
+        .string({
+            required_error: "Deskripsi harus diisi",
+        })
+        .min(3, { message: "Deskripsi minimal 3 karakter" })
+        .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
+});

@@ -28,9 +28,15 @@ export enum Route {
     EditUser = "/kelola-user/edit/:uuid",
     DeleteUser = "/kelola-user/delete/:uuid",
 
+    // Master Satuan
+    MasterSatuan = "/master/satuan",
+    CreateMasterSatuan = "/master/satuan/create",
+    EditMasterSatuan = "/master/satuan/edit/:uuid",
+    DeleteMasterSatuan = "/master/satuan/delete/:uuid",
+
+    LaporanDeadstock = "/laporan-deadstock",
     Order = "/orders",
     RootMaster = "/master",
-    MasterSatuan = "/master/satuan",
     MasterKategori = "/master/kategori",
     MasterSupplier = "/master/supplier",
 }

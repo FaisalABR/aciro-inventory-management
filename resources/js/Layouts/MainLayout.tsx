@@ -1,6 +1,7 @@
 import {
     BuildOutlined,
     DesktopOutlined,
+    FileTextOutlined,
     LeftSquareOutlined,
     LogoutOutlined,
     MoneyCollectOutlined,
@@ -12,12 +13,12 @@ import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Col, Flex, Layout, Menu, MenuProps, Row, Typography } from "antd";
 import React, { useMemo } from "react";
 import { Route } from "../Common/Route";
-import { useModal } from "../Shared/modal";
 import {
     PERMISSIONS_VIEW_BARANG_KELUAR,
     PERMISSIONS_VIEW_BARANG_MASUK,
     PERMISSIONS_VIEW_DASHBOARD,
     PERMISSIONS_VIEW_KELOLA_USER,
+    PERMISSIONS_VIEW_LAPORAN_DEADSTOCK,
     PERMISSIONS_VIEW_MASTER_KATEGORI,
     PERMISSIONS_VIEW_MASTER_ROOT,
     PERMISSIONS_VIEW_MASTER_SATUAN,
@@ -26,6 +27,7 @@ import {
     PERMISSIONS_VIEW_STOCK,
 } from "../Common/Permission";
 import { TInertiaProps } from "../Types/intertia";
+import { useModal } from "../Shared/hooks";
 
 type TMainLayout = {
     children: React.ReactNode;
@@ -77,6 +79,12 @@ const items: MenuItem[] = [
         icon: <UserOutlined />,
         label: <Link href={Route.KelolaUser}>Kelola User</Link>,
         permission: PERMISSIONS_VIEW_KELOLA_USER,
+    },
+    {
+        key: Route.LaporanDeadstock,
+        icon: <FileTextOutlined />,
+        label: <Link href={Route.LaporanDeadstock}>Laporan Deadstock</Link>,
+        permission: PERMISSIONS_VIEW_LAPORAN_DEADSTOCK,
     },
     {
         key: "6",

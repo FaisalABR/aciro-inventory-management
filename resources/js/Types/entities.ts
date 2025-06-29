@@ -7,6 +7,13 @@ export type TUser = {
     roles: TRoles[];
 };
 
+export type TSatuan = {
+    uuid: string;
+    name: string;
+    code: string;
+    description: string;
+};
+
 type TRoles = {
     id: number;
     name: string;
