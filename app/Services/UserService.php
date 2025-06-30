@@ -2,8 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\User\EmailAlreadyExistsException;
+use App\Exceptions\User\UserCreationException;
+use App\Exceptions\User\UserDeletionException;
 use App\Models\User;
 use App\Models\UserRole;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 interface UserServiceInterface
 {
@@ -18,73 +24,90 @@ class UserService implements UserServiceInterface
 {
     public function create(array $data)
     {
-        $user = User::create(
-            [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => $data['password'],
-                'noWhatsapp' => $data['noWhatsapp'],
-            ]
-        );
-
-        if (!$user) {
-            return false;
+        if (User::where('email', $data['email'])->exists()) {
+            throw new EmailAlreadyExistsException();
         }
 
-        UserRole::create([
-            "user_id" => $user["id"],
-            "role_id" => $data["roles"]
-        ]);
+        try {
+            DB::beginTransaction();
+            $user = User::create(
+                [
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'password' => $data['password'],
+                    'noWhatsapp' => $data['noWhatsapp'],
+                ]
+            );
 
-        return true;
+            UserRole::create([
+                "user_id" => $user["id"],
+                "role_id" => $data["roles"]
+            ]);
+
+            DB::commit();
+
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Gagal membuat pengguna" . $e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException("Terjadi masalah saat membuat pengguna. Silakan coba lagi nanti.");
+        }
     }
 
     public function getAllUsers()
     {
-        $data = User::select('id', 'uuid', 'name', 'email', 'noWhatsapp')->with(['roles:id,name'])->get();
-        return $data;
+        try {
+            $data = User::select('id', 'uuid', 'name', 'email', 'noWhatsapp')->with(['roles:id,name'])->get();
+            return $data;
+        } catch (\Exception $e) {
+            Log::error("Gagal mendapatkan semua user " . $e->getMessage(), ['exception' => $e]);
+            throw new Exception("Terjadi kesalahan dalam seerver");
+        }
     }
 
     public function getUserByUUID($uuid)
     {
-        $user = User::where('uuid', $uuid)->with(['roles:id,name'])->first();
-
-        if (!$user) {
-            return false;
+        try {
+            $user = User::where('uuid', $uuid)->with(['roles:id,name'])->firstOrFail();
+            return $user;
+        } catch (\Exception $e) {
+            Log::error("Gagal mendapatkan pengguna denga ID: " . $e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException("Pengguna tidak ditemukan");
         }
-
-
-        return $user;
     }
 
     public function update($data, $uuid)
     {
-        $user = User::where('uuid', $uuid)->with(['roles:id,name'])->first();
-        $currentRoleId = $user["roles"][0]["id"];
-        $newRoleId = $data['roles'];
-
-        if (!$user) {
-            return false;
+        if (User::where('email', $data['email'])->exists()) {
+            throw new EmailAlreadyExistsException();
         }
+        try {
+            $user = User::where('uuid', $uuid)->with(['roles:id,name'])->first();
+            $currentRoleId = $user["roles"][0]["id"];
+            $newRoleId = $data['roles'];
 
-        if ($currentRoleId != $newRoleId) {
-            $userRole = UserRole::where('user_id', $user["id"])
-                ->where('role_id', $currentRoleId)->first();
+            if ($currentRoleId != $newRoleId) {
+                $userRole = UserRole::where('user_id', $user["id"])
+                    ->where('role_id', $currentRoleId)->first();
 
-            $userRole->update([
-                'role_id',
-                $newRoleId
+                $userRole->update([
+                    'role_id',
+                    $newRoleId
+                ]);
+            }
+
+            $user->update([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'noWhatsapp' => $data['noWhatsapp'],
             ]);
+
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Gagal memperbaharui user: " . $e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException("Terjadi masalah saat update pengguna. Silakan coba lagi nanti.");
         }
-
-        $user->update([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'noWhatsapp' => $data['noWhatsapp'],
-        ]);
-
-
-        return true;
     }
 
     public function delete($uuid)
@@ -92,10 +115,15 @@ class UserService implements UserServiceInterface
         $user = User::where('uuid', $uuid)->first();
 
         if (!$user) {
-            return false;
+            throw new UserDeletionException("Pengguna belum terdaftar");
         }
 
-        $user->delete();
-        return true;
+        try {
+            $user->delete();
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Gagal menghapus user dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
+            throw new UserDeletionException("Terjadi kesalahan dalam menghapus user. Silahkan coba lagi nanti");
+        }
     }
 }
