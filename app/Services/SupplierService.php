@@ -11,6 +11,7 @@ interface SupplierServiceInterface
     public function get($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
+    public function getOptions();
 };
 
 class SupplierService implements SupplierServiceInterface
@@ -67,5 +68,19 @@ class SupplierService implements SupplierServiceInterface
 
         $supplier->delete();
         return true;
+    }
+
+    public function getOptions()
+    {
+        $data = Supplier::all();
+
+        $options = $data->map(function ($supplier) {
+            return [
+                'value' => $supplier->id,
+                'label' => $supplier->name,
+            ];
+        });
+
+        return $options;
     }
 }

@@ -4,3 +4,24 @@ export const generateRolesName = (role: string) => {
         .map((item) => item.toUpperCase())
         .join(" ");
 };
+
+export const formatRupiah = (value: number | undefined) => {
+    if (value === null || value === undefined) return "";
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(value);
+};
+
+export const parser = (value: string | undefined) => {
+    if (!value) return 0;
+
+    let cleanedValue = value.replace(/[^0-9,-]/g, "");
+    cleanedValue = cleanedValue.replace(/,/, ".");
+
+    const parsed = parseFloat(cleanedValue);
+
+    return isNaN(parsed) ? 0 : parsed;
+};

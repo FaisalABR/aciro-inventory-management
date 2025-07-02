@@ -19,6 +19,7 @@ import {
     PERMISSIONS_VIEW_DASHBOARD,
     PERMISSIONS_VIEW_KELOLA_USER,
     PERMISSIONS_VIEW_LAPORAN_DEADSTOCK,
+    PERMISSIONS_VIEW_MASTER_BARANG,
     PERMISSIONS_VIEW_MASTER_KATEGORI,
     PERMISSIONS_VIEW_MASTER_ROOT,
     PERMISSIONS_VIEW_MASTER_SATUAN,
@@ -93,19 +94,24 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_MASTER_ROOT,
         children: [
             {
+                key: Route.MasterBarang,
+                label: <Link href={Route.MasterBarang}>Data Barang</Link>,
+                permission: PERMISSIONS_VIEW_MASTER_BARANG,
+            },
+            {
                 key: Route.MasterSatuan,
                 label: <Link href={Route.MasterSatuan}>Data Satuan</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SATUAN,
             },
             {
-                key: Route.MasterKategori,
-                label: <Link href={Route.MasterKategori}>Data Kategori</Link>,
-                permission: PERMISSIONS_VIEW_MASTER_KATEGORI,
-            },
-            {
                 key: Route.MasterSupplier,
                 label: <Link href={Route.MasterSupplier}>Data Supplier</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SUPPLIER,
+            },
+            {
+                key: Route.MasterKategori,
+                label: <Link href={Route.MasterKategori}>Data Kategori</Link>,
+                permission: PERMISSIONS_VIEW_MASTER_KATEGORI,
             },
         ],
     },

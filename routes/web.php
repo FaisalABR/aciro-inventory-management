@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -54,6 +55,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/master/supplier/edit/{uuid}', [SupplierController::class, 'showEdit']);
     Route::put('/master/supplier/edit/{uuid}', [SupplierController::class, 'update']);
     Route::delete('/master/supplier/delete/{uuid}', [SupplierController::class, 'destroy']);
+
+    // Kelola Master Barang
+    Route::get('/master/barang', [BarangController::class, 'index']);
+    Route::get('/master/barang/create', [BarangController::class, 'showCreate']);
+    Route::post('/master/barang/create', [BarangController::class, 'create']);
+    Route::get('/master/barang/edit/{uuid}', [BarangController::class, 'showEdit']);
+    Route::put('/master/barang/edit/{uuid}', [BarangController::class, 'update']);
+    Route::delete('/master/barang/delete/{uuid}', [BarangController::class, 'destroy']);
+
 
 
     Route::get('/logout', [AuthController::class, "logout"]);

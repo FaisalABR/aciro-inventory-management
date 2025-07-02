@@ -11,6 +11,7 @@ interface SatuanServiceInterface
     public function get($satuan);
     public function update($data, $uuid);
     public function delete($uuid);
+    public function getOptions();
 };
 
 class SatuanService implements SatuanServiceInterface
@@ -67,5 +68,19 @@ class SatuanService implements SatuanServiceInterface
 
         $satuan->delete();
         return true;
+    }
+
+    public function getOptions()
+    {
+        $data = Satuan::all();
+
+        $options = $data->map(function ($satuan) {
+            return [
+                'value' => $satuan->id,
+                'label' => $satuan->name,
+            ];
+        });
+
+        return $options;
     }
 }

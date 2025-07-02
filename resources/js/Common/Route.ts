@@ -40,6 +40,12 @@ export enum Route {
     EditMasterSupplier = "/master/supplier/edit/:uuid",
     DeleteMasterSupplier = "/master/supplier/delete/:uuid",
 
+    // Master Supplier
+    MasterBarang = "/master/barang",
+    CreateMasterBarang = "/master/barang/create",
+    EditMasterBarang = "/master/barang/edit/:uuid",
+    DeleteMasterBarang = "/master/barang/delete/:uuid",
+
     LaporanDeadstock = "/laporan-deadstock",
     Order = "/orders",
     RootMaster = "/master",

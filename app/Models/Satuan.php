@@ -25,4 +25,9 @@ class Satuan extends Model
         'code',
         'description',
     ];
+
+    public function barangs()
+    {
+        return $this->hasMany(Barang::class, 'satuan_id', 'id');
+    }
 }

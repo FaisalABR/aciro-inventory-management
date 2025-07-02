@@ -51,6 +51,7 @@ const Login: React.FC = () => {
                         form={form}
                         onFinish={onSubmit}
                         style={{ marginTop: "2rem" }}
+                        layout="vertical"
                     >
                         <Form.Item name="email" label="Email">
                             <Input

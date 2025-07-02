@@ -14,6 +14,15 @@ export type TSatuan = {
     description: string;
 };
 
+export type TBarang = {
+    uuid: string;
+    name: string;
+    supplier: TSupplier;
+    satuan: TSatuan;
+    hargaJual: number;
+    hargaBeli: number;
+};
+
 export type TSupplier = {
     uuid: string;
     name: string;

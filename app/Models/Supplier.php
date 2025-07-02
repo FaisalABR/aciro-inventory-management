@@ -28,4 +28,9 @@ class Supplier extends Model
         'alamat',
         'kota'
     ];
+
+    public function barangs()
+    {
+        return $this->hasMany(Barang::class, 'supplier_id', 'id');
+    }
 }

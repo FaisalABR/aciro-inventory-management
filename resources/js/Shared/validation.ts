@@ -90,3 +90,24 @@ export const CreateSupplierSchema = z.object({
         .min(3, { message: "Deskripsi minimal 3 karakter" })
         .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
 });
+
+export const CreateBarangSchema = z.object({
+    name: z
+        .string({
+            required_error: "Nama harus diisi",
+        })
+        .min(3, { message: "Nama minimal 3 karakter" })
+        .max(20, { message: "Nama maximal dari 20 karakter" }),
+    supplier: z.number({ required_error: "Supplier harus diisi" }),
+    satuan: z.number({ required_error: "Satuan harus diisi" }),
+    hargaJual: z
+        .number({
+            required_error: "Harga Jual wajib diisi",
+        })
+        .min(0, { message: "Harga Jual tidak boleh 0" }),
+    hargaBeli: z
+        .number({
+            required_error: "Harga Beli wajib diisi",
+        })
+        .min(0, { message: "Harga Beli tidak boleh 0" }),
+});
