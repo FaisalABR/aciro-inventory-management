@@ -50,6 +50,22 @@ export type TBarangMasuk = {
     items: TBarangMasukItem[];
 };
 
+export type TBarangKeluarItem = {
+    barang_keluar_id: number;
+    barang_id: number;
+    barangs: TBarang;
+    quantity: number;
+    harga_jual: number;
+};
+
+export type TBarangKeluar = {
+    uuid: string;
+    nomor_referensi: string;
+    tanggal_keluar: string;
+    catatan: string | null;
+    items: TBarangKeluarItem[];
+};
+
 type TRoles = {
     id: number;
     name: string;

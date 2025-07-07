@@ -14,8 +14,14 @@ export enum Route {
     Dashboard = "/",
     AuthLogin = "/login",
     AuthLogout = "/logout",
-    BarangKeluar = "/barang-keluar",
     StockBarang = "/barang-stock",
+
+    // Kelola Barang Keluar
+    BarangKeluar = "/barang-keluar",
+    BarangKeluarDetail = "/barang-keluar/:uuid",
+    CreateBarangKeluar = "/barang-keluar/create",
+    EditBarangKeluar = "/barang-keluar/edit/:uuid",
+    DeleteBarangKeluar = "/barang-keluar/delete/:uuid",
 
     // Kelola Barang Masuk
     BarangMasuk = "/barang-masuk",
@@ -42,7 +48,7 @@ export enum Route {
     EditMasterSupplier = "/master/supplier/edit/:uuid",
     DeleteMasterSupplier = "/master/supplier/delete/:uuid",
 
-    // Master Supplier
+    // Master Barang
     MasterBarang = "/master/barang",
     CreateMasterBarang = "/master/barang/create",
     EditMasterBarang = "/master/barang/edit/:uuid",

@@ -33,15 +33,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put("/kelola-user/edit/{uuid}", [UserController::class, 'update']);
     Route::delete("/kelola-user/delete/{uuid}", [UserController::class, 'destroy']);
 
-    // Kelola Barang Masuk
-    Route::get('/barang-masuk', [BarangMasukController::class, 'index'])->middleware("permission:view-barang-masuk");
-    Route::get("/barang-masuk/create", [BarangMasukController::class, 'showCreate']);
-    Route::get('/barang-masuk/{uuid}', [BarangMasukController::class, 'showDetail']);
-    Route::post("/barang-masuk/create", [BarangMasukController::class, 'create']);
-    Route::delete("/barang-masuk/delete/{uuid}", [BarangMasukController::class, 'destroy']);
-
-
-
     // Kelola Master Satuan
     Route::get('/master/satuan', [SatuanController::class, 'index'])->middleware("permission:view-master-satuan");;
     Route::get('/master/satuan/create', [SatuanController::class, 'showCreate']);
@@ -50,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/master/satuan/edit/{uuid}', [SatuanController::class, 'update']);
     Route::delete('/master/satuan/delete/{uuid}', [SatuanController::class, 'destroy']);
 
-    // Kelola Master Satuan
+    // Kelola Master supplier
     Route::get('/master/supplier', [SupplierController::class, 'index'])->middleware("permission:view-master-supplier");;
     Route::get('/master/supplier/create', [SupplierController::class, 'showCreate']);
     Route::post('/master/supplier/create', [SupplierController::class, 'create']);
@@ -66,16 +57,38 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/master/barang/edit/{uuid}', [BarangController::class, 'update']);
     Route::delete('/master/barang/delete/{uuid}', [BarangController::class, 'destroy']);
 
+    // Kelola Barang Masuk
+    Route::get('/barang-masuk', [BarangMasukController::class, 'index'])->middleware("permission:view-barang-masuk");
+    Route::get("/barang-masuk/create", [BarangMasukController::class, 'showCreate']);
+    Route::get('/barang-masuk/{uuid}', [BarangMasukController::class, 'showDetail']);
+    Route::post("/barang-masuk/create", [BarangMasukController::class, 'create']);
+    Route::delete("/barang-masuk/delete/{uuid}", [BarangMasukController::class, 'destroy']);
+
+
+    //Kelola Barang Keluar
+    Route::get('/barang-keluar', function () {
+        return Inertia::render('BarangKeluar/Index', [
+            'name' => 'Faisal',
+        ]);
+    })->middleware("permission:view-barang-keluar");
+    Route::get("/barang-keluar/create", function () {
+        return Inertia::render('BarangKeluar/FormBarangKeluar', [
+            'name' => 'Faisal',
+        ]);
+    });
+    Route::get("/barang-keluar/{uuid}", function () {
+        return Inertia::render('BarangKeluar/Detail', [
+            'name' => 'Faisal',
+        ]);
+    });
+
+
 
 
     Route::get('/logout', [AuthController::class, "logout"]);
 
 
-    Route::get('/barang-keluar', function () {
-        return Inertia::render('BarangKeluar', [
-            'name' => 'Faisal',
-        ]);
-    })->middleware("permission:view-barang-keluar");
+
 
     Route::get('/barang-stock', function () {
         return Inertia::render('Stock', [

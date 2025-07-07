@@ -141,3 +141,32 @@ export const CreateBarangMasukSchema = z.object({
         )
         .min(1, { message: "Minimal 1 barang dimasukkan" }),
 });
+
+export const CreateBarangKeluarSchema = z.object({
+    nomor_referensi: z
+        .string({
+            required_error: "Nomor Referensi harus diisi",
+        })
+        .min(3, { message: "Nomor Referensi minimal 3 karakter" })
+        .max(20, { message: "Nomor Referensi maximal dari 20 karakter" }),
+    tanggal_keluar: z.coerce.date({
+        invalid_type_error: "Tanggal keluar tidak valid",
+        required_error: "Tanggal keluar harus diisi",
+    }),
+    catatan: z
+        .string()
+        .min(3, { message: "Catatan minimal 3 karakter" })
+        .max(20, { message: "Catatan maximal dari 100 karakter" })
+        .optional(),
+    items: z
+        .array(
+            z.object({
+                barang_id: z.number({ required_error: "Barang harus di isi" }),
+                quantity: z.number({ required_error: "quantity harus di isi" }),
+                harga_jual: z.number({
+                    required_error: "Harga Jual harus di isi",
+                }),
+            }),
+        )
+        .min(1, { message: "Minimal 1 barang dimasukkan" }),
+});
