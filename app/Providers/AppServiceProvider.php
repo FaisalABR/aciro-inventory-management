@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Barang;
 use App\Services\AuthService;
 use App\Services\AuthServiceInterface;
+use App\Services\BarangMasukService;
+use App\Services\BarangMasukServiceInterface;
 use App\Services\BarangService;
 use App\Services\BarangServiceInterface;
 use App\Services\SatuanService;
@@ -42,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             BarangServiceInterface::class,
             BarangService::class,
+        );
+        $this->app->bind(
+            BarangMasukServiceInterface::class,
+            BarangMasukService::class,
         );
     }
 

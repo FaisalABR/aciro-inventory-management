@@ -33,6 +33,23 @@ export type TSupplier = {
     kota: string;
 };
 
+export type TBarangMasukItem = {
+    barang_masuk_id: number;
+    barang_id: number;
+    barangs: TBarang;
+    quantity: number;
+    harga_beli: number;
+};
+
+export type TBarangMasuk = {
+    uuid: string;
+    nomor_referensi: string;
+    tanggal_masuk: string;
+    supplier: string;
+    catatan: string | null;
+    items: TBarangMasukItem[];
+};
+
 type TRoles = {
     id: number;
     name: string;

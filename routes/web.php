@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -33,11 +34,12 @@ Route::middleware(['auth'])->group(function () {
     Route::delete("/kelola-user/delete/{uuid}", [UserController::class, 'destroy']);
 
     // Kelola Barang Masuk
-    Route::get('/barang-masuk', function () {
-        return Inertia::render('BarangMasuk', [
-            'name' => 'Faisal',
-        ]);
-    })->middleware("permission:view-barang-masuk");
+    Route::get('/barang-masuk', [BarangMasukController::class, 'index'])->middleware("permission:view-barang-masuk");
+    Route::get("/barang-masuk/create", [BarangMasukController::class, 'showCreate']);
+    Route::get('/barang-masuk/{uuid}', [BarangMasukController::class, 'showDetail']);
+    Route::post("/barang-masuk/create", [BarangMasukController::class, 'create']);
+    Route::delete("/barang-masuk/delete/{uuid}", [BarangMasukController::class, 'destroy']);
+
 
 
     // Kelola Master Satuan

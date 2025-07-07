@@ -19,7 +19,9 @@ export enum Route {
 
     // Kelola Barang Masuk
     BarangMasuk = "/barang-masuk",
+    BarangMasukDetail = "/barang-masuk/:uuid",
     CreateBarangMasuk = "/barang-masuk/create",
+    EditBarangMasuk = "/barang-masuk/edit/:uuid",
     DeleteBarangMasuk = "/barang-masuk/delete/:uuid",
 
     // Kelola User

@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 
-class Barang extends Model
+class BarangMasuk extends Model
 {
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
+
 
     protected static function booted(): void
     {
@@ -19,38 +20,16 @@ class Barang extends Model
         });
     }
 
-    protected $casts = [
-        'hargaJual' => 'float', // Akan mengonversi 'harga' menjadi float
-        'hargaBeli' => 'float',
-
-    ];
-
     protected $fillable = [
         'uuid',
-        'name',
+        'nomor_referensi',
+        'tanggal_masuk',
         'supplier_id',
-        'satuan_id',
-        'hargaJual',
-        'hargaBeli'
+        'catatan',
     ];
 
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
-    }
-
-    public function satuan()
-    {
-        return $this->belongsTo(Satuan::class, 'satuan_id', 'id');
-    }
-
-    public function barangMasukItems()
-    {
-        return $this->hasMany(BarangMasukItem::class, 'barang_masuk_item_id', 'id');
-    }
-
-    public function stock()
-    {
-        return $this->hasOne(Stock::class);
     }
 }

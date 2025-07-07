@@ -108,11 +108,6 @@ const items: MenuItem[] = [
                 label: <Link href={Route.MasterSupplier}>Data Supplier</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SUPPLIER,
             },
-            {
-                key: Route.MasterKategori,
-                label: <Link href={Route.MasterKategori}>Data Kategori</Link>,
-                permission: PERMISSIONS_VIEW_MASTER_KATEGORI,
-            },
         ],
     },
 ];

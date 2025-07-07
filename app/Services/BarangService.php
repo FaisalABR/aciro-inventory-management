@@ -16,6 +16,7 @@ interface BarangServiceInterface
     public function getBarangByUUID($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
+    public function getOptions();
 };
 
 class BarangService implements BarangServiceInterface
@@ -41,6 +42,7 @@ class BarangService implements BarangServiceInterface
     {
         try {
             $data = Barang::with(['supplier', 'satuan'])->get();
+
             return $data;
         } catch (\Exception $e) {
             Log::error("Gagal mendapatkan semua barang " . $e->getMessage(), ['exception' => $e]);
@@ -90,5 +92,19 @@ class BarangService implements BarangServiceInterface
             Log::error("Gagal menghapus barang dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
             throw new BarangException("Terjadi kesalahan dalam menghapus barang. Silahkan coba lagi nanti");
         }
+    }
+
+    public function getOptions()
+    {
+        $data = Barang::all();
+
+        $options = $data->map(function ($barang) {
+            return [
+                'value' => $barang->id,
+                'label' => $barang->name,
+            ];
+        });
+
+        return $options;
     }
 }
