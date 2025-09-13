@@ -21,6 +21,17 @@ export type TSatuan = {
     description: string;
 };
 
+export type TStock = {
+    barang: TBarang;
+    name: string;
+    quantity: number;
+    potensi_penjualan: number;
+    itr: number;
+    rop: number;
+    status_rop: string;
+    status_itr: string;
+};
+
 export type TBarang = {
     uuid: string;
     name: string;
