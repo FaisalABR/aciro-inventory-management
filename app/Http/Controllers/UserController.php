@@ -20,13 +20,20 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $users = $this->userService->getAllUsers();
+            $search = $request->input('search');
+            $perPage  = $request->input('per_page', 10); // default 10
+            $page     = $request->input('page', 1);
+
+            $users = $this->userService->getAllUsers($search, $perPage);
 
             return Inertia::render('KelolaUser/Index', [
                 'data' => $users,
+                'filters' => [
+                    'search' => $search,
+                ],
                 'message' => "Sukses mengirim data"
             ]);
         } catch (\Exception $e) {

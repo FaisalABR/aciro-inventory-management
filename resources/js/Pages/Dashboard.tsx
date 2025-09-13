@@ -8,7 +8,7 @@ const Home: React.FC = () => {
     let bar: string = "Typescript";
 
     return (
-        <RootLayout type="main" title="Dashboard">
+        <RootLayout type="main" title="Dashboard Inventori Management">
             <Layout>
                 <Content style={{ backgroundColor: "white" }}>
                     <h1>

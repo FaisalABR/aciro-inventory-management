@@ -1,5 +1,5 @@
 import { Button, Input, Table } from "antd";
-import React from "react";
+import React, { ReactHTMLElement, useMemo, useState } from "react";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -10,16 +10,49 @@ import {
 import { Link, router } from "@inertiajs/react";
 import { route, Route } from "../../Common/Route";
 import { ColumnsType } from "antd/es/table";
-import { TUser } from "../../Types/entities";
+import { Paginate, TUser } from "../../Types/entities";
 import { generateRolesName } from "../../Shared/utils";
 import RootLayout from "../../Layouts/RootLayout";
 import { useModal } from "../../Shared/hooks";
+import { debounce } from "lodash";
 
 type TUserIndexProps = {
-    data: TUser[];
+    data: Paginate<TUser>;
+    filters: {
+        search: string;
+    };
 };
 
-const Index: React.FC<TUserIndexProps> = ({ data }) => {
+const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
+    const [search, setSearch] = useState(filters.search || "");
+
+    const debounceSearch = useMemo(
+        () =>
+            debounce((value: any) => {
+                router.get(
+                    Route.KelolaUser,
+                    { search: value, page: 1 },
+                    { preserveState: true },
+                );
+            }, 500),
+        [],
+    );
+
+    const handleChange = (e: any) => {
+        const value = e.target.value;
+
+        debounceSearch(value);
+        setSearch(value);
+    };
+
+    const handleChangePage = (page: any, pageSize: any) => {
+        router.get(
+            Route.KelolaUser,
+            { search, page, per_page: pageSize },
+            { preserveState: true },
+        );
+    };
+
     const handleDeleteUser = (uuid: string) => {
         return useModal({
             type: "confirm",
@@ -96,7 +129,7 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
         },
     ];
 
-    const userData = data?.map((item) => {
+    const userData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
 
@@ -121,8 +154,21 @@ const Index: React.FC<TUserIndexProps> = ({ data }) => {
                 prefix={<SearchOutlined />}
                 placeholder="Cari orang berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
+                value={search}
+                onChange={handleChange}
             />
-            <Table dataSource={userData ? userData : []} columns={columns} />;
+            <Table
+                dataSource={userData ? userData : []}
+                columns={columns}
+                pagination={{
+                    current: data.current_page,
+                    total: data.total,
+                    pageSize: data.per_page,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20"],
+                    onChange: handleChangePage,
+                }}
+            />
         </RootLayout>
     );
 };

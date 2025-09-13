@@ -1,3 +1,10 @@
+export type Paginate<T> = {
+    data: T[];
+    current_page: number;
+    total: number;
+    per_page: number;
+};
+
 export type TUser = {
     uuid: string;
     name: string;

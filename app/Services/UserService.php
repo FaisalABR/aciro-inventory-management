@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 interface UserServiceInterface
 {
     public function create(array $data);
-    public function getAllUsers();
+    public function getAllUsers($search, $perPage);
     public function getUserByUUID($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
@@ -54,14 +54,22 @@ class UserService implements UserServiceInterface
         }
     }
 
-    public function getAllUsers()
+    public function getAllUsers($search = null, $perPage = 10)
     {
         try {
-            $data = User::select('id', 'uuid', 'name', 'email', 'noWhatsapp')->with(['roles:id,name'])->get();
+            $data = User::select('id', 'uuid', 'name', 'email', 'noWhatsapp')->with(['roles:id,name'])
+                ->when($search, function ($query, $search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('LOWER("noWhatsapp") LIKE ?', ["%{$search}%"]);
+                    });
+                })->paginate($perPage)
+                ->withQueryString();
             return $data;
         } catch (\Exception $e) {
             Log::error("Gagal mendapatkan semua user " . $e->getMessage(), ['exception' => $e]);
-            throw new Exception("Terjadi kesalahan dalam seerver");
+            throw new Exception("Terjadi kesalahan dalam server");
         }
     }
 
