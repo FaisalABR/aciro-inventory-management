@@ -24,13 +24,20 @@ class BarangController extends Controller
         $this->supplierService = $supplierService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $barang = $this->barangService->getAll();
+            $search = $request->input("search");
+            $perPage = $request->input("per_page", 10);
+            $page     = $request->input('page', 1);
+
+            $barang = $this->barangService->getAll($search, $perPage);
 
             return Inertia::render('Master/Barang/Index', [
                 'data' => $barang,
+                'filters' => [
+                    'search' => $search,
+                ],
             ]);
         } catch (\Exception $e) {
             return redirect("/master/barang")->with('error', $e->getMessage());

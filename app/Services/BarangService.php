@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 interface BarangServiceInterface
 {
     public function create(array $data);
-    public function getAll();
+    public function getAll($search, $perPage);
     public function getBarangByUUID($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
@@ -39,10 +39,15 @@ class BarangService implements BarangServiceInterface
         }
     }
 
-    public function getAll()
+    public function getAll($search = null, $perPage = 10)
     {
         try {
-            $data = Barang::with(['supplier', 'satuan'])->get();
+            $data = Barang::with(['supplier', 'satuan'])->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                });
+            })->paginate($perPage)
+                ->withQueryString();
 
             return $data;
         } catch (\Exception $e) {

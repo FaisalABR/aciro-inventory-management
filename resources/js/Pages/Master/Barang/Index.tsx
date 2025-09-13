@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
 import { route, Route } from "../../../Common/Route";
 import { Link, router } from "@inertiajs/react";
@@ -11,15 +11,50 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
-import { TBarang } from "../../../Types/entities";
+import { Paginate, TBarang } from "../../../Types/entities";
 import { useModal } from "../../../Shared/hooks";
 import { formatRupiah } from "../../../Shared/utils";
+import { debounce } from "lodash";
 
 type TBarangIndexProps = {
-    data: TBarang[];
+    data: Paginate<TBarang>;
+    filters: {
+        search: string;
+    };
 };
 
-const Barang: React.FC<TBarangIndexProps> = (props) => {
+const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
+    const [search, setSearch] = useState(filters.search || "");
+
+    const debouncedSearch = useMemo(
+        () =>
+            debounce(
+                (value: any) =>
+                    router.get(
+                        Route.MasterBarang,
+                        { search: value, page: 1 },
+                        { preserveState: true },
+                    ),
+                500,
+            ),
+        [],
+    );
+
+    const handleSearch = (e: any) => {
+        const value = e.target.value;
+
+        setSearch(value);
+        debouncedSearch(value);
+    };
+
+    const handleChangePage = (page: any, pageSize: any) => {
+        router.get(
+            Route.MasterBarang,
+            { search, page, per_page: pageSize },
+            { preserveState: true },
+        );
+    };
+
     const handleDeleteBarang = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
@@ -115,40 +150,9 @@ const Barang: React.FC<TBarangIndexProps> = (props) => {
         },
     ];
 
-    const barangData = props.data?.map((item) => {
+    const barangData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
-
-    const dummySatuan = [
-        {
-            uuid: "a2b3c4d5-e6f7-8901-2345-67890abcdef0",
-            name: "PCS",
-            code: "PCS",
-            description: "Satuan per buah atau unit.",
-        },
-    ];
-
-    const dummySupplier = [
-        {
-            uuid: "s1u2p3l4-i5e6-r789-0123-4567890abcdef",
-            name: "PT. Global Retail Supply",
-            contactPerson: "Andi Wijaya",
-            noWhatsapp: "+6281122334455",
-            email: "contact@globalretail.com",
-            alamat: "Jl. Industri No. 10",
-            kota: "Jakarta",
-        },
-    ];
-    const data = [
-        {
-            uuid: "prod-001-abc-123",
-            name: "Indomie Goreng Jumbo",
-            supplier: dummySupplier[0], // Menggunakan supplier pertama
-            satuan: dummySatuan[0], // Menggunakan satuan 'Pak'
-            hargaJual: 3500,
-            hargaBeli: 2800,
-        },
-    ];
 
     return (
         <RootLayout
@@ -171,10 +175,20 @@ const Barang: React.FC<TBarangIndexProps> = (props) => {
                 prefix={<SearchOutlined />}
                 placeholder="Cari Barang berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
+                value={search}
+                onChange={handleSearch}
             />
             <Table
-                dataSource={barangData ? barangData : data}
+                dataSource={barangData}
                 columns={columns}
+                pagination={{
+                    current: data.current_page,
+                    total: data.total,
+                    pageSize: data.per_page,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20"],
+                    onChange: handleChangePage,
+                }}
             />
         </RootLayout>
     );
