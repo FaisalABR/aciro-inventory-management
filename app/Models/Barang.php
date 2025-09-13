@@ -49,6 +49,12 @@ class Barang extends Model
         return $this->hasMany(BarangMasukItem::class, 'barang_masuk_item_id', 'id');
     }
 
+    public function barangKeluarItems()
+    {
+        return $this->hasMany(BarangKeluarItem::class, 'barang_keluar_item_id', 'id');
+    }
+
+
     public function stock()
     {
         return $this->hasOne(Stock::class);

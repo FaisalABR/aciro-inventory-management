@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SupplierController;
@@ -64,20 +65,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/barang-masuk/create", [BarangMasukController::class, 'create']);
     Route::delete("/barang-masuk/delete/{uuid}", [BarangMasukController::class, 'destroy']);
 
-
     //Kelola Barang Keluar
-    Route::get('/barang-keluar', function () {
-        return Inertia::render('BarangKeluar/Index', [
-            'name' => 'Faisal',
-        ]);
-    })->middleware("permission:view-barang-keluar");
-    Route::get("/barang-keluar/create", function () {
-        return Inertia::render('BarangKeluar/FormBarangKeluar', [
-            'name' => 'Faisal',
-        ]);
-    });
-    Route::get("/barang-keluar/{uuid}", function () {
-        return Inertia::render('BarangKeluar/Detail', [
+    Route::get('/barang-keluar', [BarangKeluarController::class, 'index'])->middleware("permission:view-barang-keluar");
+    Route::get("/barang-keluar/create", [BarangKeluarController::class, 'showCreate']);
+    Route::get("/barang-keluar/{uuid}", [BarangKeluarController::class, 'index']);
+
+    //Kelola Purchase Order
+    Route::get('/purchase-orders', function () {
+        return Inertia::render('PurchaseOrder/Index', [
             'name' => 'Faisal',
         ]);
     });
@@ -96,11 +91,6 @@ Route::middleware(['auth'])->group(function () {
         ]);
     });
 
-    Route::get('/orders', function () {
-        return Inertia::render('Order', [
-            'name' => 'Faisal',
-        ]);
-    });
 
     // Master Page
     Route::get('/master', function () {

@@ -65,5 +65,9 @@ const MessageProvider: React.FC<TMessageProviderProps> = ({ children }) => {
 export default MessageProvider;
 
 export const useMessages = () => {
-    return useContext(MessageContext);
+    const context = useContext(MessageContext);
+    if (!context) {
+        throw new Error("useMessages must be used within a MessageProvider");
+    }
+    return context;
 };

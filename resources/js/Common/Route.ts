@@ -54,8 +54,14 @@ export enum Route {
     EditMasterBarang = "/master/barang/edit/:uuid",
     DeleteMasterBarang = "/master/barang/delete/:uuid",
 
+    // Kelola Purchase Order
+    PurchaseOrder = "/purchase-orders",
+    PurchaseOrderDetail = "/purchase-orders/:uuid",
+    CreatePurchaseOrder = "/purchase-orders/create",
+    EditPurchaseOrder = "/purchase-orders/edit/:uuid",
+    DeletePurchaseOrder = "/purchase-orders/delete/:uuid",
+
     LaporanDeadstock = "/laporan-deadstock",
-    Order = "/orders",
     RootMaster = "/master",
     MasterKategori = "/master/kategori",
 }

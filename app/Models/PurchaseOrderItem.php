@@ -5,24 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BarangMasukItem extends Model
+class PurchaseOrderItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
 
-    protected $casts = [
-        'harga_beli' => 'float',
 
-    ];
 
     protected $fillable = [
         'uuid',
-        'barang_masuk_id',
+        'purchase_orders_id',
         'barang_id',
         'quantity',
-        'harga_beli',
     ];
+
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id', 'id');
+    }
 
     public function barangs()
     {

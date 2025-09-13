@@ -8,6 +8,7 @@ import {
     Form,
     Input,
     InputNumber,
+    notification,
     Select,
 } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
@@ -31,6 +32,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
     const zodSync = createSchemaFieldRule(CreateBarangMasukSchema);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
+    const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -52,6 +54,43 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
         form.resetFields();
         router.get(Route.BarangMasuk);
     };
+
+    const fetchBarangBySupplier = async (supplierId: number) => {
+        if (!supplierId) {
+            setFilteredBarangOptions([]);
+            return;
+        }
+        try {
+            const response = await fetch(
+                `/api/barang-by-supplier?supplier_id=${supplierId}`,
+            );
+
+            const data = await response.json();
+            setFilteredBarangOptions(data);
+        } catch (error) {
+            notification.error({
+                message: "Error",
+                description: "Something went wrong",
+            });
+            setFilteredBarangOptions([]);
+        }
+    };
+
+    const handleChangeSupplier = (value: number) => {
+        form.resetFields(["items"]);
+        fetchBarangBySupplier(value);
+    };
+
+    const barangOptions =
+        filteredBarangOptions.length > 0
+            ? filteredBarangOptions
+            : [
+                  {
+                      label: "Pilih Supplier terlebih dahulu",
+                      value: "",
+                      disabled: true,
+                  },
+              ];
 
     return (
         <RootLayout
@@ -96,7 +135,10 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                 label="Pilih Supplier"
                                 style={{ flex: 1 }}
                             >
-                                <Select options={props.optionSupplier} />
+                                <Select
+                                    options={props.optionSupplier}
+                                    onChange={handleChangeSupplier}
+                                />
                             </Form.Item>
                         </Flex>
 
@@ -106,6 +148,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                         <Divider style={{ margin: "2rem 0" }} />
 
                         <Title level={5}>Detail Item Barang Masuk</Title>
+
                         <Form.List name="items">
                             {(fields, { add, remove }, { errors }) => (
                                 <div
@@ -134,7 +177,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                 rules={[zodSync]}
                                             >
                                                 <Select
-                                                    options={props.optionBarang}
+                                                    options={barangOptions}
                                                 />
                                             </Form.Item>
                                             <Form.Item
@@ -145,7 +188,9 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                 <InputNumber
                                                     min={1}
                                                     placeholder="10"
-                                                    style={{ width: "100%" }}
+                                                    style={{
+                                                        width: "100%",
+                                                    }}
                                                 />
                                             </Form.Item>
                                             <Form.Item
@@ -159,7 +204,9 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                 <InputNumber
                                                     min={1}
                                                     placeholder="10"
-                                                    style={{ width: "100%" }}
+                                                    style={{
+                                                        width: "100%",
+                                                    }}
                                                 />
                                             </Form.Item>
                                         </Card>

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
 use App\Models\Barang;
+use App\Models\Supplier;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ interface BarangServiceInterface
     public function getBarangByUUID($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
-    public function getOptions();
+    public function getOptions($supplier = null);
 };
 
 class BarangService implements BarangServiceInterface
@@ -94,9 +95,11 @@ class BarangService implements BarangServiceInterface
         }
     }
 
-    public function getOptions()
+    public function getOptions($supplier = null)
     {
-        $data = Barang::all();
+        $data = $supplier
+            ? Barang::where('supplier_id', $supplier)->get()
+            : Barang::all();
 
         $options = $data->map(function ($barang) {
             return [

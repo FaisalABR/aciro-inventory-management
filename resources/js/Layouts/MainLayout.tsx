@@ -70,9 +70,9 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_BARANG_KELUAR,
     },
     {
-        key: Route.Order,
+        key: Route.PurchaseOrder,
         icon: <MoneyCollectOutlined />,
-        label: <Link href={Route.Order}>Order</Link>,
+        label: <Link href={Route.PurchaseOrder}>Purchase Order</Link>,
         permission: PERMISSIONS_VIEW_ORDER,
     },
     {

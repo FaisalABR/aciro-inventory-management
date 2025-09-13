@@ -5,24 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BarangMasukItem extends Model
+class BarangKeluarItem extends Model
 {
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
 
     protected $casts = [
-        'harga_beli' => 'float',
+        'harga_jual' => 'float',
 
     ];
 
     protected $fillable = [
         'uuid',
-        'barang_masuk_id',
+        'barang_keluar_id',
         'barang_id',
         'quantity',
-        'harga_beli',
+        'harga_jual',
+
     ];
+
 
     public function barangs()
     {

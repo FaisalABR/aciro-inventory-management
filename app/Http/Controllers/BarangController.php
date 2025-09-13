@@ -133,4 +133,12 @@ class BarangController extends Controller
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }
+
+    public function getOptions(Request $request)
+    {
+        $supplierId = $request->query('supplier_id');
+        $result = $this->barangService->getOptions($supplierId);
+
+        return response()->json($result);
+    }
 }
