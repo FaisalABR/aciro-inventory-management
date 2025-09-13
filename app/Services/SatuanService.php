@@ -7,7 +7,7 @@ use App\Models\Satuan;
 interface SatuanServiceInterface
 {
     public function create(array $data);
-    public function getAll();
+    public function getAll($search, $perPage);
     public function get($satuan);
     public function update($data, $uuid);
     public function delete($uuid);
@@ -27,10 +27,15 @@ class SatuanService implements SatuanServiceInterface
         return true;
     }
 
-    public function getAll()
+    public function getAll($search = null, $perPage = 10)
     {
-        $data = Satuan::all();
-        return $data;
+        $query = Satuan::query();
+
+        if ($search) {
+            $query->where('name', 'ILIKE', "%{$search}%"); // PostgreSQL case-insensitive
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function get($uuid)

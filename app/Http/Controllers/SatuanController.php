@@ -15,12 +15,19 @@ class SatuanController extends Controller
         $this->satuanService = $satuanService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $satuan = $this->satuanService->getAll();
+        $search = $request->input("search");
+        $perPage = $request->input("per_page", 10);
+
+
+        $satuan = $this->satuanService->getAll($search, $perPage);
 
         return Inertia::render('Master/Satuan/Index', [
             'data' => $satuan,
+            'filters' => [
+                "search" => $search,
+            ],
             'message' => "Sukses mengirim data"
         ]);
     }

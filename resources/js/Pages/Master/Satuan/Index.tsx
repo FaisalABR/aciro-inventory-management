@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
 import { route, Route } from "../../../Common/Route";
 import { Link, router } from "@inertiajs/react";
@@ -11,14 +11,47 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
-import { TSatuan } from "../../../Types/entities";
+import { Paginate, TSatuan } from "../../../Types/entities";
 import { useModal } from "../../../Shared/hooks";
+import { debounce } from "lodash";
 
 type TSatuanIndexProps = {
-    data: TSatuan[];
+    data: Paginate<TSatuan>;
+    filters: {
+        search: string;
+    };
 };
 
-const Satuan: React.FC<TSatuanIndexProps> = (props) => {
+const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
+    const [search, setSearch] = useState(filters.search || "");
+
+    const debounceSearch = useMemo(
+        () =>
+            debounce((value: any) => {
+                router.get(
+                    Route.MasterSatuan,
+                    { search: value, page: 1 },
+                    { preserveState: true },
+                );
+            }, 500),
+        [],
+    );
+
+    const handleSearch = (e: any) => {
+        const value = e.target.value;
+
+        setSearch(value);
+        debounceSearch(value);
+    };
+
+    const handleChangePage = (page: any, pageSize: any) => {
+        router.get(
+            Route.MasterSatuan,
+            { search, page, per_page: pageSize },
+            { preserveState: true },
+        );
+    };
+
     const handleDeleteSatuan = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
@@ -92,7 +125,7 @@ const Satuan: React.FC<TSatuanIndexProps> = (props) => {
         },
     ];
 
-    const satuanData = props.data?.map((item) => {
+    const satuanData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
 
@@ -117,10 +150,20 @@ const Satuan: React.FC<TSatuanIndexProps> = (props) => {
                 prefix={<SearchOutlined />}
                 placeholder="Cari satuan berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
+                value={search}
+                onChange={handleSearch}
             />
             <Table
                 dataSource={satuanData ? satuanData : []}
                 columns={columns}
+                pagination={{
+                    current: data.current_page,
+                    total: data.total,
+                    pageSize: data.per_page,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20"],
+                    onChange: handleChangePage,
+                }}
             />
         </RootLayout>
     );
