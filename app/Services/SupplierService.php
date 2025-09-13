@@ -7,7 +7,7 @@ use App\Models\Supplier;
 interface SupplierServiceInterface
 {
     public function create(array $data);
-    public function getAll();
+    public function getAll($search, $perPage);
     public function get($uuid);
     public function update($data, $uuid);
     public function delete($uuid);
@@ -27,10 +27,13 @@ class SupplierService implements SupplierServiceInterface
         return true;
     }
 
-    public function getAll()
+    public function getAll($search, $perPage)
     {
-        $data = Supplier::all();
-        return $data;
+        $query = Supplier::query();
+        if ($search) {
+            $query->where("name", 'ILIKE', "%{$search}%")->orWhere("contactPerson", "ILIKE", "%{$search}%");
+        }
+        return $query->paginate($perPage);
     }
 
     public function get($uuid)

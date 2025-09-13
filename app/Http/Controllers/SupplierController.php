@@ -15,12 +15,18 @@ class SupplierController extends Controller
         $this->supplierService = $supplierService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $satuan = $this->supplierService->getAll();
+        $search = $request->input("search");
+        $perPage = $request->input("per_page", 10);
+
+        $satuan = $this->supplierService->getAll($search, $perPage);
 
         return Inertia::render('Master/Supplier/Index', [
             'data' => $satuan,
+            'filters' => [
+                "search" => $search,
+            ],
             'message' => "Sukses mengirim data"
         ]);
     }

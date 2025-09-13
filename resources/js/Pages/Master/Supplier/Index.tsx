@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
-import { TSupplier } from "../../../Types/entities";
+import { Paginate, TSupplier } from "../../../Types/entities";
 import { useModal } from "../../../Shared/hooks";
 import { Link, router } from "@inertiajs/react";
 import { Route, route } from "../../../Common/Route";
@@ -13,12 +13,45 @@ import {
     PlusSquareOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
+import { debounce } from "lodash";
 
 type TSupplierIndexProps = {
-    data: TSupplier[];
+    data: Paginate<TSupplier>;
+    filters: {
+        search: string;
+    };
 };
 
-const Supplier: React.FC<TSupplierIndexProps> = (props) => {
+const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
+    const [search, setSearch] = useState(filters.search || "");
+
+    const debounceSearch = useMemo(
+        () =>
+            debounce((value: any) => {
+                router.get(
+                    Route.MasterSupplier,
+                    { search: value, page: 1 },
+                    { preserveState: true },
+                );
+            }, 500),
+        [],
+    );
+
+    const handleSearch = (e: any) => {
+        const value = e.target.value;
+
+        setSearch(value);
+        debounceSearch(value);
+    };
+
+    const handleChangePage = (page: any, pageSize: any) => {
+        router.get(
+            Route.MasterSupplier,
+            { search, page, per_page: pageSize },
+            { preserveState: true },
+        );
+    };
+
     const handleDeleteSupplier = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
@@ -102,7 +135,7 @@ const Supplier: React.FC<TSupplierIndexProps> = (props) => {
         },
     ];
 
-    const supplierData = props.data?.map((item) => {
+    const supplierData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
     return (
@@ -126,10 +159,20 @@ const Supplier: React.FC<TSupplierIndexProps> = (props) => {
                 prefix={<SearchOutlined />}
                 placeholder="Cari satuan berdasarkan supplier"
                 style={{ marginBottom: "1rem" }}
+                value={search}
+                onChange={handleSearch}
             />
             <Table
                 dataSource={supplierData ? supplierData : []}
                 columns={columns}
+                pagination={{
+                    current: data.current_page,
+                    total: data.total,
+                    pageSize: data.per_page,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20"],
+                    onChange: handleChangePage,
+                }}
             />
         </RootLayout>
     );
