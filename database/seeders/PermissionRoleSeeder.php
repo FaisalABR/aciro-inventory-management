@@ -72,6 +72,51 @@ class PermissionRoleSeeder extends Seeder
                 'role_id' => 2,
                 'permission_id' => 5,
             ],
+            // role_id 3 memiliki permission_id 1 dan 5
+            [
+                'role_id' => 3,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 3,
+                'permission_id' => 5,
+            ],
+            // role_id 4 memiliki permission_id 1 dan 5
+            [
+                'role_id' => 4,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 4,
+                'permission_id' => 5,
+            ],
+            // role_id 5 memiliki permission_id 1 dan 5
+            [
+                'role_id' => 5,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 5,
+                'permission_id' => 5,
+            ],
+            // role_id 6 memiliki permission_id 1 dan 5
+            [
+                'role_id' => 6,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 6,
+                'permission_id' => 5,
+            ],
+            // role_id 7 memiliki permission_id 1 dan 5
+            [
+                'role_id' => 7,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 7,
+                'permission_id' => 5,
+            ],
         ];
 
         foreach ($permissionRoles as $permissionRole) {

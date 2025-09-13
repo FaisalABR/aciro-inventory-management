@@ -27,12 +27,20 @@ class RoleSeeder extends Seeder
                 'description' => 'Kepala Gudang',
             ],
             [
+                'name' => 'kepala_accounting',
+                'description' => 'Kepala Accounting',
+            ],
+            [
+                'name' => 'kepala_pengadaan',
+                'description' => 'Kepala Pengadaan',
+            ],
+            [
                 'name' => 'admin_gudang',
                 'description' => 'Admin Gudang',
             ],
             [
-                'name' => 'kepala_accounting',
-                'description' => 'Kepala Accounting',
+                'name' => 'staff_toko',
+                'description' => 'Staff Toko',
             ],
         ];
 
