@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BarangKeluarController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Route Anda di sini
 Route::get('/barang-by-supplier', [BarangController::class, 'getOptions']);
+Route::post('/check-rop', [BarangKeluarController::class, 'checkROP']);

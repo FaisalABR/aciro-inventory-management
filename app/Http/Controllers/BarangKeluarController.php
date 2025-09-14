@@ -114,4 +114,48 @@ class BarangKeluarController extends Controller
 
         return back()->with('success', 'Permintaan barang keluar disetujui');
     }
+
+    public function checkROP(Request $request)
+    {
+        $items = $request->all();
+        $warnings = [];
+        $errors = [];
+
+        foreach ($items as $item) {
+            $barang = Stock::with('barangs')->where('barang_id', $item['barang_id'])->first();
+
+
+            if (!$barang) {
+                continue;
+            }
+
+            $sisa = $barang->quantity - $item['quantity'];
+
+            if ($sisa < 0) {
+                $errors[] = [
+                    'barang_id' => $barang->id,
+                    'nama' => $barang->barangs->name,
+                    'stock' => $barang->quantity,
+                    'request' => $item['quantity'],
+                ];
+                continue;
+            }
+
+            if ($sisa <= $barang->rop) {
+                $warnings[] = [
+                    'barang_id' => $barang->id,
+                    'nama' => $barang->barangs->name,
+                    'stock' => $barang->quantity,
+                    'rop' => $barang->rop,
+                    'quantity_keluar' => $item['quantity'],
+                    'setelah_eksekusi' => $barang->quantity - $item['quantity'],
+                ];
+            }
+        }
+
+        return response()->json([
+            'errors' => $errors,
+            'ropWarnings' => $warnings,
+        ]);
+    }
 }

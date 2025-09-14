@@ -8,7 +8,10 @@ import {
     Form,
     Input,
     InputNumber,
+    Modal,
+    notification,
     Select,
+    Table,
 } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
 import React, { useState } from "react";
@@ -27,6 +30,22 @@ type TFormPermintaanBarangKeluarProps = {
     optionSupplier: BaseOptionType[];
 };
 
+const columns = [
+    { title: "Nama Barang", dataIndex: "nama", key: "nama" },
+    { title: "ROP", dataIndex: "rop", key: "rop" },
+    { title: "Stok", dataIndex: "stock", key: "stock" },
+    {
+        title: "Kuantitas Keluar",
+        dataIndex: "quantity_keluar",
+        key: "quantity_keluar",
+    },
+    {
+        title: "Setelah Eksekusi",
+        dataIndex: "setelah_eksekusi",
+        key: "setelah_eksekusi",
+    },
+];
+
 const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
     props,
 ) => {
@@ -37,14 +56,64 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
     const onFinish = async () => {
         const values = form.getFieldsValue();
         try {
-            props.isUpdate
-                ? router.put(
-                      route(Route.EditPermintaanBarangKeluar, {
-                          uuid: props?.data?.uuid,
-                      }),
-                      values,
-                  )
-                : router.post(Route.CreatePermintaanBarangKeluar, values);
+            const response = await fetch("/api/check-rop", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(values.items),
+            });
+
+            const { errors, ropWarnings } = await response.json();
+
+            if (errors.length > 0) {
+                notification.error({
+                    message: "Stok Tidak Cukup",
+                    description: errors
+                        .map(
+                            (e: any) =>
+                                `${e.nama}: Stok ${e.stock}, diminta ${e.request}`,
+                        )
+                        .join(", "),
+                });
+                return; // stop di sini
+            }
+
+            if (ropWarnings.length > 0) {
+                Modal.confirm({
+                    title: "ROP Warning",
+                    width: 800,
+                    content: (
+                        <Table
+                            dataSource={ropWarnings}
+                            columns={columns}
+                            pagination={false}
+                            rowKey="barang_id"
+                            size="small"
+                        />
+                    ),
+                    onOk: () => {
+                        props.isUpdate
+                            ? router.put(
+                                  route(Route.EditPermintaanBarangKeluar, {
+                                      uuid: props?.data?.uuid,
+                                  }),
+                                  values,
+                              )
+                            : router.post(
+                                  Route.CreatePermintaanBarangKeluar,
+                                  values,
+                              );
+                    },
+                });
+            } else {
+                props.isUpdate
+                    ? router.put(
+                          route(Route.EditPermintaanBarangKeluar, {
+                              uuid: props?.data?.uuid,
+                          }),
+                          values,
+                      )
+                    : router.post(Route.CreatePermintaanBarangKeluar, values);
+            }
         } catch (error) {
             setIsLoading(false);
         }
