@@ -74,6 +74,8 @@ class BarangKeluarService implements BarangKeluarServiceInterface
                 'tanggal_keluar' => $barangKeluar->tanggal_keluar,
                 'catatan' => $barangKeluar->catatan,
                 'status' => $barangKeluar->status,
+                'verifikasi_kepala_toko' => $barangKeluar->verifikasi_kepala_toko,
+                'verifikasi_kepala_gudang' => $barangKeluar->verifikasi_kepala_gudang,
                 'user' => [
                     'id' => $barangKeluar->user->id,
                     'name' => $barangKeluar->user->name,

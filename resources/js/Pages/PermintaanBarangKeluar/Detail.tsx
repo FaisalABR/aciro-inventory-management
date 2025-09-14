@@ -1,7 +1,14 @@
 import RootLayout from "../../Layouts/RootLayout";
 import React from "react";
 import { TBarangKeluar } from "../../Types/entities";
-import { Button, Card, Descriptions, DescriptionsProps, Table } from "antd";
+import {
+    Button,
+    Card,
+    Descriptions,
+    DescriptionsProps,
+    Table,
+    Tag,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { useModal } from "../../Shared/hooks";
@@ -25,7 +32,7 @@ const Detail: React.FC<TDetailPermintaanBarangKeluarProps> = (props) => {
                 type: "primary",
             },
             onOk: () => {
-                router.delete(
+                router.put(
                     route(Route.VerifikasiPermintaanKeluar, {
                         uuid: data?.uuid,
                     }),
@@ -58,12 +65,20 @@ const Detail: React.FC<TDetailPermintaanBarangKeluarProps> = (props) => {
         {
             key: "verifikasi kepala toko" + data?.uuid,
             label: "Verifikasi Kepala Toko",
-            children: data?.verifikasi_kepala_toko,
+            children: data?.verifikasi_kepala_toko ? (
+                <Tag color="green">Disetujui</Tag>
+            ) : (
+                <Tag color="orange">Belum Verifikasi</Tag>
+            ),
         },
         {
             key: "verifikasi kepala gudang" + data?.uuid,
             label: "Verifikasi Kepala Gudang",
-            children: data?.verifikasi_kepala_gudang,
+            children: data?.verifikasi_kepala_gudang ? (
+                <Tag color="green">Disetujui</Tag>
+            ) : (
+                <Tag color="orange">Belum Verifikasi</Tag>
+            ),
         },
         {
             key: data?.user?.name,

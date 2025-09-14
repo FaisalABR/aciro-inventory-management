@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get("/permintaan-barang-keluar/create", [BarangKeluarController::class, 'showCreate']);
     Route::get("/permintaan-barang-keluar/{uuid}", [BarangKeluarController::class, 'showDetail']);
     Route::post("/permintaan-barang-keluar/create", [BarangKeluarController::class, 'create']);
+    Route::put("/permintaan-barang-keluar/{uuid}/approved", [BarangKeluarController::class, 'verifikasi']);
 
     // View Stock
     Route::get('/barang-stock', [StockController::class, 'index']);

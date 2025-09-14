@@ -10,7 +10,16 @@ import {
     UserOutlined,
 } from "@ant-design/icons";
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import { Col, Flex, Layout, Menu, MenuProps, Row, Typography } from "antd";
+import {
+    Avatar,
+    Col,
+    Flex,
+    Layout,
+    Menu,
+    MenuProps,
+    Row,
+    Typography,
+} from "antd";
 import React, { useMemo } from "react";
 import { Route } from "../Common/Route";
 import {
@@ -179,6 +188,26 @@ export const MainLayout: React.FC<TMainLayout> = ({
                     <div style={{ fontSize: "1rem", padding: "1rem" }}>
                         <h2>Aciro Inventory Management</h2>
                     </div>
+                    <Flex
+                        gap="middle"
+                        style={{ padding: "1rem" }}
+                        align="center"
+                    >
+                        <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+                        <Flex gap="small" vertical>
+                            <Typography>Hi, {auth?.user?.name}!</Typography>
+                            <Typography>
+                                {auth?.user?.roles[0]
+                                    .split("_") // pisah underscore
+                                    .map(
+                                        (word) =>
+                                            word.charAt(0).toUpperCase() +
+                                            word.slice(1),
+                                    ) // kapital huruf pertama
+                                    .join(" ")}
+                            </Typography>
+                        </Flex>
+                    </Flex>
                     <div
                         style={{
                             flex: 1,

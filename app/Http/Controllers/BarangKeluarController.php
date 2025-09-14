@@ -91,4 +91,27 @@ class BarangKeluarController extends Controller
 
         return redirect('/permintaan-barang-keluar')->with('success', 'Permintaan Barang Keluar berhasil ditambahkan!');
     }
+
+    public function verifikasi(Request $request, $uuid)
+    {
+        $barangKeluar = BarangKeluar::where('uuid', $uuid)->first();
+
+        if (Auth::user()->hasRole('kepala_toko')) {
+            $barangKeluar->verifikasi_kepala_toko = true;
+        }
+
+        if (Auth::user()->hasRole('kepala_gudang')) {
+            $barangKeluar->verifikasi_kepala_gudang = true;
+        }
+
+        if ($barangKeluar->verifikasi_kepala_gudang && $barangKeluar->verifikasi_kepala_toko) {
+            $barangKeluar->status = 'Disetujui';
+        } else {
+            $barangKeluar->status = 'Disetujui sebagian';
+        }
+
+        $barangKeluar->save();
+
+        return back()->with('success', 'Permintaan barang keluar disetujui');
+    }
 }

@@ -62,6 +62,8 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                 switch (record.status) {
                     case "Disetujui":
                         return <Tag color="green">{record.status}</Tag>;
+                    case "Disetujui sebagian":
+                        return <Tag color="lime">{record.status}</Tag>;
                     case "Menunggu Verifikasi":
                         return <Tag color="orange">{record.status}</Tag>;
                     case "Ditolak":
