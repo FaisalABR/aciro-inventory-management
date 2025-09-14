@@ -3,23 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\Barang\BarangException;
+use App\Models\BarangKeluar;
+use App\Models\Stock;
 use App\Services\BarangKeluarServiceInterface;
 use App\Services\BarangServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class BarangKeluarController extends Controller
 {
     private $barangKeluarService;
-    private $barangService;
-
 
     public function __construct(
         BarangKeluarServiceInterface $barangKeluarService,
-        BarangServiceInterface $barangService
     ) {
         $this->barangKeluarService = $barangKeluarService;
-        $this->barangService = $barangService;
     }
 
     public function index()
@@ -27,7 +26,7 @@ class BarangKeluarController extends Controller
         try {
             $barangKeluar = $this->barangKeluarService->getAll();
 
-            return Inertia::render('BarangKeluar/Index', [
+            return Inertia::render('PermintaanBarangKeluar/Index', [
                 'data' => $barangKeluar,
             ]);
         } catch (\Exception $e) {
@@ -37,9 +36,16 @@ class BarangKeluarController extends Controller
 
     public function showCreate()
     {
-        $optionBarang = $this->barangService->getOptions();
+        $stockBarang = Stock::with('barangs')->get();
+        $optionBarang = $stockBarang->map(function ($stock) {
+            return [
+                'value' => $stock->barangs->id,
+                'label' => $stock->barangs->name . ($stock->quantity == 0 ? ' (habis)' : ''),
+                'disabled' => $stock->quantity == 0,
+            ];
+        });
 
-        return Inertia::render('BarangKeluar/FormBarangKeluar', [
+        return Inertia::render('PermintaanBarangKeluar/FormPermintaanBarangKeluar', [
             "isUpdate" => false,
             'optionBarang' => $optionBarang,
         ]);
@@ -50,7 +56,7 @@ class BarangKeluarController extends Controller
         try {
             $data = $this->barangKeluarService->getBarangKeluarByUUID($uuid);
 
-            return Inertia::render('BarangMasuk/Detail', [
+            return Inertia::render('PermintaanBarangKeluar/Detail', [
                 'data' => $data,
             ]);
         } catch (BarangException $e) {
@@ -58,5 +64,31 @@ class BarangKeluarController extends Controller
         } catch (\Exception $e) {
             return redirect('/barang-keluar')->with('error', 'Terjadi kesalahan pada server');
         }
+    }
+
+    public function create(Request $request)
+    {
+        $validated = $request->validate([
+            'tanggal_keluar' => 'required',
+            'catatan' => 'nullable',
+            'items' => 'required|array|min:1',
+            'items.*.barang_id' => 'required|exists:barangs,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        $totalBarangKeluar = BarangKeluar::count();
+
+        $permintaanBarangKeluar = BarangKeluar::create([
+            'nomor_referensi' => sprintf('PBK-%s-%04d', now()->format('Ymd'), $totalBarangKeluar + 1),
+            'tanggal_keluar' => $validated['tanggal_keluar'],
+            'catatan' =>  $validated['catatan'] ?? '',
+            'user_id' => Auth::id(),
+        ]);
+
+        foreach ($validated['items'] as $item) {
+            $permintaanBarangKeluar->items()->create($item);
+        }
+
+        return redirect('/permintaan-barang-keluar')->with('success', 'Permintaan Barang Keluar berhasil ditambahkan!');
     }
 }

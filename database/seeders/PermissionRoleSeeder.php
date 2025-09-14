@@ -63,6 +63,10 @@ class PermissionRoleSeeder extends Seeder
                 'role_id' => 1,
                 'permission_id' => 12,
             ],
+            [
+                'role_id' => 1,
+                'permission_id' => 13,
+            ],
             // role_id 2 memiliki permission_id 1 dan 5
             [
                 'role_id' => 2,

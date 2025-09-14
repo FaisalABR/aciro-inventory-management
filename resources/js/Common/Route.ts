@@ -16,12 +16,13 @@ export enum Route {
     AuthLogout = "/logout",
     StockBarang = "/barang-stock",
 
-    // Kelola Barang Keluar
-    BarangKeluar = "/barang-keluar",
-    BarangKeluarDetail = "/barang-keluar/:uuid",
-    CreateBarangKeluar = "/barang-keluar/create",
-    EditBarangKeluar = "/barang-keluar/edit/:uuid",
-    DeleteBarangKeluar = "/barang-keluar/delete/:uuid",
+    // Kelola Permintaan Barang Keluar
+    PermintaanBarangKeluar = "/permintaan-barang-keluar",
+    PermintaanBarangKeluarDetail = "/permintaan-barang-keluar/:uuid",
+    CreatePermintaanBarangKeluar = "/permintaan-barang-keluar/create",
+    EditPermintaanBarangKeluar = "/permintaan-barang-keluar/edit/:uuid",
+    DeletePermintaanBarangKeluar = "/permintaan-barang-keluar/delete/:uuid",
+    VerifikasiPermintaanKeluar = "/permintaan-barang-keluar/:uuid/approved",
 
     // Kelola Barang Masuk
     BarangMasuk = "/barang-masuk",

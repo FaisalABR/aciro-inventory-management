@@ -62,6 +62,10 @@ class PermissionSeeder extends Seeder
                 "name" => "view-master-barang",
                 "description" => "Buka Menu Master Barang",
             ],
+            [
+                "name" => "view-permintaan-barang-keluar",
+                "description" => "Buka Menu Permintaan Barang Keluar",
+            ],
         ];
 
         foreach ($permissions as $permissionData) {

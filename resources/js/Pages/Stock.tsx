@@ -58,7 +58,7 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
                         return <Tag color="green">{record.status_rop}</Tag>;
                     case "Need Restock":
                         return <Tag color="orange">{record.status_rop}</Tag>;
-                    case "Out of Stock":
+                    case "Out Of Stock":
                         return <Tag color="red">{record.status_rop}</Tag>;
                 }
             },

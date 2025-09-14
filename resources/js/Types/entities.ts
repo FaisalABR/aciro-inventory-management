@@ -81,6 +81,10 @@ export type TBarangKeluar = {
     nomor_referensi: string;
     tanggal_keluar: string;
     catatan: string | null;
+    user: TUser;
+    verifikasi_kepala_toko: boolean;
+    verifikasi_kepala_gudang: boolean;
+    status: string;
     items: TBarangKeluarItem[];
 };
 

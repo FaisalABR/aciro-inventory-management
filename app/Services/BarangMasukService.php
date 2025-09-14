@@ -29,7 +29,7 @@ class BarangMasukService implements BarangMasukServiceInterface
                 'nomor_referensi' => $data['nomor_referensi'],
                 'tanggal_masuk' => $data['tanggal_masuk'],
                 'supplier_id' => $data['supplier_id'],
-                'catatan' => $data['catatan'],
+                'catatan' => $data['catatan'] ?? null,
             ]);
 
             foreach ($data["items"] as $item) {
@@ -69,8 +69,8 @@ class BarangMasukService implements BarangMasukServiceInterface
             return $barangMasuk;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Gagal membuat barang" . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Terjadi masalah saat membuat barang. Silakan coba lagi nanti.", 500);
+            Log::error("Gagal membuat barang masuk" . $e->getMessage(), ['exception' => $e]);
+            throw new BarangException("Terjadi masalah saat membuat barang masuk. Silakan coba lagi nanti.", 500);
         }
     }
 

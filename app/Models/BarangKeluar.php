@@ -23,6 +23,17 @@ class BarangKeluar extends Model
         'uuid',
         'nomor_referensi',
         'tanggal_keluar',
+        'user_id',
         'catatan',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(BarangKeluarItem::class);
+    }
 }

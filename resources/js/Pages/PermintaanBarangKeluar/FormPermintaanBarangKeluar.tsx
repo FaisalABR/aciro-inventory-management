@@ -20,14 +20,16 @@ import { CreateBarangKeluarSchema } from "../../Shared/validation";
 import { TBarang } from "../../Types/entities";
 import { BaseOptionType } from "antd/es/select";
 
-type TFormBarangKeluarProps = {
+type TFormPermintaanBarangKeluarProps = {
     isUpdate: boolean;
     data: TBarang;
     optionBarang: BaseOptionType[];
     optionSupplier: BaseOptionType[];
 };
 
-const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
+const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
+    props,
+) => {
     const zodSync = createSchemaFieldRule(CreateBarangKeluarSchema);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
@@ -37,12 +39,12 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
         try {
             props.isUpdate
                 ? router.put(
-                      route(Route.EditBarangKeluar, {
+                      route(Route.EditPermintaanBarangKeluar, {
                           uuid: props?.data?.uuid,
                       }),
                       values,
                   )
-                : router.post(Route.CreateBarangKeluar, values);
+                : router.post(Route.CreatePermintaanBarangKeluar, values);
         } catch (error) {
             setIsLoading(false);
         }
@@ -50,13 +52,15 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
 
     const onReset = () => {
         form.resetFields();
-        router.get(Route.BarangKeluar);
+        router.get(Route.PermintaanBarangKeluar);
     };
 
     return (
         <RootLayout
             title={
-                props.isUpdate ? "Edit Barang Keluar" : "Tambah Barang Keluar"
+                props.isUpdate
+                    ? "Edit Permintaan Barang Keluar"
+                    : "Tambah Permintaan Barang Keluar"
             }
             type="main"
         >
@@ -64,10 +68,10 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
                 <Flex vertical style={{ width: "40%", marginInline: "auto" }}>
                     <Title level={3}>
                         {props.isUpdate
-                            ? "Form Edit Barang Keluar"
-                            : "Form Tambah Barang Keluar"}
+                            ? "Form Edit Permintaan Barang Keluar"
+                            : "Form Tambah Permintaan Barang Keluar"}
                     </Title>
-                    <Title level={5}>Informasi Umum Barang Keluar</Title>
+                    <Title level={5}>Informasi Umum Permintaan</Title>
                     <Form
                         form={form}
                         initialValues={{
@@ -99,7 +103,9 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
                         </Form.Item>
                         <Divider style={{ margin: "2rem 0" }} />
 
-                        <Title level={5}>Detail Item Barang Keluar</Title>
+                        <Title level={5}>
+                            Detail Item Permintaan Barang Keluar
+                        </Title>
                         <Form.List name="items">
                             {(fields, { add, remove }, { errors }) => (
                                 <div
@@ -134,20 +140,6 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
                                             <Form.Item
                                                 label="Kuantitas"
                                                 name={[field.name, "quantity"]}
-                                                rules={[zodSync]}
-                                            >
-                                                <InputNumber
-                                                    min={1}
-                                                    placeholder="10"
-                                                    style={{ width: "100%" }}
-                                                />
-                                            </Form.Item>
-                                            <Form.Item
-                                                label="Harga Beli"
-                                                name={[
-                                                    field.name,
-                                                    "harga_beli",
-                                                ]}
                                                 rules={[zodSync]}
                                             >
                                                 <InputNumber
@@ -191,4 +183,4 @@ const FormBarangKeluar: React.FC<TFormBarangKeluarProps> = (props) => {
     );
 };
 
-export default FormBarangKeluar;
+export default FormPermintaanBarangKeluar;

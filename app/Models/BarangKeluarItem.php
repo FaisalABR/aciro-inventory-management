@@ -10,18 +10,11 @@ class BarangKeluarItem extends Model
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
-
-    protected $casts = [
-        'harga_jual' => 'float',
-
-    ];
-
     protected $fillable = [
         'uuid',
         'barang_keluar_id',
         'barang_id',
         'quantity',
-        'harga_jual',
 
     ];
 

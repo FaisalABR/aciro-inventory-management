@@ -2,7 +2,7 @@ import React from "react";
 import RootLayout from "../../Layouts/RootLayout";
 import { Link, router } from "@inertiajs/react";
 import { route, Route } from "../../Common/Route";
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -13,11 +13,11 @@ import { ColumnsType } from "antd/es/table";
 import { TBarangKeluar } from "../../Types/entities";
 import { useModal } from "../../Shared/hooks";
 
-type TBarangKeluarIndexProps = {
+type TPermintaanBarangKeluarIndexProps = {
     data: TBarangKeluar[];
 };
 
-const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
+const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
@@ -31,7 +31,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
             },
             onOk: () => {
                 router.delete(
-                    route(Route.DeleteBarangKeluar, {
+                    route(Route.DeletePermintaanBarangKeluar, {
                         uuid,
                     }),
                 );
@@ -55,14 +55,29 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
             key: "total_unique_items",
         },
         {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (_, record) => {
+                switch (record.status) {
+                    case "Disetujui":
+                        return <Tag color="green">{record.status}</Tag>;
+                    case "Menunggu Verifikasi":
+                        return <Tag color="orange">{record.status}</Tag>;
+                    case "Ditolak":
+                        return <Tag color="red">{record.status}</Tag>;
+                }
+            },
+        },
+        {
             title: "Total Kuantitas",
             dataIndex: "total_quantity",
             key: "total_quantity",
         },
         {
-            title: "Total Penjualan",
-            dataIndex: "total_penjualan",
-            key: "total_penjualan",
+            title: "Permintaan Oleh",
+            dataIndex: ["user", "name"],
+            key: "users",
         },
         {
             title: "Actions",
@@ -72,7 +87,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
                         <Link
-                            href={route(Route.EditBarangKeluar, {
+                            href={route(Route.EditPermintaanBarangKeluar, {
                                 uuid: record.uuid,
                             })}
                         >
@@ -93,7 +108,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
                             <DeleteOutlined />
                         </Button>
                         <Link
-                            href={route(Route.BarangKeluarDetail, {
+                            href={route(Route.PermintaanBarangKeluarDetail, {
                                 uuid: record.uuid,
                             })}
                         >
@@ -110,15 +125,15 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
     return (
         <RootLayout
             type="main"
-            title="Barang Keluar"
+            title="Permintaan Barang Keluar"
             actions={[
-                <Link href={Route.CreateBarangKeluar}>
+                <Link href={Route.CreatePermintaanBarangKeluar}>
                     <Button
                         icon={<PlusSquareOutlined />}
                         type="primary"
                         size="large"
                     >
-                        Tambah Barang Keluar
+                        Tambah Permintaan Barang Keluar
                     </Button>
                 </Link>,
             ]}

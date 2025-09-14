@@ -66,10 +66,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/barang-masuk/create", [BarangMasukController::class, 'create']);
     Route::delete("/barang-masuk/delete/{uuid}", [BarangMasukController::class, 'destroy']);
 
-    //Kelola Barang Keluar
-    Route::get('/barang-keluar', [BarangKeluarController::class, 'index'])->middleware("permission:view-barang-keluar");
-    Route::get("/barang-keluar/create", [BarangKeluarController::class, 'showCreate']);
-    Route::get("/barang-keluar/{uuid}", [BarangKeluarController::class, 'index']);
+    //Kelola Permintaan Barang Keluar
+    Route::get('/permintaan-barang-keluar', [BarangKeluarController::class, 'index'])->middleware("permission:view-permintaan-barang-keluar");
+    Route::get("/permintaan-barang-keluar/create", [BarangKeluarController::class, 'showCreate']);
+    Route::get("/permintaan-barang-keluar/{uuid}", [BarangKeluarController::class, 'showDetail']);
+    Route::post("/permintaan-barang-keluar/create", [BarangKeluarController::class, 'create']);
 
     // View Stock
     Route::get('/barang-stock', [StockController::class, 'index']);

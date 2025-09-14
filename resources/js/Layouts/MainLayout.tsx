@@ -64,9 +64,13 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_STOCK,
     },
     {
-        key: Route.BarangKeluar,
+        key: Route.PermintaanBarangKeluar,
         icon: <LeftSquareOutlined />,
-        label: <Link href={Route.BarangKeluar}>Barang Keluar</Link>,
+        label: (
+            <Link href={Route.PermintaanBarangKeluar}>
+                Permintaan Barang Keluar
+            </Link>
+        ),
         permission: PERMISSIONS_VIEW_BARANG_KELUAR,
     },
     {

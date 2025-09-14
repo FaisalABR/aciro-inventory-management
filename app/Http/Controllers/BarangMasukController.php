@@ -75,7 +75,7 @@ class BarangMasukController extends Controller
                 'nomor_referensi' => 'required',
                 'supplier_id' => 'required',
                 'tanggal_masuk' => 'required',
-                'catatan' => 'required',
+                'catatan' => 'nullable',
                 'items' => 'required|array|min:1',
                 'items.*.barang_id' => 'required|exists:barangs,id',
                 'items.*.quantity' => 'required|integer|min:1',
