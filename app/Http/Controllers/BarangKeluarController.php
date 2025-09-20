@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\Barang\BarangException;
 use App\Models\BarangKeluar;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\Stock;
 use App\Services\BarangKeluarServiceInterface;
 use App\Services\BarangServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class BarangKeluarController extends Controller
@@ -157,5 +160,106 @@ class BarangKeluarController extends Controller
             'errors' => $errors,
             'ropWarnings' => $warnings,
         ]);
+    }
+
+    public function indexEksekusi()
+    {
+        $barangKeluar = BarangKeluar::with(['items.barangs', 'user'])->whereIn('status', ['Disetujui', 'Dieksekusi'])->get();
+
+        return Inertia::render('BarangKeluar/Index', [
+            'data' => $barangKeluar,
+        ]);
+    }
+
+    public function checkExecute($uuid)
+    {
+        $barangKeluar = BarangKeluar::with('items.barangs')->where('uuid', $uuid)->firstOrFail(); // ambil 1 row saja;
+
+        $warnings = [];
+
+        foreach ($barangKeluar->items as $item) {
+            $stock = Stock::where('barang_id', $item->barang_id)->first();
+
+            if (!$stock) {
+                $warnings[] = "Barang {$item->barangs->name} belum ada stok.";
+                continue;
+            }
+
+            // cek stok minus
+            if ($stock->quantity < $item->quantity) {
+                $warnings[] = "Barang {$item->barangs->name} tidak cukup stok (tersedia {$stock->quantity}, diminta {$item->quantity})";
+            }
+
+            // cek ROP
+            if (($stock->quantity - $item->quantity) <= $stock->rop) {
+                $warnings[] = "Barang {$item->barangs->name} akan mencapai ROP (sisa setelah keluar: " . ($stock->quantity - $item->quantity) . ")";
+            }
+        }
+
+        return response()->json([
+            'warnings' => $warnings
+        ]);
+    }
+
+    public function execute($uuid)
+    {
+        $barangKeluar = BarangKeluar::with('items.barangs.supplier')->where('uuid', $uuid)->firstOrFail();
+
+        if ($barangKeluar->status !== 'Disetujui') {
+            return back()->withErrors(['msg' => 'Barang keluar belum diverifikasi']);
+        }
+
+        DB::transaction(function () use ($barangKeluar) {
+            foreach ($barangKeluar->items as $item) {
+                $stock = Stock::where('barang_id', $item->barang_id)->first();
+
+                if (!$stock || $stock->quantity < $item->quantity) {
+                    throw new \Exception("Stok tidak mencukupi untuk {$item->barang->nama}");
+                };
+
+                $sisa = $stock->quantity - $item->quantity;
+                $stock->quantity = $sisa;
+
+                if ($sisa <= $stock->rop) {
+                    $stock->status_rop = 'Need Restock';
+                }
+
+                if ($sisa == 0) {
+                    $stock->status_rop = 'Out Of Stock';
+                }
+
+                $stock->save();
+
+                if ($sisa <= $stock->rop) {
+                    $supplier = $item->barangs->supplier;
+                    $totalPo = PurchaseOrder::count();
+
+                    $po = PurchaseOrder::where('supplier_id', $supplier->id)->where('status', 'DRAFT')->first();
+
+                    if (!$po) {
+                        $po = PurchaseOrder::create([
+                            'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPo + 1),
+                            'tanggal_order' => now(),
+                            'supplier_id' => $supplier->id,
+                            'status' => 'DRAFT',
+                            'catatan' => 'test',
+                        ]);
+                    }
+
+                    PurchaseOrderItem::create([
+                        'purchase_order_id' => $po->id,
+                        'barang_id' => $item->barang_id,
+                        'quantity' => $item->barangs->maximal_quantity - $stock->rop ?? 0,
+                        'harga_beli' => $item->barangs->harga_beli
+                    ]);
+                }
+
+                // Update status barang keluar
+                $barangKeluar->status = 'Dieksekusi';
+                $barangKeluar->save();
+            };
+        });
+
+        return redirect('/barang-keluar')->with('success', 'Barang keluar berhasil dieksekusi');
     }
 }

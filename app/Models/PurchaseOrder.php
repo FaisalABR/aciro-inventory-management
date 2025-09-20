@@ -28,6 +28,11 @@ class PurchaseOrder extends Model
         'status',
     ];
 
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');

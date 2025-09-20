@@ -12,6 +12,7 @@ import {
 import { ColumnsType } from "antd/es/table";
 import { TBarangMasuk } from "../../Types/entities";
 import { useModal } from "../../Shared/hooks";
+import { formatRupiah } from "../../Shared/utils";
 
 type TBarangIndexProps = {
     data: TBarangMasuk[];
@@ -68,6 +69,9 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
             title: "Total Harga",
             dataIndex: "total_harga",
             key: "total_harga",
+            render: (_, record) => {
+                return formatRupiah(record.total_harga);
+            },
         },
         {
             title: "Actions",

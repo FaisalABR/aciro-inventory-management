@@ -14,7 +14,7 @@ class PurchaseOrderItem extends Model
 
     protected $fillable = [
         'uuid',
-        'purchase_orders_id',
+        'purchase_order_id',
         'barang_id',
         'quantity',
     ];
@@ -24,7 +24,7 @@ class PurchaseOrderItem extends Model
         return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id', 'id');
     }
 
-    public function barangs()
+    public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id', 'id');
     }

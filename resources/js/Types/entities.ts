@@ -88,6 +88,26 @@ export type TBarangKeluar = {
     items: TBarangKeluarItem[];
 };
 
+export type TPurchaseOrder = {
+    uuid: string;
+    nomor_referensi: string;
+    tanggal_order: string;
+    catatan: string | null;
+    supplier_id: number;
+    verifikasi_kepala_toko: boolean;
+    verifikasi_kepala_gudang: boolean;
+    status: string;
+    items: TPurchaseOrderItem[];
+};
+
+export type TPurchaseOrderItem = {
+    purchase_order_id: number;
+    barang_id: number;
+    barangs: TBarang;
+    quantity: number;
+    harga_jual: number;
+};
+
 type TRoles = {
     id: number;
     name: string;

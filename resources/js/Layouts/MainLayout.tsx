@@ -83,6 +83,12 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_BARANG_KELUAR,
     },
     {
+        key: Route.BarangKeluar,
+        icon: <LeftSquareOutlined />,
+        label: <Link href={Route.BarangKeluar}>Barang Keluar</Link>,
+        permission: PERMISSIONS_VIEW_BARANG_KELUAR,
+    },
+    {
         key: Route.PurchaseOrder,
         icon: <MoneyCollectOutlined />,
         label: <Link href={Route.PurchaseOrder}>Purchase Order</Link>,

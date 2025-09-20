@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
@@ -73,16 +74,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/permintaan-barang-keluar/create", [BarangKeluarController::class, 'create']);
     Route::put("/permintaan-barang-keluar/{uuid}/approved", [BarangKeluarController::class, 'verifikasi']);
 
+    // Kelola Barang Keluar
+    Route::get('/barang-keluar', [BarangKeluarController::class, 'indexEksekusi']);
+    Route::post('barang-keluar/{uuid}/execute', [BarangKeluarController::class, 'execute']);
+
     // View Stock
     Route::get('/barang-stock', [StockController::class, 'index']);
 
 
     //Kelola Purchase Order
-    Route::get('/purchase-orders', function () {
-        return Inertia::render('PurchaseOrder/Index', [
-            'name' => 'Faisal',
-        ]);
-    });
+    Route::get('/purchase-orders', [PurchaseOrderController::class, 'index']);
+    Route::get('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'showEdit']);
 
 
 

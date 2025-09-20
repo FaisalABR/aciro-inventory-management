@@ -68,6 +68,10 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                         return <Tag color="orange">{record.status}</Tag>;
                     case "Ditolak":
                         return <Tag color="red">{record.status}</Tag>;
+                    case "Dieksekusi":
+                        return <Tag color="blue">{record.status}</Tag>;
+                    default:
+                        return <Tag color="grey">{record.status}</Tag>;
                 }
             },
         },

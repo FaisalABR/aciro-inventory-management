@@ -162,3 +162,33 @@ export const CreateBarangKeluarSchema = z.object({
         )
         .min(1, { message: "Minimal 1 barang dimasukkan" }),
 });
+
+export const CreatePurchaseOrderSchema = z.object({
+    nomor_referensi: z
+        .string({
+            required_error: "Nomor Referensi harus diisi",
+        })
+        .min(3, { message: "Nomor Referensi minimal 3 karakter" })
+        .max(20, { message: "Nomor Referensi maximal dari 20 karakter" }),
+    tanggal_order: z.coerce.date({
+        invalid_type_error: "Tanggal purchase order tidak valid",
+        required_error: "Tanggal purchase order harus diisi",
+    }),
+    supplier_id: z.number({ required_error: "Supplier harus diisi" }),
+    catatan: z
+        .string()
+        .min(3, { message: "Catatan minimal 3 karakter" })
+        .max(20, { message: "Catatan maximal dari 100 karakter" })
+        .optional(),
+    items: z
+        .array(
+            z.object({
+                barang_id: z.number({ required_error: "Barang harus di isi" }),
+                quantity: z.number({ required_error: "quantity harus di isi" }),
+                harga_beli: z.number({
+                    required_error: "Harga Beli harus di isi",
+                }),
+            }),
+        )
+        .min(1, { message: "Minimal 1 barang dimasukkan" }),
+});

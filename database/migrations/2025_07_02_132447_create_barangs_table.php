@@ -25,6 +25,7 @@ return new class extends Migration
                 ->onDelete('restrict');
             $table->decimal('hargaJual', 10, 2);
             $table->decimal('hargaBeli', 10, 2);
+            $table->integer('maximal_quantity');
             $table->timestamps();
         });
     }

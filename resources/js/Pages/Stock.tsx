@@ -158,6 +158,7 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
                     placeholder="select status ITR"
                     style={{ width: "15%" }}
                     size="large"
+                    allowClear
                     value={statusITR}
                     onChange={handleStatusITR}
                     options={[

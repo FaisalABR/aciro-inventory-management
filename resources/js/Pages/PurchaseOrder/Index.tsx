@@ -11,8 +11,14 @@ import {
     EyeOutlined,
     PlusSquareOutlined,
 } from "@ant-design/icons";
+import { TPurchaseOrder } from "../../Types/entities";
+import { formatRupiah } from "../../Shared/utils";
 
-const PurchaseIndex: React.FC = () => {
+type TPurchaseOrderIndexProps = {
+    data: TPurchaseOrder[];
+};
+
+const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
@@ -61,7 +67,7 @@ const PurchaseIndex: React.FC = () => {
         },
         {
             title: "Supplier",
-            dataIndex: "supplier",
+            dataIndex: ["supplier", "name"],
             key: "supplier",
         },
         {
@@ -75,9 +81,12 @@ const PurchaseIndex: React.FC = () => {
             key: "total_quantity",
         },
         {
-            title: "Total Pembalian",
-            dataIndex: "total_pembalian",
-            key: "total_pembalian",
+            title: "Total Pembelian",
+            dataIndex: "total_pembelian",
+            key: "total_pembelian",
+            render: (_, record) => {
+                return formatRupiah(record.total_pembelian);
+            },
         },
         {
             title: "Actions",
@@ -138,7 +147,7 @@ const PurchaseIndex: React.FC = () => {
                 </Link>,
             ]}
         >
-            <Table dataSource={[]} columns={columns} />;
+            <Table dataSource={data} columns={columns} />;
         </RootLayout>
     );
 };

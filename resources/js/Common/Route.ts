@@ -24,6 +24,11 @@ export enum Route {
     DeletePermintaanBarangKeluar = "/permintaan-barang-keluar/delete/:uuid",
     VerifikasiPermintaanKeluar = "/permintaan-barang-keluar/:uuid/approved",
 
+    // Kelola Barang Keluar
+    BarangKeluar = "/barang-keluar",
+    EksekusiBarangKeluar = "/barang-keluar/:uuid/execute",
+    CekEksekusiBarangKeluar = "/barang-keluar/:uuid/check-execute",
+
     // Kelola Barang Masuk
     BarangMasuk = "/barang-masuk",
     BarangMasukDetail = "/barang-masuk/:uuid",
