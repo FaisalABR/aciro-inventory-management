@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
 use App\Models\BarangKeluar;
 use App\Models\PurchaseOrder;
@@ -252,6 +253,8 @@ class BarangKeluarController extends Controller
                         'quantity' => $item->barangs->maximal_quantity - $stock->rop ?? 0,
                         'harga_beli' => $item->barangs->harga_beli
                     ]);
+                    event(new ROPNotification("Stok {$item->barangs->nama} menyentuh ROP!", 'kepala_toko'));
+                    event(new ROPNotification("Stok {$item->barangs->nama} menyentuh ROP!", 'kepala_gudang'));
                 }
 
                 // Update status barang keluar

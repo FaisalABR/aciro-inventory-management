@@ -17,10 +17,11 @@ import {
     Layout,
     Menu,
     MenuProps,
+    notification,
     Row,
     Typography,
 } from "antd";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Route } from "../Common/Route";
 import {
     PERMISSIONS_VIEW_BARANG_KELUAR,
@@ -142,6 +143,84 @@ export const MainLayout: React.FC<TMainLayout> = ({
         () => window.location.pathname,
         [window.location.pathname],
     );
+
+    useEffect(() => {
+        if (!auth.user) return;
+
+        // Wait for Echo to be ready
+        const initializeEcho = () => {
+            if (!window.Echo) {
+                console.log("Echo not ready yet, retrying...");
+                setTimeout(initializeEcho, 100);
+                return;
+            }
+
+            if (auth.user.roles[0] === "kepala_toko") {
+                window.Echo.private(`notifications.kepala_toko`)
+                    .subscribed(() => {
+                        console.log(
+                            "✅ Subscribed to notifications.kepala_toko",
+                        );
+                    })
+                    .error((err: any) => {
+                        console.error("❌ Error subscribe kepala_toko:", err);
+                    })
+                    .listen(".ROPNotification", (e: any) => {
+                        console.log("Triggered notif kepala_toko");
+                        notification.info({
+                            message: "Notifikasi Kepala Toko: " + e.message,
+                            description: ` mencapai ROP. Stok tersisa`,
+                            duration: 0,
+                        });
+                    });
+            }
+
+            if (auth.user.roles[0] === "kepala_gudang") {
+                window.Echo.private(`notifications.kepala_gudang`)
+                    .subscribed(() => {
+                        console.log(
+                            "✅ Subscribed to notifications.kepala_gudang",
+                        );
+                    })
+                    .error((err: any) => {
+                        console.error("❌ Error subscribe kepala_gudang:", err);
+                    })
+                    .listen(".ROPNotification", (e: any) => {
+                        console.log("Triggered notif kepala_gudang");
+                        notification.info({
+                            message: "Notifikasi Kepala Gudang: " + e.message,
+                            description: ` mencapai ROP. Stok tersisa`,
+                            duration: 0,
+                        });
+                    });
+            }
+        };
+
+        // Start initialization
+        initializeEcho();
+    }, [auth.user]);
+
+    useEffect(() => {
+        if (window.Echo && window.Echo.connector?.pusher?.connection) {
+            console.log(
+                "Echo config auth",
+                window.Echo.connector.pusher.config.auth,
+            );
+            console.log("Echo instance:", window.Echo);
+            console.log(
+                "State:",
+                window.Echo.connector.pusher.connection.state,
+            );
+
+            window.Echo.connector.pusher.connection.bind("connected", () => {
+                console.log("Connected ke Soketi!");
+            });
+
+            window.Echo.connector.pusher.connection.bind("error", (err) => {
+                console.error("Error koneksi:", err);
+            });
+        }
+    }, []);
 
     const defaultOpenedKey = useMemo(
         () =>

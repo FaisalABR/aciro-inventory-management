@@ -1,0 +1,50 @@
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
+
+window.Pusher = Pusher;
+// Get CSRF token
+const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute("content");
+
+if (!csrfToken) {
+    console.error(
+        "❌ CSRF token not found! Make sure meta tag is present in HTML head.",
+    );
+}
+
+const echoOptions = {
+    broadcaster: "reverb",
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
+    enabledTransports: ["ws", "wss"],
+    authEndpoint: "/broadcasting/auth",
+    // Ini penting untuk private channel auth
+    auth: {
+        headers: {
+            "X-CSRF-TOKEN": csrfToken,
+            Accept: "application/json",
+        },
+        withCredentials: true,
+    },
+};
+
+window.Echo = new Echo(echoOptions);
+
+// Add connection event listeners for debugging
+if (window.Echo.connector && window.Echo.connector.pusher) {
+    window.Echo.connector.pusher.connection.bind("connected", () => {
+        console.log("✅ Reverb connected successfully");
+    });
+
+    window.Echo.connector.pusher.connection.bind("error", (err) => {
+        console.error("❌ Reverb connection error:", err);
+    });
+
+    window.Echo.connector.pusher.connection.bind("state_change", (states) => {
+        console.log("🔄 Reverb state change:", states);
+    });
+}
