@@ -17,6 +17,8 @@ use App\Services\SupplierService;
 use App\Services\SupplierServiceInterface;
 use App\Services\UserService;
 use App\Services\UserServiceInterface;
+use App\Services\WhatsappService;
+use App\Services\WhatsappServiceInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -54,6 +56,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             BarangKeluarServiceInterface::class,
             BarangKeluarService::class,
+            WhatsappServiceInterface::class,
+        );
+        $this->app->bind(
+            WhatsappServiceInterface::class,
+            WhatsappService::class,
         );
     }
 

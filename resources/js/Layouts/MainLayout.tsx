@@ -147,7 +147,10 @@ export const MainLayout: React.FC<TMainLayout> = ({
     useEffect(() => {
         if (!auth.user) return;
 
-        // Wait for Echo to be ready
+        const role = auth.user.roles[0];
+        const channelName = `notifications.${role}`;
+        let channel: any;
+
         const initializeEcho = () => {
             if (!window.Echo) {
                 console.log("Echo not ready yet, retrying...");
@@ -155,49 +158,32 @@ export const MainLayout: React.FC<TMainLayout> = ({
                 return;
             }
 
-            if (auth.user.roles[0] === "kepala_toko") {
-                window.Echo.private(`notifications.kepala_toko`)
-                    .subscribed(() => {
-                        console.log(
-                            "✅ Subscribed to notifications.kepala_toko",
-                        );
-                    })
-                    .error((err: any) => {
-                        console.error("❌ Error subscribe kepala_toko:", err);
-                    })
-                    .listen(".ROPNotification", (e: any) => {
-                        console.log("Triggered notif kepala_toko");
-                        notification.info({
-                            message: "Notifikasi Kepala Toko: " + e.message,
-                            description: ` mencapai ROP. Stok tersisa`,
-                            duration: 0,
-                        });
+            channel = window.Echo.private(channelName)
+                .subscribed(() => {
+                    console.log("✅ Subscribed to", channelName);
+                })
+                .error((err: any) => {
+                    console.error(`❌ Error subscribe ${channelName}:`, err);
+                })
+                .listen(".ROPNotification", (e: any) => {
+                    console.log("🔔 Triggered notif", channelName);
+                    notification.info({
+                        message: `Notifikasi ${role.replace("_", " ")}: ${e.message}`,
+                        description: `Mencapai ROP. Stok tersisa`,
+                        duration: 0,
                     });
-            }
-
-            if (auth.user.roles[0] === "kepala_gudang") {
-                window.Echo.private(`notifications.kepala_gudang`)
-                    .subscribed(() => {
-                        console.log(
-                            "✅ Subscribed to notifications.kepala_gudang",
-                        );
-                    })
-                    .error((err: any) => {
-                        console.error("❌ Error subscribe kepala_gudang:", err);
-                    })
-                    .listen(".ROPNotification", (e: any) => {
-                        console.log("Triggered notif kepala_gudang");
-                        notification.info({
-                            message: "Notifikasi Kepala Gudang: " + e.message,
-                            description: ` mencapai ROP. Stok tersisa`,
-                            duration: 0,
-                        });
-                    });
-            }
+                });
         };
 
-        // Start initialization
         initializeEcho();
+
+        // Cleanup → sangat penting!
+        return () => {
+            if (channelName) {
+                console.log("🧹 Unsubscribing from", channelName);
+                window.Echo.leave(`private-${channelName}`);
+            }
+        };
     }, [auth.user]);
 
     useEffect(() => {

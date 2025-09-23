@@ -8,6 +8,7 @@ import {
     EditOutlined,
     EyeOutlined,
     PlusSquareOutlined,
+    SendOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { TBarangKeluar } from "../../Types/entities";
@@ -37,6 +38,10 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                 );
             },
         });
+    };
+
+    const handleSendWA = () => {
+        router.post(Route.SendWA);
     };
     const columns: ColumnsType = [
         {
@@ -142,6 +147,15 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                         Tambah Permintaan Barang Keluar
                     </Button>
                 </Link>,
+
+                <Button
+                    icon={<SendOutlined />}
+                    type="primary"
+                    size="large"
+                    onClick={handleSendWA}
+                >
+                    Test WA
+                </Button>,
             ]}
         >
             <Table dataSource={props.data} columns={columns} />;

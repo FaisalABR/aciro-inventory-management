@@ -23,6 +23,7 @@ export enum Route {
     EditPermintaanBarangKeluar = "/permintaan-barang-keluar/edit/:uuid",
     DeletePermintaanBarangKeluar = "/permintaan-barang-keluar/delete/:uuid",
     VerifikasiPermintaanKeluar = "/permintaan-barang-keluar/:uuid/approved",
+    SendWA = "/barang-keluar/send",
 
     // Kelola Barang Keluar
     BarangKeluar = "/barang-keluar",

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
+use App\Jobs\SendWhatsappJob;
 use App\Models\BarangKeluar;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Stock;
+use App\Models\User;
 use App\Services\BarangKeluarServiceInterface;
-use App\Services\BarangServiceInterface;
+use App\Services\WhatsappServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +20,14 @@ use Inertia\Inertia;
 class BarangKeluarController extends Controller
 {
     private $barangKeluarService;
+    private $whatsappService;
 
     public function __construct(
         BarangKeluarServiceInterface $barangKeluarService,
+        WhatsappServiceInterface $whatsappService
     ) {
         $this->barangKeluarService = $barangKeluarService;
+        $this->whatsappService = $whatsappService;
     }
 
     public function index()
@@ -211,6 +216,12 @@ class BarangKeluarController extends Controller
         }
 
         DB::transaction(function () use ($barangKeluar) {
+            $messages = []; // kumpulkan pesan ROP 
+            $users = User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['kepala_gudang', 'kepala_toko']);
+            })->get();
+
+
             foreach ($barangKeluar->items as $item) {
                 $stock = Stock::where('barang_id', $item->barang_id)->first();
 
@@ -253,16 +264,50 @@ class BarangKeluarController extends Controller
                         'quantity' => $item->barangs->maximal_quantity - $stock->rop ?? 0,
                         'harga_beli' => $item->barangs->harga_beli
                     ]);
-                    event(new ROPNotification("Stok {$item->barangs->nama} menyentuh ROP!", 'kepala_toko'));
-                    event(new ROPNotification("Stok {$item->barangs->nama} menyentuh ROP!", 'kepala_gudang'));
+                    event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));
+                    event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_gudang'));
                 }
 
                 // Update status barang keluar
                 $barangKeluar->status = 'Dieksekusi';
                 $barangKeluar->save();
+                // tambahkan ke array, bukan langsung kirim
+                $messages[] = "Stok {$item->barangs->name} menyentuh ROP!";
             };
+
+            if (!empty($messages)) {
+                $text = implode("\n", $messages);
+                foreach ($users as $user) {
+                    // Send whatsapp ke kepala toko dan kepala gudang
+                    SendWhatsappJob::dispatch($user->noWhatsapp, $text);
+                }
+            }
         });
 
         return redirect('/barang-keluar')->with('success', 'Barang keluar berhasil dieksekusi');
+    }
+
+    public function testWA()
+    {
+        $result = $this->whatsappService->sendWA(
+            "+6282110779970",
+            "
+Halo PT SUKA SUKA LU AJA,
+
+Kami dari Koperasi Karya Bersama Aciro ingin melakukan pemesanan sesuai Purchase Order (PO):
+
+Nomor PO   : PO-20250922
+Tanggal    : Senin, 22 September 2025
+
+Link Halaman PO:
+https://www.google.com/
+
+Mohon dapat diproses dan dikonfirmasi ketersediaannya.
+Terima kasih atas kerjasamanya.
+
+Hormat kami,
+Tim Procurement Koperasi Karya Bersama Aciro
+            "
+        );
     }
 }

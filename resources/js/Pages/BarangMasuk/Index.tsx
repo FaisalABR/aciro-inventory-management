@@ -116,6 +116,11 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
         },
     ];
 
+    const formattedData = props?.data?.map((item) => ({
+        ...item,
+        key: item.uuid,
+    }));
+
     return (
         <RootLayout
             type="main"
@@ -132,7 +137,7 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
                 </Link>,
             ]}
         >
-            <Table dataSource={props.data} columns={columns} />;
+            <Table dataSource={formattedData} columns={columns} />;
         </RootLayout>
     );
 };

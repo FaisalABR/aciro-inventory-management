@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'whapify' => [
+        'url' => env('WHAPIFY_URL'),
+        'key' => env('WHAPIFY_API_KEY'),
+        'account' => env('WHAPIFY_ACCOUNT')
+    ]
+
 ];

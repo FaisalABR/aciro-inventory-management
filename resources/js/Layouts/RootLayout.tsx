@@ -21,7 +21,7 @@ const RootLayout: React.FC<TRootLayout> = ({
             {type == "login" ? (
                 <LoginLayout title={title}>{children}</LoginLayout>
             ) : (
-                <MainLayout title={title} actions={actions}>
+                <MainLayout key="main layout" title={title} actions={actions}>
                     {children}
                 </MainLayout>
             )}
