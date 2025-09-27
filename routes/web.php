@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HeaderDeadstockController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
@@ -29,9 +30,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', function () {
         return redirect('/');
     });
-    Route::get('/', function () {
-        return Inertia::render('Dashboard');
-    })->middleware('permission:view-dashboard');
+
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'index'])->middleware('permission:view-dashboard');
 
     // Kelola User
     Route::get('/kelola-user', [UserController::class, 'index'])->middleware('permission:view-kelola-user');
