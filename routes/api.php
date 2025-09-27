@@ -20,7 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
 // Route Anda di sini
 Route::get('/barang-by-supplier', [BarangController::class, 'getOptions']);
 Route::post('/check-rop', [BarangKeluarController::class, 'checkROP']);

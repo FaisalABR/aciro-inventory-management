@@ -11,6 +11,7 @@ class SendWhatsappJob implements ShouldQueue
     use Queueable;
 
     protected $text;
+
     protected $phone;
 
     /**
@@ -18,7 +19,7 @@ class SendWhatsappJob implements ShouldQueue
      */
     public function __construct($phone, $text)
     {
-        $this->text = $text;
+        $this->text  = $text;
         $this->phone = $phone;
     }
 

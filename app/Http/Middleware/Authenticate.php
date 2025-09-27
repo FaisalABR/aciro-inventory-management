@@ -20,6 +20,7 @@ class Authenticate
             if ($request->inertia()) {
                 return Inertia::location(route('login'));
             }
+
             // Handle regular HTTP requests
             return redirect()->guest(route('login'));
         }

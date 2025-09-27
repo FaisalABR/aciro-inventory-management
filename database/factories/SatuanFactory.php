@@ -17,8 +17,8 @@ class SatuanFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'code' => fake()->name(),
+            'name'        => fake()->name(),
+            'code'        => fake()->name(),
             'description' => fake()->text(10),
         ];
     }

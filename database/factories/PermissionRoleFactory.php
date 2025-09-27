@@ -18,7 +18,7 @@ class PermissionRoleFactory extends Factory
     {
         return [
             'permission_id' => fake()->randomNumber(1),
-            'role_id' => fake()->randomNumber(1),
+            'role_id'       => fake()->randomNumber(1),
         ];
     }
 }

@@ -17,25 +17,24 @@ class SatuanController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->input("search");
-        $perPage = $request->input("per_page", 10);
-
+        $search  = $request->input('search');
+        $perPage = $request->input('per_page', 10);
 
         $satuan = $this->satuanService->getAll($search, $perPage);
 
         return Inertia::render('Master/Satuan/Index', [
-            'data' => $satuan,
+            'data'    => $satuan,
             'filters' => [
-                "search" => $search,
+                'search' => $search,
             ],
-            'message' => "Sukses mengirim data"
+            'message' => 'Sukses mengirim data',
         ]);
     }
 
     public function showCreate()
     {
         return Inertia::render('Master/Satuan/FormSatuan', [
-            "isUpdate" => false,
+            'isUpdate' => false,
         ]);
     }
 
@@ -43,28 +42,27 @@ class SatuanController extends Controller
     {
         $satuan = $this->satuanService->get($uuid);
 
-        if (!$satuan) {
-            return redirect()->back()->with("error", "Tidak ada satuan ini");
+        if (! $satuan) {
+            return redirect()->back()->with('error', 'Tidak ada satuan ini');
         }
 
         return Inertia::render('Master/Satuan/FormSatuan', [
-            "isUpdate" => true,
-            "data" => $satuan,
+            'isUpdate' => true,
+            'data'     => $satuan,
         ]);
     }
-
 
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required',
-            'code' => 'required',
+            'name'        => 'required',
+            'code'        => 'required',
             'description' => 'required',
         ]);
 
         $satuan = $this->satuanService->create($validated);
 
-        if (!$satuan) {
+        if (! $satuan) {
             return redirect()->back()->with('error', 'Satuan gagal ditambahkan!');
         }
 
@@ -76,7 +74,7 @@ class SatuanController extends Controller
 
         $result = $this->satuanService->delete($uuid);
 
-        if (!$result) {
+        if (! $result) {
             return redirect()->back()->with('error', 'Satuan gagal dihapus!');
         }
 
@@ -86,13 +84,13 @@ class SatuanController extends Controller
     public function update(Request $request, $uuid)
     {
         $validated = $request->validate([
-            'name' => 'required',
-            'code' => 'required',
+            'name'        => 'required',
+            'code'        => 'required',
             'description' => 'required',
         ]);
 
         $result = $this->satuanService->update($validated, $uuid);
-        if (!$result) {
+        if (! $result) {
             return redirect()->back()->with('error', 'Satuan gagal diperbaharui!');
         }
 

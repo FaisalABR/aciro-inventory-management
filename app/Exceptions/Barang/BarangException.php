@@ -8,7 +8,7 @@ use Throwable;
 class BarangException extends Exception
 {
     public function __construct(
-        string $message = "Barang sudah terdaftar.",
+        string $message = 'Barang sudah terdaftar.',
         int $code = 422,
         ?Throwable $previous = null
     ) {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid()->unique();
             $table->string('nomor_referensi');
-            $table->date("tanggal_masuk");
+            $table->date('tanggal_masuk');
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
             $table->text('catatan')->nullable();
             $table->timestamps();

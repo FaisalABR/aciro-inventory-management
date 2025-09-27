@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
 use App\Models\BarangKeluar;
-use App\Models\BarangKeluarItem;
 use App\Models\BarangMasuk;
-use App\Models\BarangMasukItem;
-use App\Models\DeadstockItem;
 use App\Models\HeaderDeadstock;
 use App\Models\Stock;
 use Carbon\Carbon;
@@ -28,11 +24,11 @@ class HeaderDeadstockController extends Controller
 
         $formattedValue = $query->get()->map(function ($deadstock) {
             return [
-                'id' => $deadstock->id,
-                'uuid' => $deadstock->uuid,
+                'id'              => $deadstock->id,
+                'uuid'            => $deadstock->uuid,
                 'nomor_referensi' => $deadstock->nomor_referensi,
-                'periode_mulai' => $deadstock->periode_mulai,
-                'periode_akhir' => $deadstock->periode_akhir,
+                'periode_mulai'   => $deadstock->periode_mulai,
+                'periode_akhir'   => $deadstock->periode_akhir,
             ];
         });
 
@@ -50,15 +46,15 @@ class HeaderDeadstockController extends Controller
         // dd($kalkulasiDeadstock);
 
         if (count($kalkulasiDeadstock) == 0) {
-            return redirect("/laporan-deadstocks")->with('error', 'Tidak ada stock yang dievaluasi');
+            return redirect('/laporan-deadstocks')->with('error', 'Tidak ada stock yang dievaluasi');
         }
 
         $totalHeader = HeaderDeadstock::count();
 
         $headerDeadstock = HeaderDeadstock::create([
             'nomor_referensi' => sprintf('DS-%s-%04d', now()->format('Ymd'), $totalHeader + 1),
-            'periode_mulai' => $periodeMulai,
-            'periode_akhir' => $periodeAkhir,
+            'periode_mulai'   => $periodeMulai,
+            'periode_akhir'   => $periodeAkhir,
         ]);
 
         $headerDeadstock->items()->createMany($kalkulasiDeadstock);
@@ -124,7 +120,6 @@ class HeaderDeadstockController extends Controller
             // Hitung ITR
             $ITR = $rataPersediaan > 0 ? $totalKeluar / $rataPersediaan : 0;
 
-
             // Tentukan status
             if ($ITR > 3) {
                 $status = 'Fast Moving';
@@ -136,20 +131,20 @@ class HeaderDeadstockController extends Controller
 
             // Simpan ke result array
             $result[] = [
-                'barang_id' => $barangId,
-                'nama_barang' => $stock->barangs->name ?? 'Unknown',
-                'persediaan_awal' => $persediaanAwal,
+                'barang_id'        => $barangId,
+                'nama_barang'      => $stock->barangs->name ?? 'Unknown',
+                'persediaan_awal'  => $persediaanAwal,
                 'persediaan_akhir' => $persediaanAkhir,
-                'rata_persediaan' => $rataPersediaan,
-                'total_keluar' => $totalKeluar,
-                'itr' => $ITR,
-                'status' => $status,
+                'rata_persediaan'  => $rataPersediaan,
+                'total_keluar'     => $totalKeluar,
+                'itr'              => $ITR,
+                'status'           => $status,
             ];
 
             // Update ke tabel stocks
             $stock->update([
-                'itr' => $ITR,
-                'status_itr' => $status,
+                'itr'            => $ITR,
+                'status_itr'     => $status,
                 'last_evaluated' => now()->format('d-m-Y'),
             ]);
         }

@@ -11,7 +11,6 @@ class HeaderDeadstock extends Model
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
-
     protected static function booted(): void
     {
         static::creating(function ($model) {

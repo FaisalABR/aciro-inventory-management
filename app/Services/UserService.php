@@ -14,34 +14,38 @@ use Illuminate\Support\Facades\Log;
 interface UserServiceInterface
 {
     public function create(array $data);
+
     public function getAllUsers($search, $perPage);
+
     public function getUserByUUID($uuid);
+
     public function update($data, $uuid);
+
     public function delete($uuid);
-};
+}
 
 class UserService implements UserServiceInterface
 {
     public function create(array $data)
     {
         if (User::where('email', $data['email'])->exists()) {
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException;
         }
 
         try {
             DB::beginTransaction();
             $user = User::create(
                 [
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => $data['password'],
+                    'name'       => $data['name'],
+                    'email'      => $data['email'],
+                    'password'   => $data['password'],
                     'noWhatsapp' => $data['noWhatsapp'],
                 ]
             );
 
             UserRole::create([
-                "user_id" => $user["id"],
-                "role_id" => $data["roles"]
+                'user_id' => $user['id'],
+                'role_id' => $data['roles'],
             ]);
 
             DB::commit();
@@ -49,8 +53,8 @@ class UserService implements UserServiceInterface
             return $user;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Gagal membuat pengguna" . $e->getMessage(), ['exception' => $e]);
-            throw new UserCreationException("Terjadi masalah saat membuat pengguna. Silakan coba lagi nanti.");
+            Log::error('Gagal membuat pengguna'.$e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException('Terjadi masalah saat membuat pengguna. Silakan coba lagi nanti.');
         }
     }
 
@@ -66,10 +70,11 @@ class UserService implements UserServiceInterface
                     });
                 })->paginate($perPage)
                 ->withQueryString();
+
             return $data;
         } catch (\Exception $e) {
-            Log::error("Gagal mendapatkan semua user " . $e->getMessage(), ['exception' => $e]);
-            throw new Exception("Terjadi kesalahan dalam server");
+            Log::error('Gagal mendapatkan semua user '.$e->getMessage(), ['exception' => $e]);
+            throw new Exception('Terjadi kesalahan dalam server');
         }
     }
 
@@ -77,44 +82,44 @@ class UserService implements UserServiceInterface
     {
         try {
             $user = User::where('uuid', $uuid)->with(['roles:id,name'])->firstOrFail();
+
             return $user;
         } catch (\Exception $e) {
-            Log::error("Gagal mendapatkan pengguna denga ID: " . $e->getMessage(), ['exception' => $e]);
-            throw new UserCreationException("Pengguna tidak ditemukan");
+            Log::error('Gagal mendapatkan pengguna denga ID: '.$e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException('Pengguna tidak ditemukan');
         }
     }
 
     public function update($data, $uuid)
     {
         if (User::where('email', $data['email'])->exists()) {
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException;
         }
         try {
-            $user = User::where('uuid', $uuid)->with(['roles:id,name'])->first();
-            $currentRoleId = $user["roles"][0]["id"];
-            $newRoleId = $data['roles'];
+            $user          = User::where('uuid', $uuid)->with(['roles:id,name'])->first();
+            $currentRoleId = $user['roles'][0]['id'];
+            $newRoleId     = $data['roles'];
 
             if ($currentRoleId != $newRoleId) {
-                $userRole = UserRole::where('user_id', $user["id"])
+                $userRole = UserRole::where('user_id', $user['id'])
                     ->where('role_id', $currentRoleId)->first();
 
                 $userRole->update([
                     'role_id',
-                    $newRoleId
+                    $newRoleId,
                 ]);
             }
 
             $user->update([
-                'name' => $data['name'],
-                'email' => $data['email'],
+                'name'       => $data['name'],
+                'email'      => $data['email'],
                 'noWhatsapp' => $data['noWhatsapp'],
             ]);
 
-
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal memperbaharui user: " . $e->getMessage(), ['exception' => $e]);
-            throw new UserCreationException("Terjadi masalah saat update pengguna. Silakan coba lagi nanti.");
+            Log::error('Gagal memperbaharui user: '.$e->getMessage(), ['exception' => $e]);
+            throw new UserCreationException('Terjadi masalah saat update pengguna. Silakan coba lagi nanti.');
         }
     }
 
@@ -122,16 +127,17 @@ class UserService implements UserServiceInterface
     {
         $user = User::where('uuid', $uuid)->first();
 
-        if (!$user) {
-            throw new UserDeletionException("Pengguna belum terdaftar");
+        if (! $user) {
+            throw new UserDeletionException('Pengguna belum terdaftar');
         }
 
         try {
             $user->delete();
+
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal menghapus user dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
-            throw new UserDeletionException("Terjadi kesalahan dalam menghapus user. Silahkan coba lagi nanti");
+            Log::error("Gagal menghapus user dengan ID {$uuid}".$e->getMessage(), ['exception' => $e]);
+            throw new UserDeletionException('Terjadi kesalahan dalam menghapus user. Silahkan coba lagi nanti');
         }
     }
 }

@@ -9,9 +9,6 @@ class PurchaseOrderItem extends Model
 {
     use HasFactory;
 
-
-
-
     protected $fillable = [
         'uuid',
         'purchase_order_id',

@@ -14,7 +14,9 @@ use Inertia\Inertia;
 class BarangMasukController extends Controller
 {
     private $barangMasukService;
+
     private $barangService;
+
     private $supplierService;
 
     public function __construct(
@@ -23,8 +25,8 @@ class BarangMasukController extends Controller
         SupplierServiceInterface $supplierService
     ) {
         $this->barangMasukService = $barangMasukService;
-        $this->barangService = $barangService;
-        $this->supplierService = $supplierService;
+        $this->barangService      = $barangService;
+        $this->supplierService    = $supplierService;
     }
 
     public function index()
@@ -36,18 +38,18 @@ class BarangMasukController extends Controller
                 'data' => $barangMasuk,
             ]);
         } catch (\Exception $e) {
-            return redirect("/barang-masuk")->with('error', $e->getMessage());
+            return redirect('/barang-masuk')->with('error', $e->getMessage());
         }
     }
 
     public function showCreate()
     {
-        $optionBarang = $this->barangService->getOptions();
+        $optionBarang   = $this->barangService->getOptions();
         $optionSupplier = $this->supplierService->getOptions();
 
         return Inertia::render('BarangMasuk/FormBarangMasuk', [
-            "isUpdate" => false,
-            'optionBarang' => $optionBarang,
+            'isUpdate'       => false,
+            'optionBarang'   => $optionBarang,
             'optionSupplier' => $optionSupplier,
         ]);
     }
@@ -61,24 +63,23 @@ class BarangMasukController extends Controller
                 'data' => $data,
             ]);
         } catch (BarangException $e) {
-            return redirect('/barang-masuk')->with("error", $e->getMessage());
+            return redirect('/barang-masuk')->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return redirect('/barang-masuk')->with('error', 'Terjadi kesalahan pada server');
         }
     }
 
-
     public function create(Request $request)
     {
         try {
             $validated = $request->validate([
-                'nomor_referensi' => 'required',
-                'supplier_id' => 'required',
-                'tanggal_masuk' => 'required',
-                'catatan' => 'nullable',
-                'items' => 'required|array|min:1',
-                'items.*.barang_id' => 'required|exists:barangs,id',
-                'items.*.quantity' => 'required|integer|min:1',
+                'nomor_referensi'    => 'required',
+                'supplier_id'        => 'required',
+                'tanggal_masuk'      => 'required',
+                'catatan'            => 'nullable',
+                'items'              => 'required|array|min:1',
+                'items.*.barang_id'  => 'required|exists:barangs,id',
+                'items.*.quantity'   => 'required|integer|min:1',
                 'items.*.harga_beli' => 'required|numeric|min:0',
             ]);
 
@@ -90,7 +91,8 @@ class BarangMasukController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Terjadi error tak terduga saat membuat barang: " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat barang: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }
@@ -99,11 +101,13 @@ class BarangMasukController extends Controller
     {
         try {
             $this->barangMasukService->delete($uuid);
+
             return redirect()->back()->with('success', 'Barang berhasil dihapus!');
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Terjadi error tak terduga saat menghapus barang: " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat menghapus barang: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }

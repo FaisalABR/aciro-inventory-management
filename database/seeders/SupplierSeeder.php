@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Supplier;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class SupplierSeeder extends Seeder
@@ -16,31 +15,31 @@ class SupplierSeeder extends Seeder
 
         $suppliers = [
             [
-                'uuid' => 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-                'name' => 'PT. Distributor Cepat',
+                'uuid'          => 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+                'name'          => 'PT. Distributor Cepat',
                 'contactPerson' => 'Budi Santoso',
-                'noWhatsapp' => '+6282110779970',
-                'email' => 'info@distributorcepat.com',
-                'alamat' => 'Jl. Merdeka No. 123',
-                'kota' => 'Jakarta',
+                'noWhatsapp'    => '+6282110779970',
+                'email'         => 'info@distributorcepat.com',
+                'alamat'        => 'Jl. Merdeka No. 123',
+                'kota'          => 'Jakarta',
             ],
             [
-                'uuid' => 'f1e2d3c4-b5a6-0987-6543-210fedcba987',
-                'name' => 'CV. Jaya Abadi Supplies',
+                'uuid'          => 'f1e2d3c4-b5a6-0987-6543-210fedcba987',
+                'name'          => 'CV. Jaya Abadi Supplies',
                 'contactPerson' => 'Siti Aminah',
-                'noWhatsapp' => '+6282110779970',
-                'email' => 'admin@jayaabadi.co.id',
-                'alamat' => 'Jl. Pahlawan No. 45, Blok A',
-                'kota' => 'Surabaya',
+                'noWhatsapp'    => '+6282110779970',
+                'email'         => 'admin@jayaabadi.co.id',
+                'alamat'        => 'Jl. Pahlawan No. 45, Blok A',
+                'kota'          => 'Surabaya',
             ],
             [
-                'uuid' => '1a2b3c4d-5e6f-7080-9101-112131415161',
-                'name' => 'Toko Sumber Rezeki',
+                'uuid'          => '1a2b3c4d-5e6f-7080-9101-112131415161',
+                'name'          => 'Toko Sumber Rezeki',
                 'contactPerson' => 'Ahmad Fauzi',
-                'noWhatsapp' => '+6282110779970',
-                'email' => 'sumberrezeki@gmail.com',
-                'alamat' => 'Jl. Kenangan Indah Raya No. 7',
-                'kota' => 'Bandung',
+                'noWhatsapp'    => '+6282110779970',
+                'email'         => 'sumberrezeki@gmail.com',
+                'alamat'        => 'Jl. Kenangan Indah Raya No. 7',
+                'kota'          => 'Bandung',
             ],
         ];
         foreach ($suppliers as $supplier) {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid()->unique();
             $table->string('nomor_referensi');
-            $table->date("tanggal_keluar");
+            $table->date('tanggal_keluar');
             $table->foreignId('user_id')->constrained('users'); // staff peminta
             $table->enum('status', ['Menunggu Verifikasi', 'Disetujui sebagian', 'Disetujui', 'Ditolak', 'Dieksekusi'])->default('Menunggu Verifikasi');
             $table->boolean('verifikasi_kepala_toko')->default(false);

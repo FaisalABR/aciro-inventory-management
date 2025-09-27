@@ -6,7 +6,6 @@ use App\Exceptions\User\EmailAlreadyExistsException;
 use App\Exceptions\User\UserCreationException;
 use App\Exceptions\User\UserDeletionException;
 use App\Services\UserServiceInterface;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -23,28 +22,28 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $search = $request->input('search');
-            $perPage  = $request->input('per_page', 10); // default 10
-            $page     = $request->input('page', 1);
+            $search  = $request->input('search');
+            $perPage = $request->input('per_page', 10); // default 10
+            $page    = $request->input('page', 1);
 
             $users = $this->userService->getAllUsers($search, $perPage);
 
             return Inertia::render('KelolaUser/Index', [
-                'data' => $users,
+                'data'    => $users,
                 'filters' => [
                     'search' => $search,
                 ],
-                'message' => "Sukses mengirim data"
+                'message' => 'Sukses mengirim data',
             ]);
         } catch (\Exception $e) {
-            return redirect("/kelola-user")->with('error', $e->getMessage());
+            return redirect('/kelola-user')->with('error', $e->getMessage());
         }
     }
 
     public function showCreate()
     {
         return Inertia::render('KelolaUser/FormUser', [
-            "isUpdate" => false,
+            'isUpdate' => false,
         ]);
     }
 
@@ -52,27 +51,27 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserByUUID($uuid);
+
             return Inertia::render('KelolaUser/FormUser', [
-                "isUpdate" => true,
-                "data" => $user,
+                'isUpdate' => true,
+                'data'     => $user,
             ]);
         } catch (UserCreationException $e) {
-            return redirect("/kelola-user")->with("error", $e->getMessage());
+            return redirect('/kelola-user')->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            return redirect("/kelola-user")->with('error', 'Terjadi kesalahan server saat mengambil data pengguna.');
+            return redirect('/kelola-user')->with('error', 'Terjadi kesalahan server saat mengambil data pengguna.');
         }
     }
-
 
     public function create(Request $request)
     {
         try {
             $validated = $request->validate([
-                'name' => 'required',
-                'email' => 'required|email',
-                'password' => 'required',
+                'name'       => 'required',
+                'email'      => 'required|email',
+                'password'   => 'required',
                 'noWhatsapp' => 'required',
-                'roles' => 'required',
+                'roles'      => 'required',
             ]);
 
             $this->userService->create($validated);
@@ -83,7 +82,8 @@ class UserController extends Controller
         } catch (UserCreationException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Terjadi error tak terduga saat membuat pengguna: " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat pengguna: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }
@@ -92,11 +92,13 @@ class UserController extends Controller
     {
         try {
             $this->userService->delete($uuid);
+
             return redirect()->back()->with('success', 'User berhasil dihapus!');
         } catch (UserDeletionException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Terjadi error tak terduga saat menghapus pengguna: " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat menghapus pengguna: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }
@@ -106,14 +108,14 @@ class UserController extends Controller
         try {
 
             $validated = $request->validate([
-                'name' => 'required',
-                'email' => 'required|email',
+                'name'       => 'required',
+                'email'      => 'required|email',
                 'noWhatsapp' => 'required',
-                'roles' => 'required',
+                'roles'      => 'required',
             ]);
 
             $result = $this->userService->update($validated, $uuid);
-            if (!$result) {
+            if (! $result) {
                 return redirect()->back()->with('error', 'User gagal diperbaharui!');
             }
 
@@ -123,7 +125,8 @@ class UserController extends Controller
         } catch (UserCreationException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Terjadi error tak terduga saat membuat pengguna: " . $e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat pengguna: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
     }

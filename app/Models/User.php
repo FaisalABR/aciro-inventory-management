@@ -18,7 +18,6 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-
     protected static function booted(): void
     {
         static::creating(function ($model) {
@@ -31,7 +30,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'noWhatsapp'
+        'noWhatsapp',
     ];
 
     /**
@@ -53,7 +52,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 

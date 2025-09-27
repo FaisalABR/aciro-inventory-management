@@ -7,12 +7,17 @@ use App\Models\Supplier;
 interface SupplierServiceInterface
 {
     public function create(array $data);
+
     public function getAll($search, $perPage);
+
     public function get($uuid);
+
     public function update($data, $uuid);
+
     public function delete($uuid);
+
     public function getOptions();
-};
+}
 
 class SupplierService implements SupplierServiceInterface
 {
@@ -20,7 +25,7 @@ class SupplierService implements SupplierServiceInterface
     {
         $supplier = Supplier::create($data);
 
-        if (!$supplier) {
+        if (! $supplier) {
             return false;
         }
 
@@ -31,8 +36,9 @@ class SupplierService implements SupplierServiceInterface
     {
         $query = Supplier::query();
         if ($search) {
-            $query->where("name", 'ILIKE', "%{$search}%")->orWhere("contactPerson", "ILIKE", "%{$search}%");
+            $query->where('name', 'ILIKE', "%{$search}%")->orWhere('contactPerson', 'ILIKE', "%{$search}%");
         }
+
         return $query->paginate($perPage);
     }
 
@@ -40,10 +46,9 @@ class SupplierService implements SupplierServiceInterface
     {
         $supplier = Supplier::where('uuid', $uuid)->first();
 
-        if (!$supplier) {
+        if (! $supplier) {
             return false;
         }
-
 
         return $supplier;
     }
@@ -52,7 +57,7 @@ class SupplierService implements SupplierServiceInterface
     {
         $supplier = Supplier::where('uuid', $uuid)->first();
 
-        if (!$supplier) {
+        if (! $supplier) {
             return false;
         }
 
@@ -65,11 +70,12 @@ class SupplierService implements SupplierServiceInterface
     {
         $supplier = Supplier::where('uuid', $uuid)->first();
 
-        if (!$supplier) {
+        if (! $supplier) {
             return false;
         }
 
         $supplier->delete();
+
         return true;
     }
 

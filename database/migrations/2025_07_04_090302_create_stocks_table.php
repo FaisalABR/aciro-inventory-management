@@ -21,14 +21,14 @@ return new class extends Migration
             $table->enum('status_rop', [
                 'In Stock',
                 'Need Restock',
-                'Out Of Stock'
+                'Out Of Stock',
             ]);
             $table->enum('status_itr', [
                 'Fast Moving',
                 'Slow Moving',
                 'Deadstock',
             ])->nullable();
-            $table->date("last_evaluated")->nullable();
+            $table->date('last_evaluated')->nullable();
             $table->timestamps();
         });
     }

@@ -17,10 +17,12 @@ use Inertia\Inertia;
 class PurchaseOrderController extends Controller
 {
     protected $url;
+
     public function __construct()
     {
         $this->url = config('app.url');
     }
+
     public function index()
     {
         $query = PurchaseOrder::with('supplier')->select(
@@ -37,14 +39,14 @@ class PurchaseOrderController extends Controller
 
         $formattedValue = $query->get()->map(function ($purchaseOrder) {
             return [
-                'id' => $purchaseOrder->id,
-                'uuid' => $purchaseOrder->uuid,
-                'nomor_referensi' => $purchaseOrder->nomor_referensi,
-                'tanggal_order' => $purchaseOrder->tanggal_order,
-                'total_quantity' => $purchaseOrder->total_quantity,
+                'id'                 => $purchaseOrder->id,
+                'uuid'               => $purchaseOrder->uuid,
+                'nomor_referensi'    => $purchaseOrder->nomor_referensi,
+                'tanggal_order'      => $purchaseOrder->tanggal_order,
+                'total_quantity'     => $purchaseOrder->total_quantity,
                 'total_unique_items' => $purchaseOrder->total_unique_items,
-                'status' => $purchaseOrder->status,
-                'supplier' => [
+                'status'             => $purchaseOrder->status,
+                'supplier'           => [
                     'id'   => $purchaseOrder->supplier->id,
                     'name' => $purchaseOrder->supplier->name,
                 ],
@@ -58,7 +60,7 @@ class PurchaseOrderController extends Controller
 
     public function showEdit($uuid)
     {
-        $po = PurchaseOrder::where('uuid', $uuid)->with(['supplier', 'items.barang'])->firstOrFail();
+        $po   = PurchaseOrder::where('uuid', $uuid)->with(['supplier', 'items.barang'])->firstOrFail();
         $data = Supplier::all();
 
         $optionSupplier = $data->map(function ($supplier) {
@@ -69,75 +71,74 @@ class PurchaseOrderController extends Controller
         });
 
         return Inertia::render('PurchaseOrder/FormPurchase', [
-            "isUpdate" => true,
-            "data" => $po,
+            'isUpdate'       => true,
+            'data'           => $po,
             'optionSupplier' => $optionSupplier,
         ]);
     }
 
     public function showDetail($uuid)
     {
-        $po = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
+        $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
         $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
 
         $data = [
-            'id' => $po->id,
-            'uuid' => $po->uuid,
-            'nomor_referensi' => $po->nomor_referensi,
-            'tanggal_order' => $po->tanggal_order,
-            'catatan' => $po->catatan,
-            'status' => $po->status,
-            'verifikasi_kepala_toko' => $po->verifikasi_kepala_toko,
-            'verifikasi_kepala_gudang' => $po->verifikasi_kepala_gudang,
-            'verifikasi_kepala_pengadaan' => $po->verifikasi_kepala_pengadaan,
+            'id'                           => $po->id,
+            'uuid'                         => $po->uuid,
+            'nomor_referensi'              => $po->nomor_referensi,
+            'tanggal_order'                => $po->tanggal_order,
+            'catatan'                      => $po->catatan,
+            'status'                       => $po->status,
+            'verifikasi_kepala_toko'       => $po->verifikasi_kepala_toko,
+            'verifikasi_kepala_gudang'     => $po->verifikasi_kepala_gudang,
+            'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
-            'supplier' => [
-                "id" => $po->supplier->id,
-                "name" => $po->supplier->name,
+            'supplier'                     => [
+                'id'   => $po->supplier->id,
+                'name' => $po->supplier->name,
             ],
             'items' => $poItems,
         ];
 
         return Inertia::render('PurchaseOrder/Detail', [
-            "data" => $data,
+            'data' => $data,
         ]);
     }
 
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'tanggal_order' => 'required',
-            'catatan' => 'nullable',
-            'supplier_id' => 'required',
-            'items' => 'required|array|min:1',
+            'tanggal_order'     => 'required',
+            'catatan'           => 'nullable',
+            'supplier_id'       => 'required',
+            'items'             => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity'  => 'required|integer|min:1',
             'items.*.hargaBeli' => 'required|integer|min:1',
         ]);
 
         $totalPO = PurchaseOrder::count();
-        $users = User::whereHas('roles', function ($q) {
+        $users   = User::whereHas('roles', function ($q) {
             $q->whereIn('name', ['kepala_gudang', 'kepala_toko', 'kepala_pengadaan', 'kepala_accounting']);
         })->get();
 
         $PO = PurchaseOrder::create([
             'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPO + 1),
-            'tanggal_order' => $validated['tanggal_keluar'],
-            'catatan' =>  $validated['catatan'] ?? '',
-            'status' => 'BUTUH VERIFIKASI',
-            'supplier_id' =>  $validated['supplier_id'] ?? '',
+            'tanggal_order'   => $validated['tanggal_keluar'],
+            'catatan'         => $validated['catatan'] ?? '',
+            'status'          => 'BUTUH VERIFIKASI',
+            'supplier_id'     => $validated['supplier_id'] ?? '',
         ]);
 
         foreach ($validated['items'] as $item) {
             $PO->items()->create($item);
         }
 
-
         foreach ($users as $user) {
             // Send whatsapp ke kepala toko, kepala gudang, kepala accounting, dan kepala pengadaan
             // Format role agar jadi "Kepala Gudang" bukan "kepala_gudang"
             $roles = $user->roles->pluck('name')
-                ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
                 ->implode(', ');
 
             $text = "Halo {$user->name} ({$roles}), ada PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih.";
@@ -145,19 +146,18 @@ class PurchaseOrderController extends Controller
             SendWhatsappJob::dispatch($user->noWhatsapp, $text);
         }
 
-
         return redirect('/purchase-orders')->with('success', 'PO Berhasil Dibuat berhasil ditambahkan!');
     }
 
     public function update(Request $request, $uuid)
     {
         $validated = $request->validate([
-            'tanggal_order' => 'required|date',
-            'catatan' => 'nullable|string',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'items' => 'required|array|min:1',
+            'tanggal_order'     => 'required|date',
+            'catatan'           => 'nullable|string',
+            'supplier_id'       => 'required|exists:suppliers,id',
+            'items'             => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity'  => 'required|integer|min:1',
             // 'items.*.harga_beli' => 'required|integer|min:1',
         ]);
 
@@ -167,9 +167,9 @@ class PurchaseOrderController extends Controller
         // Update PO
         $PO->update([
             'tanggal_order' => $validated['tanggal_order'],
-            'catatan' => $validated['catatan'] ?? '',
-            'status' => 'BUTUH VERIFIKASI',
-            'supplier_id' => $validated['supplier_id'],
+            'catatan'       => $validated['catatan'] ?? '',
+            'status'        => 'BUTUH VERIFIKASI',
+            'supplier_id'   => $validated['supplier_id'],
         ]);
 
         // Hapus items lama, buat ulang
@@ -184,13 +184,13 @@ class PurchaseOrderController extends Controller
                 'kepala_gudang',
                 'kepala_toko',
                 'kepala_pengadaan',
-                'kepala_accounting'
+                'kepala_accounting',
             ]);
         })->with('roles')->get();
 
         foreach ($users as $user) {
             $roles = $user->roles->pluck('name')
-                ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
                 ->implode(', ');
 
             $text = "Halo {$user->name} ({$roles}), ada PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih.";
@@ -227,9 +227,9 @@ class PurchaseOrderController extends Controller
             $PO->status = 'VERIFIKASI';
 
             if ($PO->status == 'VERIFIKASI') {
-                $tanggal = Carbon::parse($PO->tanggal_order)->locale('id');
+                $tanggal   = Carbon::parse($PO->tanggal_order)->locale('id');
                 $formatted = $tanggal->translatedFormat('l, d F Y');
-                $text =   "
+                $text      = "
 Halo {$PO->supplier->name},
 
 Kami dari Koperasi Karya Bersama Aciro ingin melakukan pemesanan sesuai Purchase Order (PO):
@@ -261,29 +261,29 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
     public function showSupplierPortal($uuid)
     {
-        $po = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
+        $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
         $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
 
         $data = [
-            'id' => $po->id,
-            'uuid' => $po->uuid,
-            'nomor_referensi' => $po->nomor_referensi,
-            'tanggal_order' => $po->tanggal_order,
-            'catatan' => $po->catatan,
-            'status' => $po->status,
-            'verifikasi_kepala_toko' => $po->verifikasi_kepala_toko,
-            'verifikasi_kepala_gudang' => $po->verifikasi_kepala_gudang,
-            'verifikasi_kepala_pengadaan' => $po->verifikasi_kepala_pengadaan,
+            'id'                           => $po->id,
+            'uuid'                         => $po->uuid,
+            'nomor_referensi'              => $po->nomor_referensi,
+            'tanggal_order'                => $po->tanggal_order,
+            'catatan'                      => $po->catatan,
+            'status'                       => $po->status,
+            'verifikasi_kepala_toko'       => $po->verifikasi_kepala_toko,
+            'verifikasi_kepala_gudang'     => $po->verifikasi_kepala_gudang,
+            'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
-            'supplier' => [
-                "id" => $po->supplier->id,
-                "name" => $po->supplier->name,
+            'supplier'                     => [
+                'id'   => $po->supplier->id,
+                'name' => $po->supplier->name,
             ],
             'items' => $poItems,
         ];
 
         return Inertia::render('SupplierView/Index', [
-            "data" => $data,
+            'data' => $data,
         ]);
     }
 
@@ -301,12 +301,11 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
         $tanggalSekarang = Carbon::parse(now())->locale('id');
 
-
-        if ($PO->status === "TERKIRIM") {
-            $PO->status = "KONFIRMASI SUPPLIER";
+        if ($PO->status === 'TERKIRIM') {
+            $PO->status = 'KONFIRMASI SUPPLIER';
             foreach ($users as $user) {
                 $roles = $user->roles->pluck('name')
-                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
                     ->implode(', ');
 
                 $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
@@ -316,11 +315,11 @@ Tim Procurement Koperasi Karya Bersama Aciro
                 SendWhatsappJob::dispatch($user->noWhatsapp, $text);
             }
         } else {
-            $PO->status = "BARANG DIKIRIM";
+            $PO->status = 'BARANG DIKIRIM';
 
             foreach ($users as $user) {
                 $roles = $user->roles->pluck('name')
-                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
                     ->implode(', ');
 
                 $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi} sedang dalam pengiriman oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
@@ -332,10 +331,10 @@ Tim Procurement Koperasi Karya Bersama Aciro
         }
         $PO->save();
 
-        $pesan = $PO->status === "KONFIRMASI SUPPLIER"
+        $pesan = $PO->status === 'KONFIRMASI SUPPLIER'
             ? 'PO berhasil dikonfirmasi'
             : 'PO berhasil dikirim';
 
-        return back()->with('success',  $pesan);
+        return back()->with('success', $pesan);
     }
 }

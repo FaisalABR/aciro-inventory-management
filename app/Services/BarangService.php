@@ -5,27 +5,30 @@ namespace App\Services;
 use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
 use App\Models\Barang;
-use App\Models\Supplier;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 interface BarangServiceInterface
 {
     public function create(array $data);
+
     public function getAll($search, $perPage);
+
     public function getBarangByUUID($uuid);
+
     public function update($data, $uuid);
+
     public function delete($uuid);
+
     public function getOptions($supplier = null);
-};
+}
 
 class BarangService implements BarangServiceInterface
 {
     public function create(array $data)
     {
         if (Barang::where('name', $data['name'])->exists()) {
-            throw new BarangAlreadyExistsException();
+            throw new BarangAlreadyExistsException;
         }
 
         try {
@@ -34,8 +37,8 @@ class BarangService implements BarangServiceInterface
             return $barang;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Gagal membuat barang" . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Terjadi masalah saat membuat barang. Silakan coba lagi nanti.", 500);
+            Log::error('Gagal membuat barang'.$e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi masalah saat membuat barang. Silakan coba lagi nanti.', 500);
         }
     }
 
@@ -51,8 +54,8 @@ class BarangService implements BarangServiceInterface
 
             return $data;
         } catch (\Exception $e) {
-            Log::error("Gagal mendapatkan semua barang " . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Terjadi kesalahan dalam server", 500);
+            Log::error('Gagal mendapatkan semua barang '.$e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi kesalahan dalam server', 500);
         }
     }
 
@@ -60,10 +63,11 @@ class BarangService implements BarangServiceInterface
     {
         try {
             $barang = Barang::where('uuid', $uuid)->with(['supplier', 'satuan'])->firstOrFail();
+
             return $barang;
         } catch (\Exception $e) {
-            Log::error("Gagal mendapatkan barang dengan ID: " . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Pengguna tidak ditemukan", 404);
+            Log::error('Gagal mendapatkan barang dengan ID: '.$e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Pengguna tidak ditemukan', 404);
         }
     }
 
@@ -75,11 +79,10 @@ class BarangService implements BarangServiceInterface
 
             $barang->update($data);
 
-
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal memperbaharui barang: " . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Terjadi masalah saat update pengguna. Silakan coba lagi nanti.", 500);
+            Log::error('Gagal memperbaharui barang: '.$e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi masalah saat update pengguna. Silakan coba lagi nanti.', 500);
         }
     }
 
@@ -87,16 +90,17 @@ class BarangService implements BarangServiceInterface
     {
         $barang = Barang::where('uuid', $uuid)->first();
 
-        if (!$barang) {
-            throw new BarangException("Pengguna belum terdaftar");
+        if (! $barang) {
+            throw new BarangException('Pengguna belum terdaftar');
         }
 
         try {
             $barang->delete();
+
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal menghapus barang dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
-            throw new BarangException("Terjadi kesalahan dalam menghapus barang. Silahkan coba lagi nanti");
+            Log::error("Gagal menghapus barang dengan ID {$uuid}".$e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi kesalahan dalam menghapus barang. Silahkan coba lagi nanti');
         }
     }
 

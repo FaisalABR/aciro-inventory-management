@@ -12,11 +12,10 @@ class StockController extends Controller
     {
         $statusITR = $request->input('statusITR', null);
         $statusROP = $request->input('statusROP', null);
-        $perPage = $request->input('per_page', null);
-        $search = $request->input("search");
+        $perPage   = $request->input('per_page', null);
+        $search    = $request->input('search');
 
         $query = Stock::with(['barangs']);
-
 
         if ($search) {
             $query->whereHas('barangs', function ($q) use ($search) {
@@ -27,10 +26,10 @@ class StockController extends Controller
         if ($statusITR || $statusROP) {
             $query->where(function ($q) use ($statusITR, $statusROP) {
                 if ($statusITR) {
-                    $q->where("status_itr", 'ILIKE', "%{$statusITR}%");
+                    $q->where('status_itr', 'ILIKE', "%{$statusITR}%");
                 }
                 if ($statusROP) {
-                    $q->orWhere("status_rop", "ILIKE", "%{$statusROP}%");
+                    $q->orWhere('status_rop', 'ILIKE', "%{$statusROP}%");
                 }
             });
         }
@@ -38,12 +37,12 @@ class StockController extends Controller
         $paginated_data = $query->paginate($perPage);
 
         return Inertia::render('Stock', [
-            'data' => $paginated_data,
+            'data'    => $paginated_data,
             'filters' => [
-                'search' => $search,
+                'search'    => $search,
                 'statusROP' => $statusROP,
                 'statusITR' => $statusITR,
-            ]
+            ],
         ]);
     }
 }

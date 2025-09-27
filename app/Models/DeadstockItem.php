@@ -10,7 +10,6 @@ class DeadstockItem extends Model
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
-
     protected $casts = [
         'itr' => 'float',
 
@@ -24,7 +23,7 @@ class DeadstockItem extends Model
         'persediaan_awal',
         'persediaan_akhir',
         'itr',
-        'status'
+        'status',
     ];
 
     public function headerDeadstock()

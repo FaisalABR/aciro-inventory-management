@@ -17,24 +17,24 @@ class SupplierController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->input("search");
-        $perPage = $request->input("per_page", 10);
+        $search  = $request->input('search');
+        $perPage = $request->input('per_page', 10);
 
         $satuan = $this->supplierService->getAll($search, $perPage);
 
         return Inertia::render('Master/Supplier/Index', [
-            'data' => $satuan,
+            'data'    => $satuan,
             'filters' => [
-                "search" => $search,
+                'search' => $search,
             ],
-            'message' => "Sukses mengirim data"
+            'message' => 'Sukses mengirim data',
         ]);
     }
 
     public function showCreate()
     {
         return Inertia::render('Master/Supplier/FormSupplier', [
-            "isUpdate" => false,
+            'isUpdate' => false,
         ]);
     }
 
@@ -42,31 +42,30 @@ class SupplierController extends Controller
     {
         $supplier = $this->supplierService->get($uuid);
 
-        if (!$supplier) {
-            return redirect()->back()->with("error", "Tidak ada satuan ini");
+        if (! $supplier) {
+            return redirect()->back()->with('error', 'Tidak ada satuan ini');
         }
 
         return Inertia::render('Master/Supplier/FormSupplier', [
-            "isUpdate" => true,
-            "data" => $supplier,
+            'isUpdate' => true,
+            'data'     => $supplier,
         ]);
     }
-
 
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required',
+            'name'          => 'required',
             'contactPerson' => 'required',
-            'noWhatsapp' => 'required',
-            'email' => 'required',
-            'alamat' => 'required',
-            'kota' => 'required',
+            'noWhatsapp'    => 'required',
+            'email'         => 'required',
+            'alamat'        => 'required',
+            'kota'          => 'required',
         ]);
 
         $satuan = $this->supplierService->create($validated);
 
-        if (!$satuan) {
+        if (! $satuan) {
             return redirect()->back()->with('error', 'Supplier gagal ditambahkan!');
         }
 
@@ -78,7 +77,7 @@ class SupplierController extends Controller
 
         $result = $this->supplierService->delete($uuid);
 
-        if (!$result) {
+        if (! $result) {
             return redirect()->back()->with('error', 'Supplier gagal dihapus!');
         }
 
@@ -88,16 +87,16 @@ class SupplierController extends Controller
     public function update(Request $request, $uuid)
     {
         $validated = $request->validate([
-            'name' => 'required',
+            'name'          => 'required',
             'contactPerson' => 'required',
-            'noWhatsapp' => 'required',
-            'email' => 'required',
-            'alamat' => 'required',
-            'kota' => 'required',
+            'noWhatsapp'    => 'required',
+            'email'         => 'required',
+            'alamat'        => 'required',
+            'kota'          => 'required',
         ]);
 
         $result = $this->supplierService->update($validated, $uuid);
-        if (!$result) {
+        if (! $result) {
             return redirect()->back()->with('error', 'Supplier gagal diperbaharui!');
         }
 

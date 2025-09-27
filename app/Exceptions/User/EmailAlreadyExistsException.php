@@ -8,7 +8,7 @@ use Throwable;
 class EmailAlreadyExistsException extends Exception
 {
     public function __construct(
-        string $message = "Email sudah terdaftar.",
+        string $message = 'Email sudah terdaftar.',
         int $code = 422,
         ?Throwable $previous = null
     ) {

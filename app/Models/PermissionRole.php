@@ -10,7 +10,7 @@ class PermissionRole extends Pivot
     /** @use HasFactory<\Database\Factories\PermissionRoleFactory> */
     use HasFactory;
 
-        protected $fillable = ['role_id', 'permission_id'];
+    protected $fillable = ['role_id', 'permission_id'];
 
     // Relasi ke Role
     public function role()
@@ -23,5 +23,4 @@ class PermissionRole extends Pivot
     {
         return $this->belongsTo(Permission::class);
     }
-
 }

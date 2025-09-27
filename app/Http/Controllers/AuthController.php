@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            return redirect("/");
+            return redirect('/');
         }
 
         return Inertia::render('Login');
@@ -28,7 +28,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
@@ -44,6 +44,7 @@ class AuthController extends Controller
     public function logout()
     {
         $this->authService->logout();
-        return redirect("/login");
+
+        return redirect('/login');
     }
 }

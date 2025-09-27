@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Barang;
 use App\Services\AuthService;
 use App\Services\AuthServiceInterface;
 use App\Services\BarangKeluarService;

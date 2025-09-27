@@ -10,7 +10,6 @@ class BarangMasukItem extends Model
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
 
-
     protected $casts = [
         'harga_beli' => 'float',
 

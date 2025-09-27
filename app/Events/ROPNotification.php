@@ -2,10 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -15,6 +12,7 @@ class ROPNotification implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
+
     public $role;
 
     /**
@@ -23,7 +21,7 @@ class ROPNotification implements ShouldBroadcastNow
     public function __construct(string $message, string $role)
     {
         $this->message = $message;
-        $this->role = $role;
+        $this->role    = $role;
     }
 
     public function broadcastOn(): array

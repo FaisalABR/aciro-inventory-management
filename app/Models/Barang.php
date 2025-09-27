@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Barang extends Model
 {
     /** @use HasFactory<\Database\Factories\BarangFactory> */
@@ -31,7 +30,7 @@ class Barang extends Model
         'supplier_id',
         'satuan_id',
         'hargaJual',
-        'hargaBeli'
+        'hargaBeli',
     ];
 
     public function supplier()
@@ -53,7 +52,6 @@ class Barang extends Model
     {
         return $this->hasMany(BarangKeluarItem::class, 'barang_keluar_item_id', 'id');
     }
-
 
     public function stock()
     {

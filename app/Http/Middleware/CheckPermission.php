@@ -16,12 +16,14 @@ class CheckPermission
      */
     public function handle(Request $request, Closure $next, $permission): Response
     {
-        if(! $request->user()->hasPermission($permission)) {
-             if ($request->inertia()) {
+        if (! $request->user()->hasPermission($permission)) {
+            if ($request->inertia()) {
                 return Inertia::location(route('unauthorized'));
             }
+
             return redirect('/unauthorized');
         }
+
         return $next($request);
     }
 }

@@ -7,12 +7,17 @@ use App\Models\Satuan;
 interface SatuanServiceInterface
 {
     public function create(array $data);
+
     public function getAll($search, $perPage);
+
     public function get($satuan);
+
     public function update($data, $uuid);
+
     public function delete($uuid);
+
     public function getOptions();
-};
+}
 
 class SatuanService implements SatuanServiceInterface
 {
@@ -20,7 +25,7 @@ class SatuanService implements SatuanServiceInterface
     {
         $satuan = Satuan::create($data);
 
-        if (!$satuan) {
+        if (! $satuan) {
             return false;
         }
 
@@ -42,10 +47,9 @@ class SatuanService implements SatuanServiceInterface
     {
         $satuan = Satuan::where('uuid', $uuid)->first();
 
-        if (!$satuan) {
+        if (! $satuan) {
             return false;
         }
-
 
         return $satuan;
     }
@@ -54,7 +58,7 @@ class SatuanService implements SatuanServiceInterface
     {
         $satuan = Satuan::where('uuid', $uuid)->first();
 
-        if (!$satuan) {
+        if (! $satuan) {
             return false;
         }
 
@@ -67,11 +71,12 @@ class SatuanService implements SatuanServiceInterface
     {
         $satuan = Satuan::where('uuid', $uuid)->first();
 
-        if (!$satuan) {
+        if (! $satuan) {
             return false;
         }
 
         $satuan->delete();
+
         return true;
     }
 

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Satuan extends Model
 {
     /** @use HasFactory<\Database\Factories\SatuanFactory> */

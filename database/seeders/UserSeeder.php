@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,15 +15,15 @@ class UserSeeder extends Seeder
     {
         $users = [
             [
-                'name' => 'Admin',
-                'email' => 'admin@mail.com',
+                'name'       => 'Admin',
+                'email'      => 'admin@mail.com',
                 'noWhatsapp' => '0822136386576',
             ],
             [
-                'name' => 'Kasim',
-                'email' => 'kepalatoko@mail.com',
+                'name'       => 'Kasim',
+                'email'      => 'kepalatoko@mail.com',
                 'noWhatsapp' => '+6282110779970',
-                'password' => Hash::make("kepalatoko123"),
+                'password'   => Hash::make('kepalatoko123'),
             ],
             [
                 'name'       => 'Sarah Johnson',

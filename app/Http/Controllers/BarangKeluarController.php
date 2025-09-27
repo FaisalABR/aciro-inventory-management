@@ -20,6 +20,7 @@ use Inertia\Inertia;
 class BarangKeluarController extends Controller
 {
     private $barangKeluarService;
+
     private $whatsappService;
 
     public function __construct(
@@ -27,7 +28,7 @@ class BarangKeluarController extends Controller
         WhatsappServiceInterface $whatsappService
     ) {
         $this->barangKeluarService = $barangKeluarService;
-        $this->whatsappService = $whatsappService;
+        $this->whatsappService     = $whatsappService;
     }
 
     public function index()
@@ -39,23 +40,23 @@ class BarangKeluarController extends Controller
                 'data' => $barangKeluar,
             ]);
         } catch (\Exception $e) {
-            return redirect("/barang-keluar")->with('error', $e->getMessage());
+            return redirect('/barang-keluar')->with('error', $e->getMessage());
         }
     }
 
     public function showCreate()
     {
-        $stockBarang = Stock::with('barangs')->get();
+        $stockBarang  = Stock::with('barangs')->get();
         $optionBarang = $stockBarang->map(function ($stock) {
             return [
-                'value' => $stock->barangs->id,
-                'label' => $stock->barangs->name . ($stock->quantity == 0 ? ' (habis)' : ''),
+                'value'    => $stock->barangs->id,
+                'label'    => $stock->barangs->name.($stock->quantity == 0 ? ' (habis)' : ''),
                 'disabled' => $stock->quantity == 0,
             ];
         });
 
         return Inertia::render('PermintaanBarangKeluar/FormPermintaanBarangKeluar', [
-            "isUpdate" => false,
+            'isUpdate'     => false,
             'optionBarang' => $optionBarang,
         ]);
     }
@@ -69,7 +70,7 @@ class BarangKeluarController extends Controller
                 'data' => $data,
             ]);
         } catch (BarangException $e) {
-            return redirect('/barang-keluar')->with("error", $e->getMessage());
+            return redirect('/barang-keluar')->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return redirect('/barang-keluar')->with('error', 'Terjadi kesalahan pada server');
         }
@@ -78,20 +79,20 @@ class BarangKeluarController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'tanggal_keluar' => 'required',
-            'catatan' => 'nullable',
-            'items' => 'required|array|min:1',
+            'tanggal_keluar'    => 'required',
+            'catatan'           => 'nullable',
+            'items'             => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity'  => 'required|integer|min:1',
         ]);
 
         $totalBarangKeluar = BarangKeluar::count();
 
         $permintaanBarangKeluar = BarangKeluar::create([
             'nomor_referensi' => sprintf('PBK-%s-%04d', now()->format('Ymd'), $totalBarangKeluar + 1),
-            'tanggal_keluar' => $validated['tanggal_keluar'],
-            'catatan' =>  $validated['catatan'] ?? '',
-            'user_id' => Auth::id(),
+            'tanggal_keluar'  => $validated['tanggal_keluar'],
+            'catatan'         => $validated['catatan'] ?? '',
+            'user_id'         => Auth::id(),
         ]);
 
         foreach ($validated['items'] as $item) {
@@ -126,15 +127,14 @@ class BarangKeluarController extends Controller
 
     public function checkROP(Request $request)
     {
-        $items = $request->all();
+        $items    = $request->all();
         $warnings = [];
-        $errors = [];
+        $errors   = [];
 
         foreach ($items as $item) {
             $barang = Stock::with('barangs')->where('barang_id', $item['barang_id'])->first();
 
-
-            if (!$barang) {
+            if (! $barang) {
                 continue;
             }
 
@@ -143,27 +143,28 @@ class BarangKeluarController extends Controller
             if ($sisa < 0) {
                 $errors[] = [
                     'barang_id' => $barang->id,
-                    'nama' => $barang->barangs->name,
-                    'stock' => $barang->quantity,
-                    'request' => $item['quantity'],
+                    'nama'      => $barang->barangs->name,
+                    'stock'     => $barang->quantity,
+                    'request'   => $item['quantity'],
                 ];
+
                 continue;
             }
 
             if ($sisa <= $barang->rop) {
                 $warnings[] = [
-                    'barang_id' => $barang->id,
-                    'nama' => $barang->barangs->name,
-                    'stock' => $barang->quantity,
-                    'rop' => $barang->rop,
-                    'quantity_keluar' => $item['quantity'],
+                    'barang_id'        => $barang->id,
+                    'nama'             => $barang->barangs->name,
+                    'stock'            => $barang->quantity,
+                    'rop'              => $barang->rop,
+                    'quantity_keluar'  => $item['quantity'],
                     'setelah_eksekusi' => $barang->quantity - $item['quantity'],
                 ];
             }
         }
 
         return response()->json([
-            'errors' => $errors,
+            'errors'      => $errors,
             'ropWarnings' => $warnings,
         ]);
     }
@@ -186,8 +187,9 @@ class BarangKeluarController extends Controller
         foreach ($barangKeluar->items as $item) {
             $stock = Stock::where('barang_id', $item->barang_id)->first();
 
-            if (!$stock) {
+            if (! $stock) {
                 $warnings[] = "Barang {$item->barangs->name} belum ada stok.";
+
                 continue;
             }
 
@@ -198,12 +200,12 @@ class BarangKeluarController extends Controller
 
             // cek ROP
             if (($stock->quantity - $item->quantity) <= $stock->rop) {
-                $warnings[] = "Barang {$item->barangs->name} akan mencapai ROP (sisa setelah keluar: " . ($stock->quantity - $item->quantity) . ")";
+                $warnings[] = "Barang {$item->barangs->name} akan mencapai ROP (sisa setelah keluar: ".($stock->quantity - $item->quantity).')';
             }
         }
 
         return response()->json([
-            'warnings' => $warnings
+            'warnings' => $warnings,
         ]);
     }
 
@@ -216,20 +218,19 @@ class BarangKeluarController extends Controller
         }
 
         DB::transaction(function () use ($barangKeluar) {
-            $messages = []; // kumpulkan pesan ROP 
-            $users = User::whereHas('roles', function ($q) {
+            $messages = []; // kumpulkan pesan ROP
+            $users    = User::whereHas('roles', function ($q) {
                 $q->whereIn('name', ['kepala_gudang', 'kepala_toko']);
             })->get();
-
 
             foreach ($barangKeluar->items as $item) {
                 $stock = Stock::where('barang_id', $item->barang_id)->first();
 
-                if (!$stock || $stock->quantity < $item->quantity) {
+                if (! $stock || $stock->quantity < $item->quantity) {
                     throw new \Exception("Stok tidak mencukupi untuk {$item->barang->nama}");
-                };
+                }
 
-                $sisa = $stock->quantity - $item->quantity;
+                $sisa            = $stock->quantity - $item->quantity;
                 $stock->quantity = $sisa;
 
                 if ($sisa <= $stock->rop) {
@@ -244,25 +245,25 @@ class BarangKeluarController extends Controller
 
                 if ($sisa <= $stock->rop) {
                     $supplier = $item->barangs->supplier;
-                    $totalPo = PurchaseOrder::count();
+                    $totalPo  = PurchaseOrder::count();
 
                     $po = PurchaseOrder::where('supplier_id', $supplier->id)->where('status', 'DRAFT')->first();
 
-                    if (!$po) {
+                    if (! $po) {
                         $po = PurchaseOrder::create([
                             'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPo + 1),
-                            'tanggal_order' => now(),
-                            'supplier_id' => $supplier->id,
-                            'status' => 'DRAFT',
-                            'catatan' => 'test',
+                            'tanggal_order'   => now(),
+                            'supplier_id'     => $supplier->id,
+                            'status'          => 'DRAFT',
+                            'catatan'         => 'test',
                         ]);
                     }
 
                     PurchaseOrderItem::create([
                         'purchase_order_id' => $po->id,
-                        'barang_id' => $item->barang_id,
-                        'quantity' => $item->barangs->maximal_quantity - $stock->rop ?? 0,
-                        'harga_beli' => $item->barangs->harga_beli
+                        'barang_id'         => $item->barang_id,
+                        'quantity'          => $item->barangs->maximal_quantity - $stock->rop ?? 0,
+                        'harga_beli'        => $item->barangs->harga_beli,
                     ]);
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_gudang'));
@@ -273,9 +274,9 @@ class BarangKeluarController extends Controller
                 // Update status barang keluar
                 $barangKeluar->status = 'Dieksekusi';
                 $barangKeluar->save();
-            };
+            }
 
-            if (!empty($messages)) {
+            if (! empty($messages)) {
                 $text = implode("\n", $messages);
                 foreach ($users as $user) {
                     // Send whatsapp ke kepala toko dan kepala gudang

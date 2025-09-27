@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\UserRole;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserRoleSeeder extends Seeder
@@ -34,7 +33,7 @@ class UserRoleSeeder extends Seeder
                 'user_id' => 4,
                 'role_id' => 4,
             ],
-            // Ayu disign ke kepala 
+            // Ayu disign ke kepala
             [
                 'user_id' => 5,
                 'role_id' => 5,

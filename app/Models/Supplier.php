@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Supplier extends Model
 {
     /** @use HasFactory<\Database\Factories\SupplierFactory> */
@@ -26,7 +25,7 @@ class Supplier extends Model
         'noWhatsapp',
         'email',
         'alamat',
-        'kota'
+        'kota',
     ];
 
     public function barangs()
