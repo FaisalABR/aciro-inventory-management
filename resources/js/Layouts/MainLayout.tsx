@@ -169,7 +169,6 @@ export const MainLayout: React.FC<TMainLayout> = ({
                     console.log("🔔 Triggered notif", channelName);
                     notification.info({
                         message: `Notifikasi ${role.replace("_", " ")}: ${e.message}`,
-                        description: `Mencapai ROP. Stok tersisa`,
                         duration: 0,
                     });
                 });

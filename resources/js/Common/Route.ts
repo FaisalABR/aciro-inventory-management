@@ -67,6 +67,7 @@ export enum Route {
     CreatePurchaseOrder = "/purchase-orders/create",
     EditPurchaseOrder = "/purchase-orders/edit/:uuid",
     DeletePurchaseOrder = "/purchase-orders/delete/:uuid",
+    VerifikasiPurchaseOrder = "/purchase-orders/:uuid/approved",
 
     LaporanDeadstock = "/laporan-deadstock",
     RootMaster = "/master",

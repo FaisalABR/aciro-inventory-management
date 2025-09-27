@@ -43,7 +43,7 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
         try {
             props.isUpdate
                 ? router.put(
-                      route(Route.EditBarangMasuk, {
+                      route(Route.EditPurchaseOrder, {
                           uuid: props?.data?.uuid,
                       }),
                       values,
@@ -129,6 +129,7 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
                             items: props?.data?.items?.map((item) => ({
                                 barang_id: item.barang_id,
                                 quantity: item.quantity,
+                                harge_beli: item.harga_beli,
                             })),
                         }}
                         layout="vertical"

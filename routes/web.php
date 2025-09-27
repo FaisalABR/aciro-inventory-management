@@ -86,7 +86,16 @@ Route::middleware(['auth'])->group(function () {
 
     //Kelola Purchase Order
     Route::get('/purchase-orders', [PurchaseOrderController::class, 'index']);
+    Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'showCreate']);
+    Route::post('/purchase-orders/create', [PurchaseOrderController::class, 'create']);
+    Route::get("/purchase-orders/{uuid}", [PurchaseOrderController::class, 'showDetail']);
     Route::get('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'showEdit']);
+    Route::put('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'update']);
+    Route::put("/purchase-orders/{uuid}/approved", [PurchaseOrderController::class, 'verifikasi']);
+
+    // Supplier View
+    Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'index']);
+
 
 
 

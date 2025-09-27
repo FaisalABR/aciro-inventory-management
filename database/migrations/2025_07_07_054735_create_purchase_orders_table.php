@@ -18,10 +18,18 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
             $table->date('tanggal_order');
             $table->text('catatan');
+            $table->boolean('verifikasi_kepala_toko')->default(false);
+            $table->boolean('verifikasi_kepala_gudang')->default(false);
+            $table->boolean('verifikasi_kepala_accounting')->default(false);
+            $table->boolean('verifikasi_kepala_pengadaan')->default(false);
             $table->enum('status', [
                 'DRAFT',
-                'NEED VERIFICATION',
-                'SENT',
+                'BUTUH VERIFIKASI',
+                'VERIFIKASI SEBAGIAN',
+                'VERIFIKASI',
+                'TERKIRIM',
+                'KONFIRMASI SUPPLIER',
+                'BARANG DIKIRIM',
             ])->default('DRAFT');
             $table->timestamps();
         });

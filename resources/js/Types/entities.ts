@@ -94,8 +94,11 @@ export type TPurchaseOrder = {
     tanggal_order: string;
     catatan: string | null;
     supplier_id: number;
+    supplier: TSupplier;
     verifikasi_kepala_toko: boolean;
     verifikasi_kepala_gudang: boolean;
+    verifikasi_kepala_pengadaan: boolean;
+    verifikasi_kepala_accounting: boolean;
     status: string;
     items: TPurchaseOrderItem[];
 };
@@ -103,9 +106,9 @@ export type TPurchaseOrder = {
 export type TPurchaseOrderItem = {
     purchase_order_id: number;
     barang_id: number;
-    barangs: TBarang;
+    barang: TBarang;
     quantity: number;
-    harga_jual: number;
+    harga_beli: number;
 };
 
 type TRoles = {

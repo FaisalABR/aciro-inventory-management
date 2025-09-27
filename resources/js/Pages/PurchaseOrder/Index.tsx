@@ -57,11 +57,19 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
             render: (_, record) => {
                 switch (record.status) {
                     case "DRAFT":
-                        return <Tag color="blue">{record.status}</Tag>;
-                    case "NEED VERIFICATION":
+                        return <Tag color="grey">{record.status}</Tag>;
+                    case "BUTUH VERIFIKASI":
                         return <Tag color="orange">{record.status}</Tag>;
-                    case "SENT":
+                    case "VERIFIKASI SEBAGIAN":
                         return <Tag color="lime">{record.status}</Tag>;
+                    case "TERVEFIKASI":
+                        return <Tag color="green">{record.status}</Tag>;
+                    case "TERKIRIM":
+                        return <Tag color="geekblue">{record.status}</Tag>;
+                    case "KONFIRMASI SUPPLIER":
+                        return <Tag color="magenta">{record.status}</Tag>;
+                    case "BARANG DIKIRIM":
+                        return <Tag color="gold">{record.status}</Tag>;
                 }
             },
         },
@@ -96,11 +104,15 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
                         <Link
-                            href={route(Route.EditPurchaseOrder, {
-                                uuid: record.uuid,
-                            })}
+                            href={
+                                record.status !== "DRAFT"
+                                    ? "#"
+                                    : route(Route.EditPurchaseOrder, {
+                                          uuid: record.uuid,
+                                      })
+                            }
                         >
-                            <Button>
+                            <Button disabled={record.status !== "DRAFT"}>
                                 <EditOutlined />
                             </Button>
                         </Link>
