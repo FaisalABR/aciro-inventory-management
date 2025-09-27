@@ -4,14 +4,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
-use App\Http\Controllers\POSupplier;
+use App\Http\Controllers\HeaderDeadstockController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -88,7 +86,6 @@ Route::middleware(['auth'])->group(function () {
     // View Stock
     Route::get('/barang-stock', [StockController::class, 'index']);
 
-
     //Kelola Purchase Order
     Route::get('/purchase-orders', [PurchaseOrderController::class, 'index']);
     Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'showCreate']);
@@ -98,14 +95,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'update']);
     Route::put("/purchase-orders/{uuid}/approved", [PurchaseOrderController::class, 'verifikasi']);
 
-
-
-
+    // Kelola Laporan Deadstock
+    Route::get('/laporan-deadstocks', [HeaderDeadstockController::class, 'index']);
+    Route::post('/laporan-deadstocks/create', [HeaderDeadstockController::class, 'evaluasiITR']);
+    Route::get('/laporan-deadstocks/{uuid}', [HeaderDeadstockController::class, 'showDetail']);
 
 
 
     Route::get('/logout', [AuthController::class, "logout"]);
-
 
 
 

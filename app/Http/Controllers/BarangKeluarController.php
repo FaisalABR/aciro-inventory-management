@@ -266,13 +266,13 @@ class BarangKeluarController extends Controller
                     ]);
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_gudang'));
+                    // tambahkan ke array, bukan langsung kirim
+                    $messages[] = "Stok {$item->barangs->name} menyentuh ROP!";
                 }
 
                 // Update status barang keluar
                 $barangKeluar->status = 'Dieksekusi';
                 $barangKeluar->save();
-                // tambahkan ke array, bukan langsung kirim
-                $messages[] = "Stok {$item->barangs->name} menyentuh ROP!";
             };
 
             if (!empty($messages)) {

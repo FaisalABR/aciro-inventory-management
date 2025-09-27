@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             SatuanSeeder::class,
             SupplierSeeder::class,
             BarangSeeder::class,
+            StockSeeder::class,
         ]);
     }
 }

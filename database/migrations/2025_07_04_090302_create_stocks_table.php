@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('restrict')->onUpdate('cascade');
             $table->integer('quantity');
             $table->integer('potensi_penjualan');
-            $table->integer('itr')->nullable();
+            $table->decimal('itr', 10, 2)->nullable();
             $table->integer('rop');
             $table->enum('status_rop', [
                 'In Stock',
@@ -28,6 +28,7 @@ return new class extends Migration
                 'Slow Moving',
                 'Deadstock',
             ])->nullable();
+            $table->date("last_evaluated")->nullable();
             $table->timestamps();
         });
     }

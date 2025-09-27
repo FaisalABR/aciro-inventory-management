@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
-class BarangMasuk extends Model
+class HeaderDeadstock extends Model
 {
     /** @use HasFactory<\Database\Factories\BarangFactory> */
     use HasFactory;
@@ -23,18 +22,12 @@ class BarangMasuk extends Model
     protected $fillable = [
         'uuid',
         'nomor_referensi',
-        'tanggal_masuk',
-        'supplier_id',
-        'catatan',
+        'periode_mulai',
+        'periode_akhir',
     ];
 
     public function items()
     {
-        return $this->hasMany(BarangMasukItem::class);
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
+        return $this->hasMany(DeadstockItem::class);
     }
 }
