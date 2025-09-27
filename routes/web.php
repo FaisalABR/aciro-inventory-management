@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\POSupplier;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
@@ -17,6 +18,10 @@ use Inertia\Inertia;
 // Auth
 Route::post("/login", [AuthController::class, "login"]);
 Route::get("/login", [AuthController::class, "index"])->name("login");
+
+// Supplier View
+Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'showSupplierPortal']);
+Route::put('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'konfirmasi']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get("/unauthorized", function () {
@@ -93,8 +98,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'update']);
     Route::put("/purchase-orders/{uuid}/approved", [PurchaseOrderController::class, 'verifikasi']);
 
-    // Supplier View
-    Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'index']);
+
 
 
 

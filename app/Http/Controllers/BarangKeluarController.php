@@ -286,28 +286,4 @@ class BarangKeluarController extends Controller
 
         return redirect('/barang-keluar')->with('success', 'Barang keluar berhasil dieksekusi');
     }
-
-    public function testWA()
-    {
-        $result = $this->whatsappService->sendWA(
-            "+6282110779970",
-            "
-Halo PT SUKA SUKA LU AJA,
-
-Kami dari Koperasi Karya Bersama Aciro ingin melakukan pemesanan sesuai Purchase Order (PO):
-
-Nomor PO   : PO-20250922
-Tanggal    : Senin, 22 September 2025
-
-Link Halaman PO:
-https://www.google.com/
-
-Mohon dapat diproses dan dikonfirmasi ketersediaannya.
-Terima kasih atas kerjasamanya.
-
-Hormat kami,
-Tim Procurement Koperasi Karya Bersama Aciro
-            "
-        );
-    }
 }

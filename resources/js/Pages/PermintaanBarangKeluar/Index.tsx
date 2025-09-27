@@ -40,9 +40,6 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
         });
     };
 
-    const handleSendWA = () => {
-        router.post(Route.SendWA);
-    };
     const columns: ColumnsType = [
         {
             title: "Nomor Referensi",
@@ -147,15 +144,6 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                         Tambah Permintaan Barang Keluar
                     </Button>
                 </Link>,
-
-                <Button
-                    icon={<SendOutlined />}
-                    type="primary"
-                    size="large"
-                    onClick={handleSendWA}
-                >
-                    Test WA
-                </Button>,
             ]}
         >
             <Table dataSource={props.data} columns={columns} />;

@@ -258,4 +258,84 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
         return back()->with('success', 'Permintaan barang keluar disetujui');
     }
+
+    public function showSupplierPortal($uuid)
+    {
+        $po = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
+        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
+
+        $data = [
+            'id' => $po->id,
+            'uuid' => $po->uuid,
+            'nomor_referensi' => $po->nomor_referensi,
+            'tanggal_order' => $po->tanggal_order,
+            'catatan' => $po->catatan,
+            'status' => $po->status,
+            'verifikasi_kepala_toko' => $po->verifikasi_kepala_toko,
+            'verifikasi_kepala_gudang' => $po->verifikasi_kepala_gudang,
+            'verifikasi_kepala_pengadaan' => $po->verifikasi_kepala_pengadaan,
+            'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
+            'supplier' => [
+                "id" => $po->supplier->id,
+                "name" => $po->supplier->name,
+            ],
+            'items' => $poItems,
+        ];
+
+        return Inertia::render('SupplierView/Index', [
+            "data" => $data,
+        ]);
+    }
+
+    public function konfirmasi($uuid)
+    {
+        $PO = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
+        // Cari user dengan role terkait
+        $users = User::whereHas('roles', function ($q) {
+            $q->whereIn('name', [
+                'kepala_gudang',
+                'kepala_toko',
+                'kepala_pengadaan',
+            ]);
+        })->with('roles')->get();
+
+        $tanggalSekarang = Carbon::parse(now())->locale('id');
+
+
+        if ($PO->status === "TERKIRIM") {
+            $PO->status = "KONFIRMASI SUPPLIER";
+            foreach ($users as $user) {
+                $roles = $user->roles->pluck('name')
+                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->implode(', ');
+
+                $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
+
+                event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.", $user->roles->pluck('name')[0]));
+                // Kirim notifikasi (kalau perlu detail barang, bisa di-loop terpisah dari $validated['items'])
+                SendWhatsappJob::dispatch($user->noWhatsapp, $text);
+            }
+        } else {
+            $PO->status = "BARANG DIKIRIM";
+
+            foreach ($users as $user) {
+                $roles = $user->roles->pluck('name')
+                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->implode(', ');
+
+                $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi} sedang dalam pengiriman oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
+
+                event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi} sedang dalam pengirima noleh {$PO->supplier->name} pada {$tanggalSekarang}.", $user->roles->pluck('name')[0]));
+                // Kirim notifikasi (kalau perlu detail barang, bisa di-loop terpisah dari $validated['items'])
+                SendWhatsappJob::dispatch($user->noWhatsapp, $text);
+            }
+        }
+        $PO->save();
+
+        $pesan = $PO->status === "KONFIRMASI SUPPLIER"
+            ? 'PO berhasil dikonfirmasi'
+            : 'PO berhasil dikirim';
+
+        return back()->with('success',  $pesan);
+    }
 }

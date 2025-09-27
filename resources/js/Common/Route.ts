@@ -69,6 +69,9 @@ export enum Route {
     DeletePurchaseOrder = "/purchase-orders/delete/:uuid",
     VerifikasiPurchaseOrder = "/purchase-orders/:uuid/approved",
 
+    // SupplierView
+    KonfirmasiPOSupplier = "/suppliers/:uuid/views",
+
     LaporanDeadstock = "/laporan-deadstock",
     RootMaster = "/master",
     MasterKategori = "/master/kategori",
