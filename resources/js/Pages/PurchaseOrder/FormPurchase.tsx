@@ -67,6 +67,11 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
         try {
             const response = await fetch(
                 `/api/barang-by-supplier?supplier_id=${supplierId}`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
             );
 
             const data = await response.json();

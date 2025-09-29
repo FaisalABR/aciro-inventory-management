@@ -138,7 +138,7 @@ class PurchaseOrderController extends Controller
             // Send whatsapp ke kepala toko, kepala gudang, kepala accounting, dan kepala pengadaan
             // Format role agar jadi "Kepala Gudang" bukan "kepala_gudang"
             $roles = $user->roles->pluck('name')
-                ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
+                ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
                 ->implode(', ');
 
             $text = "Halo {$user->name} ({$roles}), ada PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih.";
@@ -190,7 +190,7 @@ class PurchaseOrderController extends Controller
 
         foreach ($users as $user) {
             $roles = $user->roles->pluck('name')
-                ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
+                ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
                 ->implode(', ');
 
             $text = "Halo {$user->name} ({$roles}), ada PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih.";
@@ -305,7 +305,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
             $PO->status = 'KONFIRMASI SUPPLIER';
             foreach ($users as $user) {
                 $roles = $user->roles->pluck('name')
-                    ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
                     ->implode(', ');
 
                 $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
@@ -319,7 +319,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
             foreach ($users as $user) {
                 $roles = $user->roles->pluck('name')
-                    ->map(fn ($r) => ucwords(str_replace('_', ' ', $r)))
+                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
                     ->implode(', ');
 
                 $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi} sedang dalam pengiriman oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
@@ -336,5 +336,31 @@ Tim Procurement Koperasi Karya Bersama Aciro
             : 'PO berhasil dikirim';
 
         return back()->with('success', $pesan);
+    }
+
+    public function showDetailScan($uuid)
+    {
+        $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
+        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
+
+        $data = [
+            'id'                           => $po->id,
+            'uuid'                         => $po->uuid,
+            'nomor_referensi'              => $po->nomor_referensi,
+            'tanggal_order'                => $po->tanggal_order,
+            'catatan'                      => $po->catatan,
+            'status'                       => $po->status,
+            'verifikasi_kepala_toko'       => $po->verifikasi_kepala_toko,
+            'verifikasi_kepala_gudang'     => $po->verifikasi_kepala_gudang,
+            'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
+            'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
+            'supplier'                     => [
+                'id'   => $po->supplier->id,
+                'name' => $po->supplier->name,
+            ],
+            'items' => $poItems,
+        ];
+
+        return response()->json($data);
     }
 }

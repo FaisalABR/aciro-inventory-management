@@ -6,6 +6,7 @@ import {
     Card,
     Descriptions,
     DescriptionsProps,
+    QRCode,
     Table,
     Tag,
 } from "antd";
@@ -121,6 +122,10 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             key: data?.catatan || "catatan",
             label: "Catatan",
             children: data?.catatan,
+        },
+        {
+            label: "QR Code",
+            children: <QRCode value={data?.uuid} />,
         },
     ];
 

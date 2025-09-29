@@ -8,6 +8,7 @@ import {
     Form,
     Input,
     InputNumber,
+    Modal,
     notification,
     Select,
 } from "antd";
@@ -16,10 +17,15 @@ import React, { useState } from "react";
 import { route, Route } from "../../Common/Route";
 import RootLayout from "../../Layouts/RootLayout";
 import Title from "antd/es/typography/Title";
-import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+    CloseOutlined,
+    LoadingOutlined,
+    QrcodeOutlined,
+} from "@ant-design/icons";
 import { CreateBarangMasukSchema } from "../../Shared/validation";
 import { TBarang } from "../../Types/entities";
 import { BaseOptionType } from "antd/es/select";
+import QrReader from "react-qr-reader-es6";
 
 type TFormBarangMasukProps = {
     isUpdate: boolean;
@@ -33,6 +39,8 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
     const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
+    const [isOpenQR, setIsOpenQR] = useState(false);
+    const [scannedUuid, setScannedUuid] = useState(null);
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -92,6 +100,52 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                   },
               ];
 
+    const handleError = () => {
+        return;
+    };
+
+    const stopCamera = () => {
+        const videoEl = document.querySelector("video");
+        if (videoEl && videoEl.srcObject) {
+            const stream = videoEl.srcObject as MediaStream;
+            stream.getTracks().forEach((track) => track.stop());
+            videoEl.srcObject = null;
+        }
+    };
+
+    const handleScan = async (result: any) => {
+        console.log("result", result);
+        if (result) {
+            setScannedUuid(result);
+            try {
+                const response = await fetch(`/api/po-scan/${result}`);
+
+                const data = await response.json();
+
+                form.setFieldValue("supplier_id", data?.supplier?.id);
+                const barangPO = data?.items?.map((item) => ({
+                    barang_id: item.barang_id,
+                    quantity: item.quantity,
+                }));
+                fetchBarangBySupplier(data?.supplier?.id);
+                form.setFieldValue("items", barangPO);
+                stopCamera();
+                setIsOpenQR(false);
+                notification.success({
+                    message: "Error",
+                    description: "Berhasil Scan PO",
+                });
+            } catch (error) {
+                console.log("error", error);
+                notification.error({
+                    message: "Error",
+                    description: "Something went wrong",
+                });
+            }
+        }
+        // return;
+    };
+
     return (
         <RootLayout
             title={props.isUpdate ? "Edit Barang Masuk" : "Tambah Barang Masuk"}
@@ -145,6 +199,16 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                         <Form.Item label="Catatan" name="catatan">
                             <Input.TextArea rows={2} />
                         </Form.Item>
+                        <Button
+                            type="primary"
+                            size="large"
+                            style={{ width: "100%" }}
+                            icon={<QrcodeOutlined />}
+                            onClick={() => setIsOpenQR(true)}
+                        >
+                            Scan QR
+                        </Button>
+
                         <Divider style={{ margin: "2rem 0" }} />
 
                         <Title level={5}>Detail Item Barang Masuk</Title>
@@ -239,6 +303,22 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                         </Flex>
                     </Form>
                 </Flex>
+                <Modal
+                    title="Tambah Data"
+                    open={isOpenQR}
+                    onCancel={() => setIsOpenQR(false)}
+                    cancelText="Batal"
+                >
+                    {isOpenQR && (
+                        <QrReader
+                            key={Date.now()}
+                            delay={300}
+                            onError={handleError}
+                            onScan={handleScan}
+                            style={{ width: "100%" }}
+                        />
+                    )}
+                </Modal>
             </Card>
         </RootLayout>
     );
