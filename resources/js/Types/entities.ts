@@ -111,6 +111,22 @@ export type TPurchaseOrderItem = {
     harga_beli: number;
 };
 
+export type TLaporanDeadstock = {
+    uuid: string;
+    nomor_referensi: string;
+    periode_mulai: string;
+    periode_akhir: string;
+    items: TITRItem[];
+};
+
+export type TITRItem = {
+    purchase_order_id: number;
+    barang_id: number;
+    barang: TBarang;
+    quantity: number;
+    harga_beli: number;
+};
+
 type TRoles = {
     id: number;
     name: string;

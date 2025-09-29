@@ -56,7 +56,7 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
                             <DeleteOutlined />
                         </Button>
                         <Link
-                            href={route(Route.PurchaseOrderDetail, {
+                            href={route(Route.LaporanDeadstocDetail, {
                                 uuid: record.uuid,
                             })}
                         >

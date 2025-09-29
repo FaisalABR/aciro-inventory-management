@@ -123,7 +123,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 const data = await response.json();
 
                 form.setFieldValue("supplier_id", data?.supplier?.id);
-                const barangPO = data?.items?.map((item) => ({
+                const barangPO = data?.items?.map((item: any) => ({
                     barang_id: item.barang_id,
                     quantity: item.quantity,
                 }));

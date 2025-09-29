@@ -14,10 +14,13 @@ import {
     Typography,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useModal } from "../../Shared/hooks";
 import { Route, route } from "../../Common/Route";
 import { router } from "@inertiajs/react";
+import { TemplatePOPDF } from "../PurchaseOrder/TemplatePOPDF";
+import { pdf } from "@react-pdf/renderer";
+import QRCode from "qrcode";
 
 const { Title } = Typography;
 
@@ -26,6 +29,7 @@ type TPOSupplierView = {
 };
 
 const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
+    const [qrData, setQrData] = useState<string>("");
     const descItems: DescriptionsProps["items"] = [
         {
             key: data?.uuid,
@@ -135,9 +139,56 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
         });
     };
 
-    const handlePrint = () => {
-        return;
+    useEffect(() => {
+        const generateQR = async () => {
+            const qr = await QRCode.toDataURL(data?.uuid); // bisa ganti ke poData.uuid
+            setQrData(qr);
+        };
+        generateQR();
+    }, []);
+
+    const handlePrint = async () => {
+        try {
+            const blob = await pdf(
+                <TemplatePOPDF po={data} qrData={qrData} />,
+            ).toBlob();
+            const url = URL.createObjectURL(blob);
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url;
+
+            // Add load event listener before appending iframe
+            iframe.onload = () => {
+                try {
+                    // Wait for iframe to be ready
+                    setTimeout(() => {
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.print();
+                        }
+                    }, 1000);
+
+                    // Remove iframe after printing is done or cancelled
+                    window.addEventListener(
+                        "afterprint",
+                        () => {
+                            document.body.removeChild(iframe);
+                            URL.revokeObjectURL(url);
+                        },
+                        { once: true },
+                    );
+                } catch (error) {
+                    console.error("Print window error:", error);
+                    document.body.removeChild(iframe);
+                    URL.revokeObjectURL(url);
+                }
+            };
+
+            document.body.appendChild(iframe);
+        } catch (error) {
+            console.error("Error generating PDF for print:", error);
+        }
     };
+
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Head title={`PO Supplier View | Aciro Inventory Management`} />

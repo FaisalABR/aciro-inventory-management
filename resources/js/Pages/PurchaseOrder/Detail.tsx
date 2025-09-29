@@ -1,20 +1,23 @@
 import RootLayout from "../../Layouts/RootLayout";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TPurchaseOrder } from "../../Types/entities";
 import {
     Button,
     Card,
     Descriptions,
     DescriptionsProps,
-    QRCode,
+    QRCode as QRCodeAntd,
     Table,
     Tag,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, PrinterFilled } from "@ant-design/icons";
 import { useModal } from "../../Shared/hooks";
 import { router } from "@inertiajs/react";
 import { Route, route } from "../../Common/Route";
+import QRCode from "qrcode";
+import { TemplatePOPDF } from "./TemplatePOPDF";
+import { pdf } from "@react-pdf/renderer";
 
 type TDetailPurchaseOrderProps = {
     data: TPurchaseOrder;
@@ -22,6 +25,7 @@ type TDetailPurchaseOrderProps = {
 
 const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
     const { data } = props;
+    const [qrData, setQrData] = useState<string>("");
     const handleVerification = () => {
         // hitung total verifikator
         const verifikator = [
@@ -125,7 +129,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         },
         {
             label: "QR Code",
-            children: <QRCode value={data?.uuid} />,
+            children: <QRCodeAntd value={data?.uuid} />,
         },
     ];
 
@@ -146,10 +150,60 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         return { ...item, key: item?.barang_id, name: item?.barang.name };
     });
 
+    useEffect(() => {
+        const generateQR = async () => {
+            const qr = await QRCode.toDataURL(data?.uuid); // bisa ganti ke poData.uuid
+            setQrData(qr);
+        };
+        generateQR();
+    }, []);
+
+    const handlePrint = async () => {
+        try {
+            const blob = await pdf(
+                <TemplatePOPDF po={data} qrData={qrData} />,
+            ).toBlob();
+            const url = URL.createObjectURL(blob);
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url;
+
+            // Add load event listener before appending iframe
+            iframe.onload = () => {
+                try {
+                    // Wait for iframe to be ready
+                    setTimeout(() => {
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.print();
+                        }
+                    }, 1000);
+
+                    // Remove iframe after printing is done or cancelled
+                    window.addEventListener(
+                        "afterprint",
+                        () => {
+                            document.body.removeChild(iframe);
+                            URL.revokeObjectURL(url);
+                        },
+                        { once: true },
+                    );
+                } catch (error) {
+                    console.error("Print window error:", error);
+                    document.body.removeChild(iframe);
+                    URL.revokeObjectURL(url);
+                }
+            };
+
+            document.body.appendChild(iframe);
+        } catch (error) {
+            console.error("Error generating PDF for print:", error);
+        }
+    };
+
     return (
         <RootLayout
             type="main"
-            title="Detail Permintaan Barang Keluar"
+            title="Detail Purchase Order"
             actions={[
                 <Button
                     type="primary"
@@ -165,6 +219,14 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                     onClick={handleVerification}
                 >
                     Verifikasi
+                </Button>,
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<PrinterFilled />}
+                    onClick={handlePrint}
+                >
+                    Print
                 </Button>,
             ]}
         >

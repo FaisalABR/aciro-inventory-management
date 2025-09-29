@@ -19,6 +19,7 @@ import {
     MenuProps,
     notification,
     Row,
+    Space,
     Typography,
 } from "antd";
 import React, { useEffect, useMemo } from "react";
@@ -322,7 +323,9 @@ export const MainLayout: React.FC<TMainLayout> = ({
                             style={{ marginBottom: "1rem" }}
                         >
                             <Title level={2}>{title}</Title>
-                            {actions && actions.map((item) => item)}
+                            <Space align="center">
+                                {actions && actions.map((item) => item)}
+                            </Space>
                         </Flex>
                         {children}
                     </Col>

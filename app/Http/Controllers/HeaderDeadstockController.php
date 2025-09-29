@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
+use App\Models\DeadstockItem;
 use App\Models\HeaderDeadstock;
 use App\Models\Stock;
 use Carbon\Carbon;
@@ -62,7 +63,25 @@ class HeaderDeadstockController extends Controller
         return redirect('/laporan-deadstocks')->with('success', 'Laporan Deadstock Berhasil dibuat!');
     }
 
-    public function showDetail(Request $request, $uuid) {}
+    public function showDetail($uuid)
+    {
+        $deadstock      = HeaderDeadstock::where('uuid', $uuid)->firstOrFail();
+        $deadstockItems = DeadstockItem::where('header_deadstock_id', $deadstock->id)->with(['barang'])->get();
+
+        $data = [
+            'id'                           => $deadstock->id,
+            'uuid'                         => $deadstock->uuid,
+            'nomor_referensi'              => $deadstock->nomor_referensi,
+            'periode_mulai'                => $deadstock->periode_mulai,
+            'periode_akhir'                => Carbon::parse($deadstock->periode_akhir)->format('d-m-Y'),
+            'created_at' => Carbon::parse($deadstock->created_at)->format('d-m-Y H:i:s'),
+            'items' => $deadstockItems,
+        ];
+
+        return Inertia::render('LaporanDeadstock/Detail', [
+            'data' => $data,
+        ]);
+    }
 
     private function kalkulasiDeadstock($periodeMulai, $periodeAkhir)
     {
