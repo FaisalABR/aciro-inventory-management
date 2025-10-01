@@ -13,6 +13,7 @@ export const route = (
 export enum Route {
     Dashboard = "/",
     AuthLogin = "/login",
+    AuthRegister = "/register",
     AuthLogout = "/logout",
     StockBarang = "/barang-stock",
 

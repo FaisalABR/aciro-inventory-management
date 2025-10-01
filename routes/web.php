@@ -17,7 +17,8 @@ use Inertia\Inertia;
 // Auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-
+Route::get('/register', [AuthController::class, 'viewRegister']);
+Route::post('/register', [AuthController::class, 'register']);
 // Supplier View
 Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'showSupplierPortal']);
 Route::put('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'konfirmasi']);
