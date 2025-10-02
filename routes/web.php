@@ -97,6 +97,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'showEdit']);
     Route::put('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'update']);
     Route::put('/purchase-orders/{uuid}/approved', [PurchaseOrderController::class, 'verifikasi']);
+    Route::delete('/purchase-orders/delete/{uuid}', [PurchaseOrderController::class, 'destroy']);
 
     // Kelola Laporan Deadstock
     Route::get('/laporan-deadstocks', [HeaderDeadstockController::class, 'index']);

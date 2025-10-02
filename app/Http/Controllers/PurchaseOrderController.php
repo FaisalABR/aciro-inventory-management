@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Events\ROPNotification;
+use App\Exceptions\Barang\BarangException;
 use App\Jobs\SendWhatsappJob;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -379,5 +381,22 @@ Tim Procurement Koperasi Karya Bersama Aciro
         ];
 
         return response()->json($data);
+    }
+
+    public function destroy($uuid)
+    {
+        $po = PurchaseOrder::where('uuid', $uuid)->first();
+
+
+        try {
+            PurchaseOrderItem::where('purchase_order_id', $po->id)->delete();
+
+            $po->delete();
+
+            return back()->with('success', "PO berhasil dihapus!");
+        } catch (\Exception $e) {
+            Log::error("Gagal menghapus PO dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi kesalahan dalam menghapus PO. Silahkan coba lagi nanti');
+        }
     }
 }
