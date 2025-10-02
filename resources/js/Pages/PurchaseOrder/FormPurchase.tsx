@@ -17,10 +17,7 @@ import { route, Route } from "../../Common/Route";
 import RootLayout from "../../Layouts/RootLayout";
 import Title from "antd/es/typography/Title";
 import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
-import {
-    CreateBarangMasukSchema,
-    CreatePurchaseOrderSchema,
-} from "../../Shared/validation";
+import { CreatePurchaseOrderSchema } from "../../Shared/validation";
 import { TPurchaseOrder } from "../../Types/entities";
 import { BaseOptionType } from "antd/es/select";
 import dayjs from "dayjs";

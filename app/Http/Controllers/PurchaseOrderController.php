@@ -58,6 +58,23 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
+    public function showCreate()
+    {
+        $data = Supplier::all();
+
+        $optionSupplier = $data->map(function ($supplier) {
+            return [
+                'value' => $supplier->id,
+                'label' => $supplier->name,
+            ];
+        });
+
+        return Inertia::render('PurchaseOrder/FormPurchase', [
+            'isUpdate'       => false,
+            'optionSupplier' => $optionSupplier,
+        ]);
+    }
+
     public function showEdit($uuid)
     {
         $po   = PurchaseOrder::where('uuid', $uuid)->with(['supplier', 'items.barang'])->firstOrFail();
@@ -114,7 +131,7 @@ class PurchaseOrderController extends Controller
             'items'             => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
             'items.*.quantity'  => 'required|integer|min:1',
-            'items.*.hargaBeli' => 'required|integer|min:1',
+            'items.*.harga_beli' => 'required|integer|min:1',
         ]);
 
         $totalPO = PurchaseOrder::count();
@@ -124,7 +141,7 @@ class PurchaseOrderController extends Controller
 
         $PO = PurchaseOrder::create([
             'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPO + 1),
-            'tanggal_order'   => $validated['tanggal_keluar'],
+            'tanggal_order'   => $validated['tanggal_order'],
             'catatan'         => $validated['catatan'] ?? '',
             'status'          => 'BUTUH VERIFIKASI',
             'supplier_id'     => $validated['supplier_id'] ?? '',
@@ -142,7 +159,7 @@ class PurchaseOrderController extends Controller
                 ->implode(', ');
 
             $text = "Halo {$user->name} ({$roles}), ada PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih.";
-            event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih!", $user->roles->pluck('name')));
+            event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi}. Butuh verifikasi nih!", $user->roles->pluck('name')[0]));
             SendWhatsappJob::dispatch($user->noWhatsapp, $text);
         }
 
@@ -158,7 +175,7 @@ class PurchaseOrderController extends Controller
             'items'             => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
             'items.*.quantity'  => 'required|integer|min:1',
-            // 'items.*.harga_beli' => 'required|integer|min:1',
+            'items.*.harga_beli' => 'required|integer|min:1',
         ]);
 
         // Ambil PO berdasarkan UUID

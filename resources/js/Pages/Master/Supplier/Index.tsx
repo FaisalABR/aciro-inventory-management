@@ -128,7 +128,6 @@ const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
                         >
                             <DeleteOutlined />
                         </Button>
-                        <EyeOutlined />
                     </div>
                 );
             },

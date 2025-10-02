@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
+use App\Models\Barang;
 use App\Services\BarangServiceInterface;
 use App\Services\SatuanServiceInterface;
 use App\Services\SupplierServiceInterface;
@@ -87,6 +88,10 @@ class BarangController extends Controller
                 'satuan_id'   => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
+                'maximal_quantity' => 'required',
+                'rata_rata_permintaan_harian' => 'required',
+                'leadtime' => 'required',
+                'safety_stock' => 'required',
             ]);
 
             $this->barangService->create($validated);
@@ -97,7 +102,7 @@ class BarangController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Terjadi error tak terduga saat membuat barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat barang: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
@@ -112,7 +117,7 @@ class BarangController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Terjadi error tak terduga saat menghapus barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat menghapus barang: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()->back()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
@@ -128,6 +133,10 @@ class BarangController extends Controller
                 'satuan_id'   => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
+                'maximal_quantity' => 'required',
+                'rata_rata_permintaan_harian' => 'required',
+                'leadtime' => 'required',
+                'safety_stock' => 'required',
             ]);
 
             $result = $this->barangService->update($validated, $uuid);
@@ -141,7 +150,7 @@ class BarangController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Terjadi error tak terduga saat membuat barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat barang: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
@@ -153,5 +162,34 @@ class BarangController extends Controller
         $result     = $this->barangService->getOptions($supplierId);
 
         return response()->json($result);
+    }
+
+    public function showDetail($uuid)
+    {
+        $barang      = Barang::where('uuid', $uuid)->with(['supplier', 'satuan'])->firstOrFail();
+
+        $data = [
+            'id'                           => $barang->id,
+            'uuid'                         => $barang->uuid,
+            'name'                         => $barang->name,
+            'hargaJual'                => $barang->hargaJual,
+            'hargaBeli'                      => $barang->hargaBeli,
+            'maximal_quantity'                       => $barang->maximal_quantity,
+            'rata_rata_permintaan_harian'       => $barang->rata_rata_permintaan_harian,
+            'leadtime'     => $barang->leadtime,
+            'safety_stock'  => $barang->safety_stock,
+            'supplier'                     => [
+                'id'   => $barang->supplier->id,
+                'name' => $barang->supplier->name,
+            ],
+            'satuan'                     => [
+                'id'   => $barang->satuan->id,
+                'name' => $barang->satuan->name,
+            ],
+        ];
+
+        return Inertia::render('Master/Barang/Detail', [
+            'data' => $data,
+        ]);
     }
 }

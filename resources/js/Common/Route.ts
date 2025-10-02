@@ -58,6 +58,7 @@ export enum Route {
 
     // Master Barang
     MasterBarang = "/master/barang",
+    MasterBarangDetail = "/master/barang/:uuid",
     CreateMasterBarang = "/master/barang/create",
     EditMasterBarang = "/master/barang/edit/:uuid",
     DeleteMasterBarang = "/master/barang/delete/:uuid",

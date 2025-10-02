@@ -60,7 +60,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/master/supplier/delete/{uuid}', [SupplierController::class, 'destroy']);
 
     // Kelola Master Barang
-    Route::get('/master/barang', [BarangController::class, 'index']);
+    Route::get('/master/barang/', [BarangController::class, 'index']);
+    Route::get('/master/barang/{uuid}', [BarangController::class, 'showDetail']);
     Route::get('/master/barang/create', [BarangController::class, 'showCreate']);
     Route::post('/master/barang/create', [BarangController::class, 'create']);
     Route::get('/master/barang/edit/{uuid}', [BarangController::class, 'showEdit']);

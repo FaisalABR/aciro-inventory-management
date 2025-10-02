@@ -118,7 +118,6 @@ const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
                         >
                             <DeleteOutlined />
                         </Button>
-                        <EyeOutlined />
                     </div>
                 );
             },

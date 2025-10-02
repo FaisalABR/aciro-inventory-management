@@ -143,7 +143,15 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
                         >
                             <DeleteOutlined />
                         </Button>
-                        <EyeOutlined />
+                        <Link
+                            href={route(Route.MasterBarangDetail, {
+                                uuid: record.uuid,
+                            })}
+                        >
+                            <Button>
+                                <EyeOutlined />
+                            </Button>
+                        </Link>
                     </div>
                 );
             },

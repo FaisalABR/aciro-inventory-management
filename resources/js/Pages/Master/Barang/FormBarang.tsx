@@ -104,6 +104,58 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                                 style={{ width: "100%" }}
                             />
                         </Form.Item>
+                        <Form.Item
+                            rules={[zodSync]}
+                            name="maximal_quantity"
+                            label="Kuantitas Maksimal"
+                        >
+                            <InputNumber
+                                min={1}
+                                placeholder="10"
+                                style={{
+                                    width: "100%",
+                                }}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            rules={[zodSync]}
+                            name="rata_rata_permintaan_harian"
+                            label="Rata Rata Permintaan Harian"
+                        >
+                            <InputNumber
+                                min={1}
+                                placeholder="10"
+                                style={{
+                                    width: "100%",
+                                }}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            rules={[zodSync]}
+                            name="leadtime"
+                            label="Lead Time (hari)"
+                        >
+                            <InputNumber
+                                min={1}
+                                placeholder="10"
+                                style={{
+                                    width: "100%",
+                                }}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            rules={[zodSync]}
+                            name="safety_stock"
+                            label="Safety Stock"
+                        >
+                            <InputNumber
+                                min={1}
+                                placeholder="10"
+                                style={{
+                                    width: "100%",
+                                }}
+                            />
+                        </Form.Item>
 
                         <Flex gap="small">
                             <Button

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
 use App\Models\Barang;
+use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -34,10 +35,20 @@ class BarangService implements BarangServiceInterface
         try {
             $barang = Barang::create($data);
 
+            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $barang->safety_stock;
+
+
+
+            Stock::create([
+                'barang_id' => $barang->id,
+                'rop' => $rop,
+                'status' => 'Out Of Stock',
+            ]);
+
             return $barang;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal membuat barang'.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal membuat barang' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi masalah saat membuat barang. Silakan coba lagi nanti.', 500);
         }
     }
@@ -54,7 +65,7 @@ class BarangService implements BarangServiceInterface
 
             return $data;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan semua barang '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan semua barang ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam server', 500);
         }
     }
@@ -66,7 +77,7 @@ class BarangService implements BarangServiceInterface
 
             return $barang;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan barang dengan ID: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan barang dengan ID: ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Pengguna tidak ditemukan', 404);
         }
     }
@@ -78,10 +89,27 @@ class BarangService implements BarangServiceInterface
             $barang = Barang::where('uuid', $uuid)->first();
 
             $barang->update($data);
+            $barang->refresh();
+            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $barang->safety_stock;
+
+            $stock = Stock::where('barang_id', $barang->id)->first();
+
+            if ($stock) {
+                $stock->rop = $rop;
+                if ($stock->quantity == 0) {
+                    $stock->status_rop = "Out Of Stock";
+                } elseif ($stock->quantity <= $rop) {
+                    $stock->status_rop = "Need Restock";
+                } else {
+                    $stock->status_rop = "In Stock";
+                }
+
+                $stock->save();
+            }
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Gagal memperbaharui barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal memperbaharui barang: ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi masalah saat update pengguna. Silakan coba lagi nanti.', 500);
         }
     }
@@ -99,7 +127,7 @@ class BarangService implements BarangServiceInterface
 
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal menghapus barang dengan ID {$uuid}".$e->getMessage(), ['exception' => $e]);
+            Log::error("Gagal menghapus barang dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam menghapus barang. Silahkan coba lagi nanti');
         }
     }

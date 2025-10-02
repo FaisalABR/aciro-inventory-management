@@ -148,7 +148,7 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
             type="main"
             title="Purchase Order"
             actions={[
-                <Link href={Route.CreateBarangMasuk}>
+                <Link href={Route.CreatePurchaseOrder}>
                     <Button
                         icon={<PlusSquareOutlined />}
                         type="primary"

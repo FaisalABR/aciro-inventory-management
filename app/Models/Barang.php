@@ -31,6 +31,10 @@ class Barang extends Model
         'satuan_id',
         'hargaJual',
         'hargaBeli',
+        'maximal_quantity',
+        'rata_rata_permintaan_harian',
+        'leadtime',
+        'safety_stock',
     ];
 
     public function supplier()

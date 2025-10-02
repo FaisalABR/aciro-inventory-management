@@ -39,6 +39,10 @@ export type TBarang = {
     satuan: TSatuan;
     hargaJual: number;
     hargaBeli: number;
+    maximal_quantity: number;
+    rata_rata_permintaan_harian: number;
+    leadtime: number;
+    safety_stock: number;
 };
 
 export type TSupplier = {

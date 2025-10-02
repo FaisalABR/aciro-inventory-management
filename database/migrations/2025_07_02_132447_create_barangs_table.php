@@ -26,6 +26,9 @@ return new class extends Migration
             $table->decimal('hargaJual', 10, 2);
             $table->decimal('hargaBeli', 10, 2);
             $table->integer('maximal_quantity');
+            $table->decimal('rata_rata_permintaan_harian', 10, 2)->nullable();
+            $table->integer('leadtime')->nullable();
+            $table->decimal('safety_stock', 10, 2)->nullable();
             $table->timestamps();
         });
     }

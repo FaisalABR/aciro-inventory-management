@@ -110,6 +110,26 @@ export const CreateBarangSchema = z.object({
             required_error: "Harga Beli wajib diisi",
         })
         .min(0, { message: "Harga Beli tidak boleh 0" }),
+    maximal_quantity: z
+        .number({
+            required_error: "Maksimal Kuantitas wajib diisi",
+        })
+        .min(0, { message: "Maksimal Kuantitas tidak boleh 0" }),
+    rata_rata_permintaan_harian: z
+        .number({
+            required_error: "Rata-rata permintaan wajib diisi",
+        })
+        .min(0, { message: "Rata-rata permintaan tidak boleh 0" }),
+    leadtime: z
+        .number({
+            required_error: "Lead time wajib diisi",
+        })
+        .min(0, { message: "Lead time tidak boleh 0" }),
+    safety_stock: z
+        .number({
+            required_error: "Safety stock wajib diisi",
+        })
+        .min(0, { message: "Safety stock tidak boleh 0" }),
 });
 
 export const CreateBarangMasukSchema = z.object({
@@ -164,12 +184,7 @@ export const CreateBarangKeluarSchema = z.object({
 });
 
 export const CreatePurchaseOrderSchema = z.object({
-    nomor_referensi: z
-        .string({
-            required_error: "Nomor Referensi harus diisi",
-        })
-        .min(3, { message: "Nomor Referensi minimal 3 karakter" })
-        .max(20, { message: "Nomor Referensi maximal dari 20 karakter" }),
+    nomor_referensi: z.string().optional(),
     tanggal_order: z.coerce.date({
         invalid_type_error: "Tanggal purchase order tidak valid",
         required_error: "Tanggal purchase order harus diisi",
