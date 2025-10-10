@@ -335,8 +335,83 @@ export const MainLayout: React.FC<TMainLayout> = ({
                         height: "100%",
                     }}
                 >
-                    <div style={{ fontSize: "1rem", padding: "1rem" }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            fontSize: "1rem",
+                            padding: "1rem",
+                        }}
+                    >
                         <h2>Aciro Inventory Management</h2>
+                        <Space align="center">
+                            <Dropdown
+                                trigger={["click"]}
+                                dropdownRender={() => (
+                                    <div
+                                        style={{
+                                            width: 320,
+                                            maxHeight: 400,
+                                            overflowY: "auto",
+                                            background: "#fff",
+                                            borderRadius: 8,
+                                            boxShadow:
+                                                "0 2px 8px rgba(0,0,0,0.15)",
+                                            padding: "0.5rem",
+                                        }}
+                                    >
+                                        <List
+                                            dataSource={notifications}
+                                            locale={{
+                                                emptyText:
+                                                    "Tidak ada notifikasi",
+                                            }}
+                                            renderItem={(item) => (
+                                                <List.Item
+                                                    onClick={() =>
+                                                        handleMarkAsRead(
+                                                            item.id,
+                                                        )
+                                                    }
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        backgroundColor:
+                                                            item.is_read
+                                                                ? "white"
+                                                                : "#e6f7ff",
+                                                        borderRadius: 6,
+                                                        transition:
+                                                            "background-color 0.2s",
+                                                    }}
+                                                >
+                                                    <List.Item.Meta
+                                                        title={item.message}
+                                                        description={formattedDate(
+                                                            item.time,
+                                                        )}
+                                                    />
+                                                </List.Item>
+                                            )}
+                                        />
+                                    </div>
+                                )}
+                            >
+                                <Badge
+                                    count={
+                                        notifications.filter((n) => !n.is_read)
+                                            .length
+                                    }
+                                >
+                                    <Button
+                                        type="text"
+                                        shape="circle"
+                                        size="large"
+                                        icon={<BellOutlined />}
+                                    />
+                                </Badge>
+                            </Dropdown>
+                        </Space>
                     </div>
                     <Flex
                         gap="middle"
@@ -358,68 +433,6 @@ export const MainLayout: React.FC<TMainLayout> = ({
                             </Typography>
                         </Flex>
                     </Flex>
-                    <Space align="center">
-                        <Dropdown
-                            trigger={["click"]}
-                            dropdownRender={() => (
-                                <div
-                                    style={{
-                                        width: 320,
-                                        maxHeight: 400,
-                                        overflowY: "auto",
-                                        background: "#fff",
-                                        borderRadius: 8,
-                                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                                        padding: "0.5rem",
-                                    }}
-                                >
-                                    <List
-                                        dataSource={notifications}
-                                        locale={{
-                                            emptyText: "Tidak ada notifikasi",
-                                        }}
-                                        renderItem={(item) => (
-                                            <List.Item
-                                                onClick={() =>
-                                                    handleMarkAsRead(item.id)
-                                                }
-                                                style={{
-                                                    cursor: "pointer",
-                                                    backgroundColor:
-                                                        item.is_read
-                                                            ? "white"
-                                                            : "#e6f7ff",
-                                                    borderRadius: 6,
-                                                    transition:
-                                                        "background-color 0.2s",
-                                                }}
-                                            >
-                                                <List.Item.Meta
-                                                    title={item.message}
-                                                    description={formattedDate(
-                                                        item.time,
-                                                    )}
-                                                />
-                                            </List.Item>
-                                        )}
-                                    />
-                                </div>
-                            )}
-                        >
-                            <Badge
-                                count={
-                                    notifications.filter((n) => !n.is_read)
-                                        .length
-                                }
-                            >
-                                <Button
-                                    type="text"
-                                    shape="circle"
-                                    icon={<BellOutlined />}
-                                />
-                            </Badge>
-                        </Dropdown>
-                    </Space>
 
                     <div
                         style={{

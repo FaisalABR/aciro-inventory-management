@@ -2,8 +2,16 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 
 window.Pusher = Pusher;
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop()?.split(";").shift() ?? null;
+    }
+    return null;
+}
 // Get CSRF token
-const csrfToken = window.csrfToken;
+const csrfToken = getCookie("XSRF-TOKEN");
 
 if (!csrfToken) {
     console.error(
