@@ -16,6 +16,7 @@ export enum Route {
     AuthRegister = "/register",
     AuthLogout = "/logout",
     StockBarang = "/barang-stock",
+    NotificationsRead = "/notifications/:id/read",
 
     // Kelola Permintaan Barang Keluar
     PermintaanBarangKeluar = "/permintaan-barang-keluar",
@@ -24,6 +25,7 @@ export enum Route {
     EditPermintaanBarangKeluar = "/permintaan-barang-keluar/edit/:uuid",
     DeletePermintaanBarangKeluar = "/permintaan-barang-keluar/delete/:uuid",
     VerifikasiPermintaanKeluar = "/permintaan-barang-keluar/:uuid/approved",
+    TolakPermintaanKeluar = "/permintaan-barang-keluar/:uuid/reject",
     SendWA = "/barang-keluar/send",
 
     // Kelola Barang Keluar

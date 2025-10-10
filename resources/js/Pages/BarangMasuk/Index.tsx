@@ -16,6 +16,7 @@ import { formatRupiah } from "../../Shared/utils";
 
 type TBarangIndexProps = {
     data: TBarangMasuk[];
+    auth: any;
 };
 
 const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
@@ -111,21 +112,28 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
         key: item.uuid,
     }));
 
+    const userRole = props?.auth?.user?.roles?.[0];
+    const isAdminGudang = ["admin_gudang", "admin_sistem"].includes(userRole);
+
+    const showActions = isAdminGudang
+        ? [
+              <Link href={Route.CreateBarangMasuk}>
+                  <Button
+                      icon={<PlusSquareOutlined />}
+                      type="primary"
+                      size="large"
+                  >
+                      Tambah Barang Masuk
+                  </Button>
+              </Link>,
+          ]
+        : [];
+
     return (
         <RootLayout
             type="main"
             title="Kelola Barang Masuk"
-            actions={[
-                <Link href={Route.CreateBarangMasuk}>
-                    <Button
-                        icon={<PlusSquareOutlined />}
-                        type="primary"
-                        size="large"
-                    >
-                        Tambah Barang Masuk
-                    </Button>
-                </Link>,
-            ]}
+            actions={showActions}
         >
             <Table dataSource={formattedData} columns={columns} />;
         </RootLayout>

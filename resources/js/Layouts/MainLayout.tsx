@@ -28,7 +28,7 @@ import {
     List,
 } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
-import { Route } from "../Common/Route";
+import { route, Route } from "../Common/Route";
 import {
     PERMISSIONS_VIEW_BARANG_KELUAR,
     PERMISSIONS_VIEW_BARANG_MASUK,
@@ -46,6 +46,7 @@ import {
 } from "../Common/Permission";
 import { TInertiaProps } from "../Types/intertia";
 import { useModal } from "../Shared/hooks";
+import { getCookie } from "../Shared/utils";
 
 type TMainLayout = {
     children: React.ReactNode;
@@ -158,7 +159,7 @@ export const MainLayout: React.FC<TMainLayout> = ({
             method: "GET",
             headers: {
                 Accept: "application/json",
-                "X-CSRF-TOKEN": window.csrfToken, // ambil dari window
+                "X-CSRF-TOKEN": getCookie("XSRF-TOKEN") as string, // ambil dari window
             },
             credentials: "same-origin", // biar cookie session ikut dikirim
         })
@@ -293,23 +294,25 @@ export const MainLayout: React.FC<TMainLayout> = ({
     }, []);
 
     const handleMarkAsRead = (id: number) => {
-        fetch(`notifications/${id}/read`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": window.csrfToken,
+        router.post(
+            route(Route.NotificationsRead, { id }),
+            {},
+            {
+                onSuccess: () => {
+                    setNotifications((prev) =>
+                        prev.map((n) =>
+                            n.id === id ? { ...n, is_read: true } : n,
+                        ),
+                    );
+                },
+                onError: () => {
+                    notification.error({
+                        message: "Gagal",
+                        description: "Gagal saat buat baca notifikasi",
+                    });
+                },
             },
-            credentials: "same-origin",
-        })
-            .then((res) => {
-                if (!res.ok) throw new Error("Failed to mark as read");
-                setNotifications((prev) =>
-                    prev.map((n) =>
-                        n.id === id ? { ...n, is_read: true } : n,
-                    ),
-                );
-            })
-            .catch((err) => console.error(err));
+        );
     };
 
     const formattedDate = (dateISO: string) => {

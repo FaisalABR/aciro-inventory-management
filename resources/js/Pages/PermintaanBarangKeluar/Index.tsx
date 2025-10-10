@@ -5,10 +5,8 @@ import { route, Route } from "../../Common/Route";
 import { Button, Table, Tag } from "antd";
 import {
     DeleteOutlined,
-    EditOutlined,
     EyeOutlined,
     PlusSquareOutlined,
-    SendOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { TBarangKeluar } from "../../Types/entities";
@@ -16,6 +14,7 @@ import { useModal } from "../../Shared/hooks";
 
 type TPermintaanBarangKeluarIndexProps = {
     data: TBarangKeluar[];
+    auth: any;
 };
 
 const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
@@ -120,21 +119,27 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
         },
     ];
 
+    const userRole = props?.auth?.user?.roles?.[0];
+    const isStaffToko = ["staff_toko", "admin_sistem"].includes(userRole);
+
+    const showActions = isStaffToko
+        ? [
+              <Link href={Route.CreatePermintaanBarangKeluar}>
+                  <Button
+                      icon={<PlusSquareOutlined />}
+                      type="primary"
+                      size="large"
+                  >
+                      Tambah Permintaan
+                  </Button>
+              </Link>,
+          ]
+        : [];
     return (
         <RootLayout
             type="main"
             title="Permintaan Barang Keluar"
-            actions={[
-                <Link href={Route.CreatePermintaanBarangKeluar}>
-                    <Button
-                        icon={<PlusSquareOutlined />}
-                        type="primary"
-                        size="large"
-                    >
-                        Tambah Permintaan
-                    </Button>
-                </Link>,
-            ]}
+            actions={showActions}
         >
             <Table dataSource={props.data} columns={columns} />;
         </RootLayout>

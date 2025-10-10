@@ -12,6 +12,7 @@ use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -86,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/permintaan-barang-keluar/create', [BarangKeluarController::class, 'create']);
     Route::delete('/permintaan-barang-keluar/delete/{uuid}', [BarangKeluarController::class, 'destroy']);
     Route::put('/permintaan-barang-keluar/{uuid}/approved', [BarangKeluarController::class, 'verifikasi']);
+    Route::put('/permintaan-barang-keluar/{uuid}/reject', [BarangKeluarController::class, 'tolak']);
 
     // Kelola Barang Keluar
     Route::get('/barang-keluar', [BarangKeluarController::class, 'indexEksekusi']);

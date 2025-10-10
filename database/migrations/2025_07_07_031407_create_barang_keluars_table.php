@@ -18,10 +18,13 @@ return new class extends Migration
             $table->date('tanggal_keluar');
             $table->string('user_id');
             $table->foreign('user_id')->references('user_id')->on('users')->onUpdate('cascade'); // staff peminta
-            $table->enum('status', ['Menunggu Verifikasi', 'Disetujui sebagian', 'Disetujui', 'Revisi', 'Ditolak', 'Dieksekusi'])->default('Menunggu Verifikasi');
+            $table->enum('status', ['Menunggu Verifikasi', 'Disetujui sebagian', 'Disetujui', 'Ditolak', 'Dieksekusi'])->default('Menunggu Verifikasi');
             $table->boolean('verifikasi_kepala_toko')->default(false);
             $table->boolean('verifikasi_kepala_gudang')->default(false);
-            $table->text('catatan');
+            $table->boolean('kepala_toko_menolak')->default(false);
+            $table->boolean('kepala_gudang_menolak')->default(false);
+            $table->text('catatan')->nullable();
+            $table->text('catatan_penolakan')->nullable();
             $table->timestamps();
         });
     }

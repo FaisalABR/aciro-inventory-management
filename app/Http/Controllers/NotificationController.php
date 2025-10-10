@@ -25,6 +25,6 @@ class NotificationController extends Controller
         $notification = Notification::findOrFail($id);
         $notification->update(['is_read' => true]);
 
-        return response()->json(['success' => true]);
+        return back();
     }
 }

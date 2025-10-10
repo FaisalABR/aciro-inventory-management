@@ -88,7 +88,10 @@ export type TBarangKeluar = {
     user: TUser;
     verifikasi_kepala_toko: boolean;
     verifikasi_kepala_gudang: boolean;
+    kepala_toko_menolak: boolean;
+    kepala_gudang_menolak: boolean;
     status: string;
+    catatan_penolakan: string;
     items: TBarangKeluarItem[];
 };
 

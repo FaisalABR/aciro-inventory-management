@@ -137,6 +137,11 @@ class BarangKeluarController extends Controller
 
         if ($barangKeluar->verifikasi_kepala_gudang && $barangKeluar->verifikasi_kepala_toko) {
             $barangKeluar->status = 'Disetujui';
+            $roles = Role::whereIn('name', ['staff_toko'])->get();
+            foreach ($roles as $role) {
+                // Send whatsapp ke kepala toko dan kepala gudang
+                event(new ROPNotification("Permintaan dengan nomor {$barangKeluar->nomor_referensi} sudah disetujui semua!", $role->name));
+            }
         } else {
             $barangKeluar->status = 'Disetujui sebagian';
         }
@@ -144,6 +149,36 @@ class BarangKeluarController extends Controller
         $barangKeluar->save();
 
         return back()->with('success', 'Permintaan barang keluar disetujui');
+    }
+
+    public function tolak(Request $request, $uuid)
+    {
+        $barangKeluar = BarangKeluar::where('uuid', $uuid)->first();
+        $alasan = $request->input("reason");
+
+
+        if (Auth::user()->hasRole('kepala_toko')) {
+            $barangKeluar->kepala_toko_menolak = true;
+        }
+
+        if (Auth::user()->hasRole('kepala_gudang')) {
+            $barangKeluar->kepala_gudang_menolak = true;
+        }
+
+
+        $barangKeluar->status = "Ditolak";
+        $barangKeluar->catatan_penolakan = $alasan;
+
+        $barangKeluar->save();
+
+        $roles = Role::whereIn('name', ['staff_toko'])->get();
+        foreach ($roles as $role) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            event(new ROPNotification("Permintaan dengan nomor {$barangKeluar->nomor_referensi} ditolak!", $role->name));
+        }
+
+
+        return back()->with('success', 'Permintaan barang keluar ditolak');
     }
 
     public function checkROP(Request $request)
@@ -304,7 +339,9 @@ class BarangKeluarController extends Controller
                     SendWhatsappJob::dispatch($user->noWhatsapp, $text);
                 }
             }
+            event(new ROPNotification("Permintaan dengan nomor {$barangKeluar->nomor_referensi}, sudah dikeluarkan!", 'staff_toko'));
         });
+
 
         return redirect('/barang-keluar')->with('success', 'Barang keluar berhasil dieksekusi');
     }
