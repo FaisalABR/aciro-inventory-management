@@ -38,40 +38,20 @@ class UserRoleSeeder extends Seeder
                 'user_id' => 'USR0000005',
                 'role_id' => 5,
             ],
-            // David disign ke admin gudang
+            // Hiroshi disign ke admin gudang
             [
                 'user_id' => 'USR0000006',
                 'role_id' => 6,
             ],
-            // Fatimah disign ke staff toko
+            // Thomas disign ke staff pengadaan
             [
                 'user_id' => 'USR0000007',
                 'role_id' => 7,
             ],
-            // Rizky disign ke admin gudang
-            [
-                'user_id' => 'USR0000008',
-                'role_id' => 6,
-            ],
-            // Jessica disign ke staff toko
-            [
-                'user_id' => 'USR0000009',
-                'role_id' => 7,
-            ],
-            // Hiroshi disign ke admin gudang
-            [
-                'user_id' => 'USR0000010',
-                'role_id' => 6,
-            ],
             // Maria disign ke staff toko
             [
-                'user_id' => 'USR0000011',
-                'role_id' => 7,
-            ],
-            // Thomas disign ke staff toko
-            [
-                'user_id' => 'USR0000012',
-                'role_id' => 7,
+                'user_id' => 'USR0000008',
+                'role_id' => 8,
             ],
         ];
 

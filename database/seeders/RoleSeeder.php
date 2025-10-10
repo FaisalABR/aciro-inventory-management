@@ -48,6 +48,11 @@ class RoleSeeder extends Seeder
                 'name'        => 'staff_toko',
                 'description' => 'Staff Toko',
             ],
+            // id 8
+            [
+                'name'        => 'staff_pengadaan',
+                'description' => 'Staff Pengadaan',
+            ],
         ];
 
         foreach ($roles as $roleData) {

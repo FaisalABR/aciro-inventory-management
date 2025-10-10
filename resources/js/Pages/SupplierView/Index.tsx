@@ -2,6 +2,7 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined,
     PrinterOutlined,
+    TruckOutlined,
 } from "@ant-design/icons";
 import { Head } from "@inertiajs/react";
 import {
@@ -25,6 +26,7 @@ import { router } from "@inertiajs/react";
 import { TemplatePOPDF } from "../PurchaseOrder/TemplatePOPDF";
 import { pdf } from "@react-pdf/renderer";
 import QRCode from "qrcode";
+import TextArea from "antd/es/input/TextArea";
 
 const { Title } = Typography;
 
@@ -101,6 +103,11 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
             label: "Catatan",
             children: data?.catatan,
         },
+        {
+            key: data?.catatan || "catatan",
+            label: "Catatan Penolakan Supplier",
+            children: data?.catatan_penolakan_supplier,
+        },
     ];
 
     const columns: ColumnsType = [
@@ -137,6 +144,37 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                     route(Route.KonfirmasiPOSupplier, {
                         uuid: data?.uuid,
                     }),
+                );
+            },
+        });
+    };
+
+    const handleReject = () => {
+        let reason = "";
+        return useModal({
+            type: "confirm",
+            content: (
+                <div>
+                    <p>Apakah anda yakin menolak {data?.nomor_referensi}?</p>
+                    <TextArea
+                        rows={3}
+                        style={{ marginTop: "1rem" }}
+                        placeholder="Masukkan alasan penolakan"
+                        onChange={(e) => (reason = e.target.value)} // simpan ke variabel
+                    />
+                </div>
+            ),
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: {
+                type: "primary",
+            },
+            onOk: () => {
+                router.put(
+                    route(Route.TolakPurchaseOrderSupplier, {
+                        uuid: data?.uuid,
+                    }),
+                    { reason },
                 );
             },
         });
@@ -223,21 +261,14 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                     disabled={["BARANG DIKIRIM"].some(
                                         (item) => item === data?.status,
                                     )}
-                                    icon={<CheckCircleOutlined />}
-                                    onClick={
-                                        data?.status !== "KONFIRMASI SUPPLIER"
-                                            ? () => {
-                                                  router.put(
-                                                      route(
-                                                          Route.KonfirmasiPOSupplier,
-                                                          {
-                                                              uuid: data?.uuid,
-                                                          },
-                                                      ),
-                                                  );
-                                              }
-                                            : handleKonfirmasi
+                                    icon={
+                                        data?.status === "TERKIRIM" ? (
+                                            <CheckCircleOutlined />
+                                        ) : (
+                                            <TruckOutlined />
+                                        )
                                     }
+                                    onClick={handleKonfirmasi}
                                 >
                                     {data?.status === "TERKIRIM"
                                         ? "Konfirmasi"
@@ -248,9 +279,10 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                     type="primary"
                                     size="large"
                                     icon={<CloseCircleOutlined />}
-                                    onClick={handlePrint}
+                                    onClick={handleReject}
                                     disabled={[
                                         "KONFIRMASI SUPPLIER",
+                                        "MENUNGGU PEMBAYARAN",
                                         "BARANG DIKIRIM",
                                     ].some((item) => item === data?.status)}
                                 >

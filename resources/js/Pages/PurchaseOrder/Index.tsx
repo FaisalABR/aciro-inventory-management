@@ -16,9 +16,10 @@ import { formatRupiah } from "../../Shared/utils";
 
 type TPurchaseOrderIndexProps = {
     data: TPurchaseOrder[];
+    auth: any;
 };
 
-const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
+const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
@@ -93,6 +94,12 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
                         return <Tag color="magenta">{record.status}</Tag>;
                     case "BARANG DIKIRIM":
                         return <Tag color="gold">{record.status}</Tag>;
+                    case "MENUNGGU PEMBAYARAN":
+                        return <Tag color="cyan">{record.status}</Tag>;
+                    case "SUDAH DIBAYAR":
+                        return <Tag color="cyan">{record.status}</Tag>;
+                    case "BARANG SAMPAI":
+                        return <Tag color="blue">{record.status}</Tag>;
                 }
             },
         },
@@ -143,21 +150,30 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
         },
     ];
 
+    const userRole = auth?.user?.roles?.[0];
+    const isStaffPengadaan = ["staff_pengadaan", "admin_sistem"].includes(
+        userRole,
+    );
+
+    const showActions = isStaffPengadaan
+        ? [
+              <Link href={Route.CreatePurchaseOrder}>
+                  <Button
+                      icon={<PlusSquareOutlined />}
+                      type="primary"
+                      size="large"
+                  >
+                      Tambah Purchase Order
+                  </Button>
+              </Link>,
+          ]
+        : [];
+
     return (
         <RootLayout
             type="main"
             title="Kelola Purchase Order"
-            actions={[
-                <Link href={Route.CreatePurchaseOrder}>
-                    <Button
-                        icon={<PlusSquareOutlined />}
-                        type="primary"
-                        size="large"
-                    >
-                        Tambah Purchase Order
-                    </Button>
-                </Link>,
-            ]}
+            actions={showActions}
         >
             <Table dataSource={data} columns={columns} />;
         </RootLayout>

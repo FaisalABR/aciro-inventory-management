@@ -44,46 +44,22 @@ class UserSeeder extends Seeder
                 'password'   => Hash::make('kepalapengadaan123'),
             ],
             [
-                'name'       => 'David Smith',
-                'email'      => 'david@mail.com',
-                'noWhatsapp' => '082198765432',
-                'password'   => Hash::make('david123'),
-            ],
-            [
-                'name'       => 'Fatimah Zahra',
-                'email'      => 'fatimah@mail.com',
-                'noWhatsapp' => '089876543210',
-                'password'   => Hash::make('fatimah123'),
-            ],
-            [
-                'name'       => 'Rizky Pratama',
-                'email'      => 'rizky@mail.com',
-                'noWhatsapp' => '081311112222',
-                'password'   => Hash::make('rizky123'),
-            ],
-            [
-                'name'       => 'Jessica Brown',
-                'email'      => 'jessica@mail.com',
-                'noWhatsapp' => '082211122233',
-                'password'   => Hash::make('jessica123'),
-            ],
-            [
                 'name'       => 'Hiroshi Tanaka',
-                'email'      => 'hiroshi@mail.com',
+                'email'      => 'admingudang@mail.com',
                 'noWhatsapp' => '083311133344',
-                'password'   => Hash::make('hiroshi123'),
-            ],
-            [
-                'name'       => 'Maria Gonzalez',
-                'email'      => 'maria@mail.com',
-                'noWhatsapp' => '084411144455',
-                'password'   => Hash::make('maria123'),
+                'password'   => Hash::make('admin123'),
             ],
             [
                 'name'       => 'Thomas Müller',
-                'email'      => 'thomas@mail.com',
+                'email'      => 'stafftoko@mail.com',
                 'noWhatsapp' => '085511155566',
-                'password'   => Hash::make('thomas123'),
+                'password'   => Hash::make('toko1234'),
+            ],
+            [
+                'name'       => 'Andreas',
+                'email'      => 'staffpengadaan@mail.com',
+                'noWhatsapp' => '085511155566',
+                'password'   => Hash::make('pengadaan123'),
             ],
         ];
 

@@ -187,7 +187,7 @@ export const CreatePurchaseOrderSchema = z.object({
     catatan: z
         .string()
         .min(3, { message: "Catatan minimal 3 karakter" })
-        .max(20, { message: "Catatan maximal dari 100 karakter" })
+        .max(200, { message: "Catatan maximal dari 200 karakter" })
         .optional(),
     items: z
         .array(
@@ -200,4 +200,35 @@ export const CreatePurchaseOrderSchema = z.object({
             }),
         )
         .min(1, { message: "Minimal 1 barang dimasukkan" }),
+});
+
+export const CreatePembayaranPOSchema = z.object({
+    metode_pembayaran: z
+        .string({
+            required_error: "Metode pembayaran harus diisi",
+        })
+        .min(3, { message: "Metode pembayaran minimal 3 karakter" })
+        .max(20, { message: "Metode pembayaran maximal dari 20 karakter" }),
+    nama_bank: z
+        .string({
+            required_error: "Nama bank harus diisi",
+        })
+        .min(3, { message: "Nama bank minimal 3 karakter" })
+        .max(20, { message: "Nama bank maximal dari 20 karakter" }),
+    nomor_rekening: z
+        .string({
+            required_error: "Nomor rekening harus diisi",
+        })
+        .min(3, { message: "Nomor rekening minimal 3 karakter" })
+        .max(255, { message: "Nomor rekening maximal dari 255 karakter" }),
+    jumlah: z.number({ required_error: "Jumlah harus di isi" }),
+    catatan: z
+        .string()
+        .min(3, { message: "Catatan minimal 3 karakter" })
+        .max(200, { message: "Catatan maximal dari 200 karakter" })
+        .optional(),
+    tanggal_pembayaran: z.coerce.date({
+        invalid_type_error: "Tanggal pembayaran order tidak valid",
+        required_error: "Tanggal pembayaran order harus diisi",
+    }),
 });

@@ -7,6 +7,7 @@ use App\Exceptions\Barang\BarangException;
 use App\Jobs\SendWhatsappJob;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\Role;
 use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
@@ -112,6 +113,12 @@ class PurchaseOrderController extends Controller
             'verifikasi_kepala_gudang'     => $po->verifikasi_kepala_gudang,
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
+            'kepala_toko_menolak'       => $po->kepala_toko_menolak,
+            'kepala_gudang_menolak'     => $po->kepala_gudang_menolak,
+            'kepala_pengadaan_menolak'  => $po->kepala_pengadaan_menolak,
+            'kepala_accounting_menolak' => $po->kepala_accounting_menolak,
+            'catatan_penolakan' => $po->catatan_penolakan,
+            'catatan_penolakan_supplier' => $po->catatan_penolakan_supplier,
             'supplier'                     => [
                 'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
@@ -131,7 +138,7 @@ class PurchaseOrderController extends Controller
             'catatan'           => 'nullable',
             'supplier_id'       => 'required',
             'items'             => 'required|array|min:1',
-            'items.*.barang_id' => 'required|exists:barangs,id',
+            'items.*.barang_id' => 'required|exists:barangs,barang_id',
             'items.*.quantity'  => 'required|integer|min:1',
             'items.*.harga_beli' => 'required|integer|min:1',
         ]);
@@ -268,6 +275,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
                 SendWhatsappJob::dispatch($PO->supplier->noWhatsapp, $text);
                 $PO->status = 'TERKIRIM';
+                event(new ROPNotification("Purchase Order dengan nomor {$PO->nomor_referensi} sudah diverifikasi dan sudah terkirim!", 'staff_pengadaan'));
             }
         } else {
             $PO->status = 'VERIFIKASI SEBAGIAN';
@@ -276,6 +284,69 @@ Tim Procurement Koperasi Karya Bersama Aciro
         $PO->save();
 
         return back()->with('success', 'Permintaan barang keluar disetujui');
+    }
+
+    public function tolak(Request $request, $uuid)
+    {
+        $po = PurchaseOrder::where('uuid', $uuid)->first();
+        $alasan = $request->input("reason");
+
+
+        if (Auth::user()->hasRole('kepala_toko')) {
+            $po->kepala_toko_menolak = true;
+        }
+
+        if (Auth::user()->hasRole('kepala_gudang')) {
+            $po->kepala_gudang_menolak = true;
+        }
+
+
+        if (Auth::user()->hasRole('kepala_accounting')) {
+            $po->kepala_accounting_menolak = true;
+        }
+
+
+
+        if (Auth::user()->hasRole('kepala_pengadaan')) {
+            $po->kepala_pengadaan_menolak = true;
+        }
+
+
+
+        $po->status = "TOLAK";
+        $po->catatan_penolakan = $alasan;
+
+        $po->save();
+
+        $roles = Role::whereIn('name', ['staff_pengadaan'])->get();
+        foreach ($roles as $role) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            event(new ROPNotification("Purchase Order dengan nomor {$po->nomor_referensi} ditolak!", $role->name));
+        }
+
+
+        return back()->with('success', 'Purchase Order ditolak');
+    }
+
+    public function tolakSupplier(Request $request, $uuid)
+    {
+        $po = PurchaseOrder::where('uuid', $uuid)->first();
+        $alasan = $request->input("reason");
+
+
+        $po->status = "TOLAK SUPPLIER";
+        $po->catatan_penolakan_supplier = $alasan;
+
+        $po->save();
+
+        $roles = Role::whereIn('name', ['staff_pengadaan', 'kepala_gudang', 'kepala_pengadaan', 'kepala_toko', 'kepala_accounting'])->get();
+        foreach ($roles as $role) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            event(new ROPNotification("Purchase Order dengan nomor {$po->nomor_referensi} ditolak supplier!", $role->name));
+        }
+
+
+        return back()->with('success', 'Purchase Order ditolak supplier');
     }
 
     public function showSupplierPortal($uuid)
@@ -294,6 +365,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
             'verifikasi_kepala_gudang'     => $po->verifikasi_kepala_gudang,
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
+            'catatan_penolakan_supplier'   => $po->catatan_penolakan_supplier,
             'supplier'                     => [
                 'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
@@ -320,15 +392,15 @@ Tim Procurement Koperasi Karya Bersama Aciro
         $tanggalSekarang = Carbon::parse(now())->locale('id');
 
         if ($PO->status === 'TERKIRIM') {
-            $PO->status = 'KONFIRMASI SUPPLIER';
+            $PO->status = 'MENUNGGU PEMBAYARAN';
             foreach ($users as $user) {
                 $roles = $user->roles->pluck('name')
                     ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
                     ->implode(', ');
 
-                $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
+                $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang} dan menunggu pembayaran.";
 
-                event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang}.", $user->roles->pluck('name')[0]));
+                event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi}. Sudah dikonfirmasi oleh {$PO->supplier->name} pada {$tanggalSekarang} dan menunggu pembayaran.", $user->roles->pluck('name')[0]));
                 // Kirim notifikasi (kalau perlu detail barang, bisa di-loop terpisah dari $validated['items'])
                 SendWhatsappJob::dispatch($user->noWhatsapp, $text);
             }
@@ -354,6 +426,25 @@ Tim Procurement Koperasi Karya Bersama Aciro
             : 'PO berhasil dikirim';
 
         return back()->with('success', $pesan);
+    }
+
+    public function konfirmasiSampai($uuid)
+    {
+        $po = PurchaseOrder::where('uuid', $uuid)->first();
+
+        $po->status = "BARANG SAMPAI";
+        $po->tanggal_sampai = now();
+
+        $po->save();
+
+        $roles = Role::whereIn('name', ['admin_gudang', 'kepala_gudang', 'kepala_toko'])->get();
+        foreach ($roles as $role) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            event(new ROPNotification("Purchase Order dengan nomor {$po->nomor_referensi} sampai digudang!", $role->name));
+        }
+
+
+        return back()->with('success', 'Purchase Order telah sampai digudang!');
     }
 
     public function showDetailScan($uuid)

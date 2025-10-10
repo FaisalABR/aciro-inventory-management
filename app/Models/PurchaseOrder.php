@@ -42,6 +42,10 @@ class PurchaseOrder extends Model
         'tanggal_order',
         'catatan',
         'status',
+        'kepala_toko_menolak',
+        'kepala_accounting_menolak',
+        'kepala_pengadaan_menolak',
+        'kepala_gudang_menolak'
     ];
 
     public function items()
@@ -52,5 +56,10 @@ class PurchaseOrder extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(PembayaranPurchaseOrder::class);
     }
 }

@@ -18,16 +18,22 @@ return new class extends Migration
             $table->string('supplier_id');
             $table->foreign('supplier_id')->references('supplier_id')->on('suppliers')->onDelete('restrict');
             $table->date('tanggal_order');
-            $table->text('catatan');
+            $table->text('catatan')->nullable();
+            $table->text('catatan_penolakan')->nullable();
+            $table->text('catatan_penolakan_supplier')->nullable();
             $table->boolean('verifikasi_kepala_toko')->default(false);
             $table->boolean('verifikasi_kepala_gudang')->default(false);
             $table->boolean('verifikasi_kepala_accounting')->default(false);
             $table->boolean('verifikasi_kepala_pengadaan')->default(false);
+            $table->boolean('kepala_toko_menolak')->default(false);
+            $table->boolean('kepala_gudang_menolak')->default(false);
+            $table->boolean('kepala_accounting_menolak')->default(false);
+            $table->boolean('kepala_pengadaan_menolak')->default(false);
             $table->enum('status', [
                 'DRAFT',
                 'BUTUH VERIFIKASI',
                 'VERIFIKASI SEBAGIAN',
-                'REVISI',
+                'TOLAK',
                 'VERIFIKASI',
                 'TERKIRIM',
                 'TOLAK SUPPLIER',

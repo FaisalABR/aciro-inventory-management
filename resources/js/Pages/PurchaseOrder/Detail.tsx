@@ -4,28 +4,51 @@ import { TPurchaseOrder } from "../../Types/entities";
 import {
     Button,
     Card,
+    DatePicker,
     Descriptions,
     DescriptionsProps,
+    Flex,
+    Form,
+    Input,
+    InputNumber,
     QRCode as QRCodeAntd,
+    Select,
     Table,
     Tag,
+    Upload,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { CheckCircleOutlined, PrinterFilled } from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    CloseCircleOutlined,
+    LoadingOutlined,
+    PrinterFilled,
+    ProductOutlined,
+} from "@ant-design/icons";
 import { useModal } from "../../Shared/hooks";
 import { router } from "@inertiajs/react";
 import { Route, route } from "../../Common/Route";
 import QRCode from "qrcode";
 import { TemplatePOPDF } from "./TemplatePOPDF";
 import { pdf } from "@react-pdf/renderer";
+import TextArea from "antd/es/input/TextArea";
+import Title from "antd/es/typography/Title";
+import { createSchemaFieldRule } from "antd-zod";
+import { CreatePembayaranPOSchema } from "../../Shared/validation";
+import dayjs from "dayjs";
 
 type TDetailPurchaseOrderProps = {
     data: TPurchaseOrder;
+    auth: any;
 };
 
 const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
     const { data } = props;
     const [qrData, setQrData] = useState<string>("");
+    const [fileList, setFileList] = useState([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const zodSync = createSchemaFieldRule(CreatePembayaranPOSchema);
+    const [form] = Form.useForm();
     const handleVerification = () => {
         // hitung total verifikator
         const verifikator = [
@@ -59,6 +82,56 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         });
     };
 
+    const handleArrived = () => {
+        return useModal({
+            type: "confirm",
+            content: `Apakah anda yakin ingin ${data?.nomor_referensi} sudah sampai?`,
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: {
+                type: "primary",
+            },
+            onOk: () => {
+                router.put(
+                    route(Route.SampaiPurchaseOrder, {
+                        uuid: data?.uuid,
+                    }),
+                );
+            },
+        });
+    };
+
+    const handleReject = () => {
+        let reason = "";
+        return useModal({
+            type: "confirm",
+            content: (
+                <div>
+                    <p>Apakah anda yakin menolak {data?.nomor_referensi}?</p>
+                    <TextArea
+                        rows={3}
+                        style={{ marginTop: "1rem" }}
+                        placeholder="Masukkan alasan penolakan"
+                        onChange={(e) => (reason = e.target.value)} // simpan ke variabel
+                    />
+                </div>
+            ),
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: {
+                type: "primary",
+            },
+            onOk: () => {
+                router.put(
+                    route(Route.TolakPurchaseOrder, {
+                        uuid: data?.uuid,
+                    }),
+                    { reason },
+                );
+            },
+        });
+    };
+
     const descItems: DescriptionsProps["items"] = [
         {
             key: data?.uuid,
@@ -83,7 +156,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         {
             key: "verifikasi kepala toko" + data?.uuid,
             label: "Verifikasi Kepala Toko",
-            children: data?.verifikasi_kepala_toko ? (
+            children: data?.kepala_toko_menolak ? (
+                <Tag color="red">Ditolak</Tag>
+            ) : data?.verifikasi_kepala_toko ? (
                 <Tag color="green">Disetujui</Tag>
             ) : (
                 <Tag color="orange">Belum Verifikasi</Tag>
@@ -125,6 +200,16 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             key: data?.catatan || "catatan",
             label: "Catatan",
             children: data?.catatan,
+        },
+        {
+            key: data?.catatan || "catatan",
+            label: "Catatan Penolakan Internal",
+            children: data?.catatan_penolakan,
+        },
+        {
+            key: data?.catatan || "catatan",
+            label: "Catatan Penolakan Supplier",
+            children: data?.catatan_penolakan_supplier,
         },
         {
             label: "QR Code",
@@ -199,6 +284,55 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         }
     };
 
+    const userRole = props?.auth?.user?.roles?.[0];
+    const disabledByRole =
+        (userRole === "kepala_toko" && data?.verifikasi_kepala_toko) ||
+        (userRole === "kepala_gudang" && data?.verifikasi_kepala_gudang) ||
+        (userRole === "kepala_accounting" &&
+            data?.verifikasi_kepala_accounting) ||
+        (userRole === "kepala_pengadaan" && data?.verifikasi_kepala_pengadaan);
+    const isDisabled = [
+        "TOLAK",
+        "TOLAK SUPPLIER",
+        "KONFIRMASI SUPPLIER",
+        "BARANG DIKIRIM",
+        "MENUNGGU PEMBAYARAN",
+    ].includes(data?.status);
+
+    const onFinish = async () => {
+        const values = form.getFieldsValue();
+        console.log(values);
+        try {
+            // Buat FormData untuk kirim file
+            const formData = new FormData();
+            Object.keys(values).forEach((key) => {
+                if (values[key] instanceof dayjs) {
+                    // format date ke string
+                    formData.append(key, values[key].format("YYYY-MM-DD"));
+                } else {
+                    formData.append(key, values[key]);
+                }
+            });
+
+            // Tambahkan file upload
+            if (fileList.length > 0) {
+                formData.append("bukti_pembayaran", fileList[0].originFileObj);
+            }
+            router.post(
+                route(Route.PembayaranPurchaseOrder, {
+                    id: data.id,
+                }),
+                formData,
+                {
+                    forceFormData: true,
+                    onFinish: () => setIsLoading(false),
+                },
+            );
+        } catch (error) {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <RootLayout
             type="main"
@@ -215,18 +349,48 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                 <Button
                     type="primary"
                     size="large"
-                    disabled={[
-                        "DRAFT",
-                        "VERIFIKASI",
-                        "TERKIRIM",
-                        "KONFIRMASI SUPPLIER",
-                        "BARANG DIKIRIM",
-                    ].some((item) => item === data?.status)}
+                    disabled={
+                        [
+                            "DRAFT",
+                            "VERIFIKASI",
+                            "TERKIRIM",
+                            "KONFIRMASI SUPPLIER",
+                            "BARANG DIKIRIM",
+                            "TOLAK",
+                            "TOLAK SUPPLIER",
+                            "MENUNGGU PEMBAYARAN",
+                        ].some((item) => item === data?.status) ||
+                        disabledByRole
+                    }
                     icon={<CheckCircleOutlined />}
                     onClick={handleVerification}
                 >
                     Verifikasi
                 </Button>,
+                <Button
+                    key="reject"
+                    danger
+                    type="primary"
+                    size="large"
+                    icon={<CloseCircleOutlined />}
+                    onClick={handleReject}
+                    disabled={isDisabled || disabledByRole}
+                >
+                    Tolak
+                </Button>,
+                data?.status === "BARANG DIKIRIM" && (
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<ProductOutlined />}
+                        onClick={handleArrived}
+                        disabled={["BARANG SAMPAI"].some(
+                            (item) => item === data?.status,
+                        )}
+                    >
+                        Barang Sampai
+                    </Button>
+                ),
             ]}
         >
             <Card style={{ marginBottom: "1rem" }}>
@@ -237,6 +401,98 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                     items={descItems}
                 />
             </Card>
+            {userRole === "kepala_accounting" &&
+                data?.status === "MENUNGGU PEMBAYARAN" && (
+                    <Card style={{ marginBottom: "1rem" }}>
+                        <Flex vertical style={{ width: "50%" }}>
+                            <Title level={4}>Formulir Pembayaran</Title>
+                            <Form
+                                form={form}
+                                initialValues={{
+                                    ...props.data,
+                                }}
+                                layout="vertical"
+                                onFinish={onFinish}
+                                style={{ marginTop: "0.5rem" }}
+                            >
+                                <Form.Item
+                                    label="Metode Pembayaran"
+                                    name="metode_pembayaran"
+                                    rules={[zodSync]}
+                                >
+                                    <Select
+                                        options={[
+                                            {
+                                                value: "Transfer",
+                                                label: "Transfer Bank",
+                                            },
+                                            { value: "Tunai", label: "Tunai" },
+                                            { value: "Giro", label: "Giro" },
+                                        ]}
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    label="Nama Bank"
+                                    name="nama_bank"
+                                    rules={[zodSync]}
+                                >
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item
+                                    label="Nomor Rekening"
+                                    name="nomor_rekening"
+                                    rules={[zodSync]}
+                                >
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item
+                                    label="Jumlah"
+                                    name="jumlah"
+                                    rules={[zodSync]}
+                                >
+                                    <InputNumber style={{ width: "100%" }} />
+                                </Form.Item>
+                                <Form.Item
+                                    label="Tanggal Pembayaran"
+                                    name="tanggal_pembayaran"
+                                    rules={[zodSync]}
+                                >
+                                    <DatePicker />
+                                </Form.Item>
+                                <Form.Item
+                                    label="Bukti Pembayaran"
+                                    name="bukti_pembayaran"
+                                    rules={[zodSync]}
+                                >
+                                    <Upload
+                                        beforeUpload={() => false} // cegah upload otomatis
+                                        fileList={fileList}
+                                        onChange={({ fileList }) =>
+                                            setFileList(fileList)
+                                        }
+                                        accept=".jpg,.png,.pdf"
+                                    >
+                                        <Button>Upload Bukti</Button>
+                                    </Upload>
+                                </Form.Item>
+                                <Form.Item
+                                    label="Catatan"
+                                    name="catatan"
+                                    rules={[zodSync]}
+                                >
+                                    <Input.TextArea rows={3} />
+                                </Form.Item>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    loading={isLoading}
+                                >
+                                    Kirim Pembayaran
+                                </Button>
+                            </Form>
+                        </Flex>
+                    </Card>
+                )}
             <Card>
                 <Table columns={columns} dataSource={dataTable} />
             </Card>

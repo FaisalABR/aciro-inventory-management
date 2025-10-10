@@ -7,6 +7,7 @@ use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HeaderDeadstockController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PembayaranPurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
@@ -24,6 +25,7 @@ Route::post('/register', [AuthController::class, 'register']);
 // Supplier View
 Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'showSupplierPortal']);
 Route::put('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'konfirmasi']);
+Route::put('/suppliers/{uuid}/views/reject', [PurchaseOrderController::class, 'tolakSupplier']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -104,7 +106,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'showEdit']);
     Route::put('/purchase-orders/edit/{uuid}', [PurchaseOrderController::class, 'update']);
     Route::put('/purchase-orders/{uuid}/approved', [PurchaseOrderController::class, 'verifikasi']);
+    Route::put('/purchase-orders/{uuid}/reject', [PurchaseOrderController::class, 'tolak']);
     Route::delete('/purchase-orders/delete/{uuid}', [PurchaseOrderController::class, 'destroy']);
+    Route::post('/purchase-orders/{id}/payments', [PembayaranPurchaseOrderController::class, 'create']);
+    Route::put('/purchase-orders/{uuid}/arrived', [PurchaseOrderController::class, 'konfirmasiSampai']);
+
+
 
     // Kelola Laporan Deadstock
     Route::get('/laporan-deadstocks', [HeaderDeadstockController::class, 'index']);

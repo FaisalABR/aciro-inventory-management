@@ -96,6 +96,7 @@ export type TBarangKeluar = {
 };
 
 export type TPurchaseOrder = {
+    id: string;
     uuid: string;
     nomor_referensi: string;
     tanggal_order: string;
@@ -106,6 +107,12 @@ export type TPurchaseOrder = {
     verifikasi_kepala_gudang: boolean;
     verifikasi_kepala_pengadaan: boolean;
     verifikasi_kepala_accounting: boolean;
+    kepala_toko_menolak: boolean;
+    kepala_gudang_menolak: boolean;
+    kepala_accounting_menolak: boolean;
+    kepala_pengadaan_menolak: boolean;
+    catatan_penolakan: string;
+    catatan_penolakan_supplier: string;
     status: string;
     items: TPurchaseOrderItem[];
 };
