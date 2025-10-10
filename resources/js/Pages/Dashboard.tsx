@@ -134,6 +134,7 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
                     }}
                 >
                     <RangePicker
+                        placeholder={["Periode Awal", "Periode Akhir"]}
                         value={dateRange}
                         onChange={(dates) => setDateRange(dates)}
                         format="YYYY-MM-DD"

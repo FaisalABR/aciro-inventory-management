@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Notification;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -22,6 +23,12 @@ class ROPNotification implements ShouldBroadcastNow
     {
         $this->message = $message;
         $this->role    = $role;
+
+        // Simpan ke DB saat dikirim
+        Notification::create([
+            'role' => $role,
+            'message' => $message,
+        ]);
     }
 
     public function broadcastOn(): array

@@ -48,14 +48,14 @@ const FormUser: React.FC<TUserFormProps> = (props) => {
     return (
         <RootLayout
             type="main"
-            title={props.isUpdate ? "Update User" : "Tambah User"}
+            title={props.isUpdate ? "Edit Pengguna" : "Tambah Pengguna"}
         >
             <Card>
                 <Flex vertical style={{ width: "30%", marginInline: "auto" }}>
                     <Title level={4}>
                         {props.isUpdate
-                            ? "Form Update User"
-                            : "Form Tambah User"}
+                            ? "Form Edit Pengguna"
+                            : "Form Tambah Pengguna"}
                     </Title>
                     <Form
                         form={form}
@@ -74,7 +74,7 @@ const FormUser: React.FC<TUserFormProps> = (props) => {
                                 autoComplete="email"
                             />
                         </Form.Item>
-                        <Form.Item rules={[zodSync]} name="name" label="Name">
+                        <Form.Item rules={[zodSync]} name="name" label="Nama">
                             <Input placeholder="Faisal Abu Bakar Riza" />
                         </Form.Item>
                         {!props.isUpdate && (
@@ -107,6 +107,18 @@ const FormUser: React.FC<TUserFormProps> = (props) => {
                                     {
                                         value: 4,
                                         label: <span>Kepala Accounting</span>,
+                                    },
+                                    {
+                                        value: 5,
+                                        label: <span>Kepala Pengadaan</span>,
+                                    },
+                                    {
+                                        value: 6,
+                                        label: <span>Admin Gudang</span>,
+                                    },
+                                    {
+                                        value: 7,
+                                        label: <span>Staff Toko</span>,
                                     },
                                 ]}
                             />

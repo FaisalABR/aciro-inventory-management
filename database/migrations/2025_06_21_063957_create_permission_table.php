@@ -26,11 +26,13 @@ return new class extends Migration
         });
 
         Schema::create('user_role', function (Blueprint $table) {
-            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreignId('role_id')->constrained();
+            $table->string('user_id');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreignId('role_id')->constrained(); // role masih pakai auto increment bigint
             $table->primary(['role_id', 'user_id']);
             $table->timestamps();
         });
+
 
         Schema::create('permission_role', function (Blueprint $table) {
             $table->foreignId('role_id')->constrained();

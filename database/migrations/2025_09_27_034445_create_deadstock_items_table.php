@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('deadstock_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('header_deadstock_id')->constrained('header_deadstocks')->onDelete('cascade');
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('restrict');
+            $table->string('deadstock_item_id')->primary();
+            $table->string('header_deadstock_id');
+            $table->foreign('header_deadstock_id')->references('header_deadstock_id')->on('header_deadstocks')->onDelete('cascade');
+            $table->string('barang_id');
+            $table->foreign('barang_id')->references('barang_id')->on('barangs')->onDelete('restrict');
             $table->integer('total_keluar');
             $table->integer('persediaan_awal');
             $table->integer('persediaan_akhir');
@@ -24,6 +26,7 @@ return new class extends Migration
                 'Slow Moving',
                 'Deadstock',
             ])->nullable();
+            $table->string('tindakan');
             $table->timestamps();
         });
     }

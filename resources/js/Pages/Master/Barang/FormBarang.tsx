@@ -60,6 +60,17 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                         form={form}
                         initialValues={{
                             ...props.data,
+                            name: props.data?.name,
+                            satuan_id: props.data?.satuan_id,
+                            supplier_id: props.data?.supplier_id,
+                            hargaBeli: props.data?.hargaBeli,
+                            hargaJual: props.data?.hargaJual,
+                            maximal_quantity: props.data?.maximal_quantity,
+                            rata_rata_permintaan_harian: Number(
+                                props.data?.rata_rata_permintaan_harian,
+                            ),
+                            leadtime: Number(props.data?.leadtime),
+                            safety_stock: Number(props.data?.safety_stock),
                         }}
                         layout="vertical"
                         onFinish={onFinish}
@@ -120,7 +131,7 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                         <Form.Item
                             rules={[zodSync]}
                             name="rata_rata_permintaan_harian"
-                            label="Rata Rata Permintaan Harian"
+                            label="Rata-rata Permintaan Harian"
                         >
                             <InputNumber
                                 min={1}
@@ -133,7 +144,7 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                         <Form.Item
                             rules={[zodSync]}
                             name="leadtime"
-                            label="Lead Time (hari)"
+                            label="Lead Time"
                         >
                             <InputNumber
                                 min={1}

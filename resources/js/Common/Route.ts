@@ -75,6 +75,7 @@ export enum Route {
     LaporanDeadstock = "/laporan-deadstocks",
     CreateLaporanDeadstock = "/laporan-deadstocks/create",
     LaporanDeadstocDetail = "/laporan-deadstocks/:uuid",
+    LaporanDeadstockDelete = "/laporan-deadstocks/:uuid/delete",
 
     // SupplierView
     KonfirmasiPOSupplier = "/suppliers/:uuid/views",

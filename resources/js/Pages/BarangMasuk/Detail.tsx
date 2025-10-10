@@ -69,7 +69,7 @@ const Detail: React.FC<TDetailBarangMasukProps> = (props) => {
         <RootLayout type="main" title="Detail Barang Masuk">
             <Card style={{ marginBottom: "1rem" }}>
                 <Descriptions
-                    title="Barang Masuk"
+                    title="Informasi Barang Masuk"
                     layout="vertical"
                     bordered
                     items={descItems}

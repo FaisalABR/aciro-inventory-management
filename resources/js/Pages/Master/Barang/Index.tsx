@@ -58,13 +58,12 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
     const handleDeleteBarang = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: (
                 <p>
                     Apakah anda yakin ingin menghapus <b>{name}</b>?
                 </p>
             ),
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -165,7 +164,7 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
     return (
         <RootLayout
             type="main"
-            title="Master Barang"
+            title="Kelola Barang"
             actions={[
                 <Link href={Route.CreateMasterBarang}>
                     <Button

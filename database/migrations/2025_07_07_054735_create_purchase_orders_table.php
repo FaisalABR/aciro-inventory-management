@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
-            $table->id();
+            $table->string('purchase_order_id')->primary();
             $table->uuid()->unique();
             $table->string('nomor_referensi');
-            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('restrict');
+            $table->string('supplier_id');
+            $table->foreign('supplier_id')->references('supplier_id')->on('suppliers')->onDelete('restrict');
             $table->date('tanggal_order');
             $table->text('catatan');
             $table->boolean('verifikasi_kepala_toko')->default(false);
@@ -26,8 +27,10 @@ return new class extends Migration
                 'DRAFT',
                 'BUTUH VERIFIKASI',
                 'VERIFIKASI SEBAGIAN',
+                'REVISI',
                 'VERIFIKASI',
                 'TERKIRIM',
+                'TOLAK SUPPLIER',
                 'KONFIRMASI SUPPLIER',
                 'BARANG DIKIRIM',
             ])->default('DRAFT');

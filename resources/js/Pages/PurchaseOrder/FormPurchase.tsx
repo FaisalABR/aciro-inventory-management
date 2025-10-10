@@ -131,7 +131,7 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
                             items: props?.data?.items?.map((item) => ({
                                 barang_id: item.barang_id,
                                 quantity: item.quantity,
-                                harge_beli: item.harga_beli,
+                                harga_beli: Number(item.harga_beli),
                             })),
                         }}
                         layout="vertical"
@@ -141,9 +141,9 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
                         <Form.Item
                             rules={[zodSync]}
                             name="nomor_referensi"
-                            label="Nomor Referensi"
+                            label="Nomor Referensi (Auto Generated)"
                         >
-                            <Input placeholder="BM-06072025-001" />
+                            <Input placeholder="BM-06072025-001" disabled />
                         </Form.Item>
                         <Flex gap="small">
                             <Form.Item

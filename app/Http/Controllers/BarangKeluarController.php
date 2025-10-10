@@ -6,8 +6,10 @@ use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
 use App\Jobs\SendWhatsappJob;
 use App\Models\BarangKeluar;
+use App\Models\BarangKeluarItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\Role;
 use App\Models\Stock;
 use App\Models\User;
 use App\Services\BarangKeluarServiceInterface;
@@ -49,8 +51,8 @@ class BarangKeluarController extends Controller
         $stockBarang  = Stock::with('barangs')->get();
         $optionBarang = $stockBarang->map(function ($stock) {
             return [
-                'value'    => $stock->barangs->id,
-                'label'    => $stock->barangs->name.($stock->quantity == 0 ? ' (habis)' : ''),
+                'value'    => $stock->barangs->barang_id,
+                'label'    => $stock->barangs->name . ($stock->quantity == 0 ? ' (habis)' : ''),
                 'disabled' => $stock->quantity == 0,
             ];
         });
@@ -82,7 +84,7 @@ class BarangKeluarController extends Controller
             'tanggal_keluar'    => 'required',
             'catatan'           => 'nullable',
             'items'             => 'required|array|min:1',
-            'items.*.barang_id' => 'required|exists:barangs,id',
+            'items.*.barang_id' => 'required|exists:barangs,barang_id',
             'items.*.quantity'  => 'required|integer|min:1',
         ]);
 
@@ -98,6 +100,25 @@ class BarangKeluarController extends Controller
         foreach ($validated['items'] as $item) {
             $permintaanBarangKeluar->items()->create($item);
         }
+
+        $roles = Role::whereIn('name', ['kepala_gudang', 'kepala_toko'])->get();
+
+        $users    = User::whereHas('roles', function ($q) {
+            $q->whereIn('name', ['kepala_gudang', 'kepala_toko']);
+        })->get();
+
+        foreach ($users as $user) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            SendWhatsappJob::dispatch($user->noWhatsapp, "Ada permintaan baru dengan nomor {$permintaanBarangKeluar->nomor_referensi} perlu diverifikasi!");
+        }
+
+        foreach ($roles as $role) {
+            // Send whatsapp ke kepala toko dan kepala gudang
+            event(new ROPNotification("Ada permintaan baru dengan nomor {$permintaanBarangKeluar->nomor_referensi} perlu diverifikasi!", $role->name));
+        }
+
+
+
 
         return redirect('/permintaan-barang-keluar')->with('success', 'Permintaan Barang Keluar berhasil ditambahkan!');
     }
@@ -142,7 +163,7 @@ class BarangKeluarController extends Controller
 
             if ($sisa < 0) {
                 $errors[] = [
-                    'barang_id' => $barang->id,
+                    'barang_id' => $barang->stock_id,
                     'nama'      => $barang->barangs->name,
                     'stock'     => $barang->quantity,
                     'request'   => $item['quantity'],
@@ -153,7 +174,7 @@ class BarangKeluarController extends Controller
 
             if ($sisa <= $barang->rop) {
                 $warnings[] = [
-                    'barang_id'        => $barang->id,
+                    'barang_id'        => $barang->stock_id,
                     'nama'             => $barang->barangs->name,
                     'stock'            => $barang->quantity,
                     'rop'              => $barang->rop,
@@ -200,7 +221,7 @@ class BarangKeluarController extends Controller
 
             // cek ROP
             if (($stock->quantity - $item->quantity) <= $stock->rop) {
-                $warnings[] = "Barang {$item->barangs->name} akan mencapai ROP (sisa setelah keluar: ".($stock->quantity - $item->quantity).')';
+                $warnings[] = "Barang {$item->barangs->name} akan mencapai ROP (sisa setelah keluar: " . ($stock->quantity - $item->quantity) . ')';
             }
         }
 
@@ -247,23 +268,23 @@ class BarangKeluarController extends Controller
                     $supplier = $item->barangs->supplier;
                     $totalPo  = PurchaseOrder::count();
 
-                    $po = PurchaseOrder::where('supplier_id', $supplier->id)->where('status', 'DRAFT')->first();
+                    $po = PurchaseOrder::where('supplier_id', $supplier->supplier_id)->where('status', 'DRAFT')->first();
 
-                    if (! $po) {
+                    if (!$po) {
                         $po = PurchaseOrder::create([
                             'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPo + 1),
                             'tanggal_order'   => now(),
-                            'supplier_id'     => $supplier->id,
+                            'supplier_id'     => $supplier->supplier_id,
                             'status'          => 'DRAFT',
                             'catatan'         => 'test',
                         ]);
                     }
 
                     PurchaseOrderItem::create([
-                        'purchase_order_id' => $po->id,
+                        'purchase_order_id' => $po->purchase_order_id,
                         'barang_id'         => $item->barang_id,
                         'quantity'          => $item->barangs->maximal_quantity - $stock->rop ?? 0,
-                        'harga_beli'        => $item->barangs->harga_beli,
+                        'harga_beli'        => $item->barangs->hargaBeli,
                     ]);
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_gudang'));
@@ -286,5 +307,22 @@ class BarangKeluarController extends Controller
         });
 
         return redirect('/barang-keluar')->with('success', 'Barang keluar berhasil dieksekusi');
+    }
+
+    public function destroy($uuid)
+    {
+        $barangKeluar = BarangKeluar::where('uuid', $uuid)->first();
+
+
+        try {
+            BarangKeluarItem::where('barang_keluar_id', $barangKeluar->barang_keluar_id)->delete();
+
+            $barangKeluar->delete();
+
+            return back()->with('success', "Permintaan barang keluar berhasil dihapus!");
+        } catch (\Exception $e) {
+            Log::error("Gagal menghapus Permintaan barang keluar dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi kesalahan dalam menghapus Permintaan barang keluar. Silahkan coba lagi nanti');
+        }
     }
 }

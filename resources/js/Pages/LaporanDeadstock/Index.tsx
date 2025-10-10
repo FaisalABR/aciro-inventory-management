@@ -43,18 +43,6 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Button
-                            onClick={() =>
-                                handleDelete(
-                                    record.uuid,
-                                    record.nomor_referensi,
-                                )
-                            }
-                            type="primary"
-                            danger
-                        >
-                            <DeleteOutlined />
-                        </Button>
                         <Link
                             href={route(Route.LaporanDeadstocDetail, {
                                 uuid: record.uuid,
@@ -73,9 +61,8 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: `Apakah anda yakin ingin menghapus ${reference}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -83,7 +70,7 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
             },
             onOk: () => {
                 router.delete(
-                    route(Route.DeletePurchaseOrder, {
+                    route(Route.LaporanDeadstockDelete, {
                         uuid,
                     }),
                 );
@@ -115,7 +102,7 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
                     size="large"
                     onClick={() => setIsModalOpen(true)}
                 >
-                    Buat Laporan Deadstock
+                    Evaluasi ITR
                 </Button>,
             ]}
         >
@@ -125,7 +112,7 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                okText="Simpan"
+                okText="Submit"
                 cancelText="Batal"
             >
                 <Form form={form} layout="vertical">

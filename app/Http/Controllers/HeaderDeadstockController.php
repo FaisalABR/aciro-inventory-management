@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Barang\BarangException;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 use App\Models\DeadstockItem;
@@ -10,13 +11,14 @@ use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class HeaderDeadstockController extends Controller
 {
     public function index()
     {
         $query = HeaderDeadstock::select(
-            'id',
+            'header_deadstock_id',
             'uuid',
             'nomor_referensi',
             'periode_mulai',
@@ -25,7 +27,7 @@ class HeaderDeadstockController extends Controller
 
         $formattedValue = $query->get()->map(function ($deadstock) {
             return [
-                'id'              => $deadstock->id,
+                'id'              => $deadstock->header_deadstock_id,
                 'uuid'            => $deadstock->uuid,
                 'nomor_referensi' => $deadstock->nomor_referensi,
                 'periode_mulai'   => $deadstock->periode_mulai,
@@ -60,16 +62,16 @@ class HeaderDeadstockController extends Controller
 
         $headerDeadstock->items()->createMany($kalkulasiDeadstock);
 
-        return redirect('/laporan-deadstocks')->with('success', 'Laporan Deadstock Berhasil dibuat!');
+        return redirect('/laporan-deadstocks')->with('success', 'Laporan Deadstock berhasil dibuat!');
     }
 
     public function showDetail($uuid)
     {
         $deadstock      = HeaderDeadstock::where('uuid', $uuid)->firstOrFail();
-        $deadstockItems = DeadstockItem::where('header_deadstock_id', $deadstock->id)->with(['barang'])->get();
+        $deadstockItems = DeadstockItem::where('header_deadstock_id', $deadstock->header_deadstock_id)->with(['barang'])->get();
 
         $data = [
-            'id'                           => $deadstock->id,
+            'id'                           => $deadstock->header_deadstock_id,
             'uuid'                         => $deadstock->uuid,
             'nomor_referensi'              => $deadstock->nomor_referensi,
             'periode_mulai'                => $deadstock->periode_mulai,
@@ -142,10 +144,13 @@ class HeaderDeadstockController extends Controller
             // Tentukan status
             if ($ITR > 3) {
                 $status = 'Fast Moving';
+                $tindakan = "Tidak Perlu Tindakan";
             } elseif ($ITR >= 1) {
                 $status = 'Slow Moving';
+                $tindakan = "Promo";
             } else {
                 $status = 'Deadstock';
+                $tindakan = "Promo/Bundling";
             }
 
             // Simpan ke result array
@@ -158,6 +163,7 @@ class HeaderDeadstockController extends Controller
                 'total_keluar'     => $totalKeluar,
                 'itr'              => $ITR,
                 'status'           => $status,
+                'tindakan'         => $tindakan,
             ];
 
             // Update ke tabel stocks
@@ -169,5 +175,22 @@ class HeaderDeadstockController extends Controller
         }
 
         return $result;
+    }
+
+    public function destroy($uuid)
+    {
+        $headerDeadstock = HeaderDeadstock::where('uuid', $uuid)->first();
+
+
+        try {
+            DeadstockItem::where('header_deadstock_id', $headerDeadstock->header_deadstock_id)->delete();
+
+            $headerDeadstock->delete();
+
+            return back()->with('success', "PO berhasil dihapus!");
+        } catch (\Exception $e) {
+            Log::error("Gagal menghapus PO dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
+            throw new BarangException('Terjadi kesalahan dalam menghapus Laporan Deadstock. Silahkan coba lagi nanti');
+        }
     }
 }

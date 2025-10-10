@@ -33,7 +33,7 @@ class DashboardController extends Controller
 
         // Loop untuk hitung total barang masuk per barang
         $barangMasukGrafik = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
-            $totalMasuk = BarangMasukItem::where('barang_id', $barang->id)
+            $totalMasuk = BarangMasukItem::where('barang_id', $barang->barang_id)
                 ->whereHas('barangMasuk', function ($q) use ($periodeMulai, $periodeAkhir) {
                     $q->whereBetween('tanggal_masuk', [$periodeMulai, $periodeAkhir]);
                 })
@@ -47,7 +47,7 @@ class DashboardController extends Controller
 
         // Loop untuk hitung total barang masuk per barang
         $barangKeluarGrafik = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
-            $totalMasuk = BarangKeluarItem::where('barang_id', $barang->id)
+            $totalMasuk = BarangKeluarItem::where('barang_id', $barang->barang_id)
                 ->whereHas('barangKeluar', function ($q) use ($periodeMulai, $periodeAkhir) {
                     $q->whereBetween('tanggal_keluar', [$periodeMulai, $periodeAkhir]);
                 })

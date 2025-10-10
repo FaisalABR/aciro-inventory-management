@@ -40,9 +40,11 @@ class BarangService implements BarangServiceInterface
 
 
             Stock::create([
-                'barang_id' => $barang->id,
+                'barang_id' => $barang->barang_id,
                 'rop' => $rop,
-                'status' => 'Out Of Stock',
+                'status_rop' => 'Out Of Stock',
+                'quantity' => 0,
+                'potensi_penjualan' => 0,
             ]);
 
             return $barang;
@@ -92,7 +94,7 @@ class BarangService implements BarangServiceInterface
             $barang->refresh();
             $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $barang->safety_stock;
 
-            $stock = Stock::where('barang_id', $barang->id)->first();
+            $stock = Stock::where('barang_id', $barang->barang_id)->first();
 
             if ($stock) {
                 $stock->rop = $rop;
@@ -140,7 +142,7 @@ class BarangService implements BarangServiceInterface
 
         $options = $data->map(function ($barang) {
             return [
-                'value' => $barang->id,
+                'value' => $barang->barang_id,
                 'label' => $barang->name,
             ];
         });

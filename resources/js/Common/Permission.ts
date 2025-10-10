@@ -2,6 +2,8 @@ export const PERMISSIONS_VIEW_DASHBOARD = "view-dashboard";
 export const PERMISSIONS_VIEW_STOCK = "view-stock";
 export const PERMISSIONS_VIEW_BARANG_MASUK = "view-barang-masuk";
 export const PERMISSIONS_VIEW_BARANG_KELUAR = "view-barang-keluar";
+export const PERMISSIONS_VIEW_PERMINTAAN_BARANG_KELUAR =
+    "view-permintaan-barang-keluar";
 export const PERMISSIONS_VIEW_ORDER = "view-order";
 export const PERMISSIONS_VIEW_MASTER_ROOT = "view-master";
 export const PERMISSIONS_VIEW_MASTER_KATEGORI = "view-master-kategori";

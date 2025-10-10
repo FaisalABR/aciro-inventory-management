@@ -132,7 +132,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 stopCamera();
                 setIsOpenQR(false);
                 notification.success({
-                    message: "Error",
+                    message: "Success",
                     description: "Berhasil Scan PO",
                 });
             } catch (error) {
@@ -171,9 +171,9 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                         <Form.Item
                             rules={[zodSync]}
                             name="nomor_referensi"
-                            label="Nomor Referensi"
+                            label="Nomor Referensi (Auto Generated)"
                         >
-                            <Input placeholder="BM-06072025-001" />
+                            <Input placeholder="BM-06072025-001" disabled />
                         </Form.Item>
                         <Flex gap="small">
                             <Form.Item

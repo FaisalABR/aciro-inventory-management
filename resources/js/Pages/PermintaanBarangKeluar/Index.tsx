@@ -22,9 +22,8 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: `Apakah anda yakin ingin menghapus ${reference}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -57,6 +56,11 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
             key: "total_unique_items",
         },
         {
+            title: "Total Kuantitas",
+            dataIndex: "total_quantity",
+            key: "total_quantity",
+        },
+        {
             title: "Status",
             dataIndex: "status",
             key: "status",
@@ -78,11 +82,6 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
             },
         },
         {
-            title: "Total Kuantitas",
-            dataIndex: "total_quantity",
-            key: "total_quantity",
-        },
-        {
             title: "Permintaan Oleh",
             dataIndex: ["user", "name"],
             key: "users",
@@ -94,15 +93,6 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Link
-                            href={route(Route.EditPermintaanBarangKeluar, {
-                                uuid: record.uuid,
-                            })}
-                        >
-                            <Button>
-                                <EditOutlined />
-                            </Button>
-                        </Link>
                         <Button
                             onClick={() =>
                                 handleDelete(
@@ -141,7 +131,7 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
                         type="primary"
                         size="large"
                     >
-                        Tambah Permintaan Barang Keluar
+                        Tambah Permintaan
                     </Button>
                 </Link>,
             ]}

@@ -94,7 +94,7 @@ const Register: React.FC = ({ data }: { data: any }) => {
                             htmlType="submit"
                             style={{ fontWeight: "bold", width: "100%" }}
                         >
-                            Daftar
+                            Register
                         </Button>
                         <Col
                             style={{

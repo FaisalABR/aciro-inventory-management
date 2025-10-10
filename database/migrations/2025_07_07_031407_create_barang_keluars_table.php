@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('barang_keluars', function (Blueprint $table) {
-            $table->id();
+            $table->string('barang_keluar_id')->primary();
             $table->uuid()->unique();
             $table->string('nomor_referensi');
             $table->date('tanggal_keluar');
-            $table->foreignId('user_id')->constrained('users'); // staff peminta
-            $table->enum('status', ['Menunggu Verifikasi', 'Disetujui sebagian', 'Disetujui', 'Ditolak', 'Dieksekusi'])->default('Menunggu Verifikasi');
+            $table->string('user_id');
+            $table->foreign('user_id')->references('user_id')->on('users')->onUpdate('cascade'); // staff peminta
+            $table->enum('status', ['Menunggu Verifikasi', 'Disetujui sebagian', 'Disetujui', 'Revisi', 'Ditolak', 'Dieksekusi'])->default('Menunggu Verifikasi');
             $table->boolean('verifikasi_kepala_toko')->default(false);
             $table->boolean('verifikasi_kepala_gudang')->default(false);
             $table->text('catatan');

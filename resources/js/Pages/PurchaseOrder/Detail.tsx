@@ -41,11 +41,10 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         const isLastVerifier = sudahVerifikasi === totalVerifikator - 1;
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: isLastVerifier
                 ? `Anda adalah orang terakhir yang melakukan verifikasi. Apakah anda yakin ingin verifikasi ${data?.nomor_referensi}? Karena akan auto dikirim ke supplier.`
                 : `Apakah anda yakin ingin verifikasi ${data?.nomor_referensi}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -119,7 +118,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         },
         {
             key: data?.supplier_id,
-            label: "Permintaan oleh",
+            label: "Supplier",
             children: data?.supplier?.name,
         },
         {
@@ -206,6 +205,14 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             title="Detail Purchase Order"
             actions={[
                 <Button
+                    type="default"
+                    size="large"
+                    icon={<PrinterFilled />}
+                    onClick={handlePrint}
+                >
+                    Print
+                </Button>,
+                <Button
                     type="primary"
                     size="large"
                     disabled={[
@@ -220,19 +227,11 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                 >
                     Verifikasi
                 </Button>,
-                <Button
-                    type="primary"
-                    size="large"
-                    icon={<PrinterFilled />}
-                    onClick={handlePrint}
-                >
-                    Print
-                </Button>,
             ]}
         >
             <Card style={{ marginBottom: "1rem" }}>
                 <Descriptions
-                    title="Barang Keluar"
+                    title="Informasi Purchase Order"
                     layout="vertical"
                     bordered
                     items={descItems}

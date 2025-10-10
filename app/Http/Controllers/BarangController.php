@@ -169,7 +169,7 @@ class BarangController extends Controller
         $barang      = Barang::where('uuid', $uuid)->with(['supplier', 'satuan'])->firstOrFail();
 
         $data = [
-            'id'                           => $barang->id,
+            'id'                           => $barang->barang_id,
             'uuid'                         => $barang->uuid,
             'name'                         => $barang->name,
             'hargaJual'                => $barang->hargaJual,
@@ -179,11 +179,11 @@ class BarangController extends Controller
             'leadtime'     => $barang->leadtime,
             'safety_stock'  => $barang->safety_stock,
             'supplier'                     => [
-                'id'   => $barang->supplier->id,
+                'id'   => $barang->supplier->supplier_id,
                 'name' => $barang->supplier->name,
             ],
             'satuan'                     => [
-                'id'   => $barang->satuan->id,
+                'id'   => $barang->satuan->satuan_id,
                 'name' => $barang->satuan->name,
             ],
         ];

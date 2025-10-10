@@ -30,20 +30,20 @@ class BarangKeluarService implements BarangKeluarServiceInterface
     {
         try {
             $query = BarangKeluar::with('user')->select(
-                'id',
+                'barang_keluar_id',
                 'uuid',
                 'nomor_referensi',
                 'tanggal_keluar',
                 'catatan',
                 'status',
                 'user_id',
-                DB::raw('(SELECT COUNT (DISTINCT barang_id) FROM barang_keluar_items WHERE barang_keluar_id = barang_keluars.id) as total_unique_items'),
-                DB::raw('(SELECT SUM(quantity) FROM barang_keluar_items WHERE barang_keluar_id = barang_keluars.id) as total_quantity'),
+                DB::raw('(SELECT COUNT (DISTINCT barang_id) FROM barang_keluar_items WHERE barang_keluar_id = barang_keluars.barang_keluar_id) as total_unique_items'),
+                DB::raw('(SELECT SUM(quantity) FROM barang_keluar_items WHERE barang_keluar_id = barang_keluars.barang_keluar_id) as total_quantity'),
             );
 
             $formattedValue = $query->get()->map(function ($barangKeluar) {
                 return [
-                    'id'                 => $barangKeluar->id,
+                    'id'                 => $barangKeluar->barang_keluar_id,
                     'uuid'               => $barangKeluar->uuid,
                     'nomor_referensi'    => $barangKeluar->nomor_referensi,
                     'tanggal_keluar'     => $barangKeluar->tanggal_keluar,
@@ -51,7 +51,7 @@ class BarangKeluarService implements BarangKeluarServiceInterface
                     'total_unique_items' => $barangKeluar->total_unique_items,
                     'status'             => $barangKeluar->status,
                     'user'               => [
-                        'id'   => $barangKeluar->user->id,
+                        'id'   => $barangKeluar->user->user_id,
                         'name' => $barangKeluar->user->name,
                     ],
                 ];
@@ -59,7 +59,7 @@ class BarangKeluarService implements BarangKeluarServiceInterface
 
             return $formattedValue;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan semua barang '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan semua barang ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam server saat mendapatkan semua barang', 500);
         }
     }
@@ -68,10 +68,10 @@ class BarangKeluarService implements BarangKeluarServiceInterface
     {
         try {
             $barangKeluar = BarangKeluar::where('uuid', $uuid)->with('user')->firstOrFail();
-            $barangItems  = BarangKeluarItem::where('barang_keluar_id', $barangKeluar->id)->with(['barangs'])->get();
+            $barangItems  = BarangKeluarItem::where('barang_keluar_id', $barangKeluar->barang_keluar_id)->with(['barangs'])->get();
 
             $data = [
-                'id'                       => $barangKeluar->id,
+                'id'                       => $barangKeluar->barang_keluar_id,
                 'uuid'                     => $barangKeluar->uuid,
                 'nomor_referensi'          => $barangKeluar->nomor_referensi,
                 'tanggal_keluar'           => $barangKeluar->tanggal_keluar,
@@ -80,7 +80,7 @@ class BarangKeluarService implements BarangKeluarServiceInterface
                 'verifikasi_kepala_toko'   => $barangKeluar->verifikasi_kepala_toko,
                 'verifikasi_kepala_gudang' => $barangKeluar->verifikasi_kepala_gudang,
                 'user'                     => [
-                    'id'   => $barangKeluar->user->id,
+                    'id'   => $barangKeluar->user->user_id,
                     'name' => $barangKeluar->user->name,
                 ],
                 'items' => $barangItems,
@@ -88,7 +88,7 @@ class BarangKeluarService implements BarangKeluarServiceInterface
 
             return $data;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan barang masuk dengan ID: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan barang masuk dengan ID: ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Barang Masuk tidak ditemukan', 404);
         }
     }

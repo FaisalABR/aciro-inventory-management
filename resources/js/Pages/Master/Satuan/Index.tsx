@@ -55,13 +55,12 @@ const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
     const handleDeleteSatuan = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: (
                 <p>
                     Apakah anda yakin ingin menghapus <b>{name}</b>?
                 </p>
             ),
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -84,14 +83,14 @@ const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
             key: "name",
         },
         {
-            title: "Deskripsi",
-            dataIndex: "description",
-            key: "description",
-        },
-        {
             title: "Kode",
             dataIndex: "code",
             key: "code",
+        },
+        {
+            title: "Deskripsi",
+            dataIndex: "description",
+            key: "description",
         },
         {
             title: "Actions",
@@ -131,7 +130,7 @@ const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
     return (
         <RootLayout
             type="main"
-            title="Master Satuan"
+            title="Kelola Satuan"
             actions={[
                 <Link href={Route.CreateMasterSatuan}>
                     <Button

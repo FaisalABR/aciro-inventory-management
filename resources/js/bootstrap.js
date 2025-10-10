@@ -5,11 +5,10 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 // Send cookies with requests so Laravel session cookies are included during
 // the /broadcasting/auth POST for private/presence channels.
 window.axios.defaults.withCredentials = true;
+window.axios.defaults.withXSRFToken = true;
 
 // Set CSRF token header from blade meta tag so Laravel can validate the request.
-const token = document
-    .querySelector('meta[name="csrf-token"]')
-    ?.getAttribute("content");
+const token = window.csrfToken;
 if (token) {
     window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token;
 }

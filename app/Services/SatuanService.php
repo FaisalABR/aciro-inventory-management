@@ -86,7 +86,7 @@ class SatuanService implements SatuanServiceInterface
 
         $options = $data->map(function ($satuan) {
             return [
-                'value' => $satuan->id,
+                'value' => $satuan->satuan_id,
                 'label' => $satuan->name,
             ];
         });

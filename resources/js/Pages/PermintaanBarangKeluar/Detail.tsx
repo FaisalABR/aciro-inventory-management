@@ -24,9 +24,8 @@ const Detail: React.FC<TDetailPermintaanBarangKeluarProps> = (props) => {
     const handleVerification = () => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
-            content: `Apakah anda yakin ingin verifikasi ${data?.nomor_referensi}?`,
-            okText: "Yes",
+            content: `Apakah anda yakin verifikasi ${data?.nomor_referensi}?`,
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -126,7 +125,7 @@ const Detail: React.FC<TDetailPermintaanBarangKeluarProps> = (props) => {
         >
             <Card style={{ marginBottom: "1rem" }}>
                 <Descriptions
-                    title="Barang Keluar"
+                    title="Informasi Permintaan Barang Keluar"
                     layout="vertical"
                     bordered
                     items={descItems}

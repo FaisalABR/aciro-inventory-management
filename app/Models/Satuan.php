@@ -14,9 +14,25 @@ class Satuan extends Model
     protected static function booted(): void
     {
         static::creating(function ($model) {
+            if (!$model->satuan_id) {
+                $lastSatuan = Satuan::orderBy('satuan_id', 'desc')->first();
+                if ($lastSatuan) {
+                    $num = (int) substr($lastSatuan->satuan_id, 3);
+                    $newNum = str_pad($num + 1, 7, '0', STR_PAD_LEFT);
+                } else {
+                    $newNum = "0000001";
+                }
+                $model->satuan_id = "STN" . $newNum;
+            }
+        });
+        static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
     }
+
+    protected $primaryKey = 'satuan_id'; // nama field PK
+    public $incrementing = false;      // bukan auto increment
+    protected $keyType = 'string';
 
     protected $fillable = [
         'uuid',
@@ -27,6 +43,6 @@ class Satuan extends Model
 
     public function barangs()
     {
-        return $this->hasMany(Barang::class, 'satuan_id', 'id');
+        return $this->hasMany(Barang::class, 'satuan_id', 'satuan_id');
     }
 }

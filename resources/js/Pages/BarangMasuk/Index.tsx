@@ -22,9 +22,8 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: `Apakah anda yakin ingin menghapus ${reference}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -80,15 +79,6 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Link
-                            href={route(Route.EditUser, {
-                                uuid: record.uuid,
-                            })}
-                        >
-                            <Button>
-                                <EditOutlined />
-                            </Button>
-                        </Link>
                         <Button
                             onClick={() =>
                                 handleDelete(
@@ -124,7 +114,7 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
     return (
         <RootLayout
             type="main"
-            title="Barang Masuk"
+            title="Kelola Barang Masuk"
             actions={[
                 <Link href={Route.CreateBarangMasuk}>
                     <Button

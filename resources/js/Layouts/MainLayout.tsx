@@ -8,6 +8,7 @@ import {
     PieChartOutlined,
     RightSquareOutlined,
     UserOutlined,
+    BellOutlined,
 } from "@ant-design/icons";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import {
@@ -21,8 +22,12 @@ import {
     Row,
     Space,
     Typography,
+    Badge,
+    Button,
+    Dropdown,
+    List,
 } from "antd";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Route } from "../Common/Route";
 import {
     PERMISSIONS_VIEW_BARANG_KELUAR,
@@ -36,6 +41,7 @@ import {
     PERMISSIONS_VIEW_MASTER_SATUAN,
     PERMISSIONS_VIEW_MASTER_SUPPLIER,
     PERMISSIONS_VIEW_ORDER,
+    PERMISSIONS_VIEW_PERMINTAAN_BARANG_KELUAR,
     PERMISSIONS_VIEW_STOCK,
 } from "../Common/Permission";
 import { TInertiaProps } from "../Types/intertia";
@@ -75,16 +81,6 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_STOCK,
     },
     {
-        key: Route.PermintaanBarangKeluar,
-        icon: <LeftSquareOutlined />,
-        label: (
-            <Link href={Route.PermintaanBarangKeluar}>
-                Permintaan Barang Keluar
-            </Link>
-        ),
-        permission: PERMISSIONS_VIEW_BARANG_KELUAR,
-    },
-    {
         key: Route.BarangKeluar,
         icon: <LeftSquareOutlined />,
         label: <Link href={Route.BarangKeluar}>Barang Keluar</Link>,
@@ -99,7 +95,7 @@ const items: MenuItem[] = [
     {
         key: Route.KelolaUser,
         icon: <UserOutlined />,
-        label: <Link href={Route.KelolaUser}>Kelola User</Link>,
+        label: <Link href={Route.KelolaUser}>Kelola Pengguna</Link>,
         permission: PERMISSIONS_VIEW_KELOLA_USER,
     },
     {
@@ -109,6 +105,16 @@ const items: MenuItem[] = [
         permission: PERMISSIONS_VIEW_LAPORAN_DEADSTOCK,
     },
     {
+        key: Route.PermintaanBarangKeluar,
+        icon: <LeftSquareOutlined />,
+        label: (
+            <Link href={Route.PermintaanBarangKeluar}>
+                Permintaan Barang Keluar
+            </Link>
+        ),
+        permission: PERMISSIONS_VIEW_PERMINTAAN_BARANG_KELUAR,
+    },
+    {
         key: "6",
         icon: <DesktopOutlined />,
         label: "Data Master",
@@ -116,17 +122,17 @@ const items: MenuItem[] = [
         children: [
             {
                 key: Route.MasterBarang,
-                label: <Link href={Route.MasterBarang}>Data Barang</Link>,
+                label: <Link href={Route.MasterBarang}>Kelola Barang</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_BARANG,
             },
             {
                 key: Route.MasterSatuan,
-                label: <Link href={Route.MasterSatuan}>Data Satuan</Link>,
+                label: <Link href={Route.MasterSatuan}>Kelola Satuan</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SATUAN,
             },
             {
                 key: Route.MasterSupplier,
-                label: <Link href={Route.MasterSupplier}>Data Supplier</Link>,
+                label: <Link href={Route.MasterSupplier}>Kelola Supplier</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SUPPLIER,
             },
         ],
@@ -139,11 +145,42 @@ export const MainLayout: React.FC<TMainLayout> = ({
     actions,
 }) => {
     const { auth } = usePage<TInertiaProps>().props;
+    const [notifications, setNotifications] = useState<any[]>([]);
 
     const activeMenuKey = useMemo(
         () => window.location.pathname,
         [window.location.pathname],
     );
+
+    // Fetch notifikasi awal dari backend
+    useEffect(() => {
+        fetch("/notifications", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "X-CSRF-TOKEN": window.csrfToken, // ambil dari window
+            },
+            credentials: "same-origin", // biar cookie session ikut dikirim
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! Status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                const dataMapping = data.map((item) => ({
+                    id: item.id,
+                    message: item.message,
+                    time: item.created_at,
+                    is_read: item.is_read,
+                }));
+                setNotifications(dataMapping);
+            })
+            .catch((err) => {
+                console.error("Error fetching notifications:", err);
+            });
+    }, []);
 
     useEffect(() => {
         if (!auth.user) return;
@@ -168,6 +205,17 @@ export const MainLayout: React.FC<TMainLayout> = ({
                 })
                 .listen(".ROPNotification", (e: any) => {
                     console.log("🔔 Triggered notif", channelName);
+                    // Tambah ke list (state)
+                    setNotifications((prev) => [
+                        {
+                            id: Date.now(),
+                            message: e.message,
+                            time: new Date().toLocaleTimeString(),
+                            is_read: false,
+                        },
+                        ...prev,
+                    ]);
+
                     notification.info({
                         message: `Notifikasi ${role.replace("_", " ")}: ${e.message}`,
                         duration: 0,
@@ -227,10 +275,9 @@ export const MainLayout: React.FC<TMainLayout> = ({
     const handleLogout = () => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: "Apakah anda yakin ingin logout?",
-            okText: "OK",
-            cancelText: "Kembali",
+            okText: "Yakin",
+            cancelText: "Batal",
             okType: "danger",
             okButtonProps: {
                 type: "primary",
@@ -244,6 +291,38 @@ export const MainLayout: React.FC<TMainLayout> = ({
 
         return items.filter((item) => permission.includes(item.permission!));
     }, []);
+
+    const handleMarkAsRead = (id: number) => {
+        fetch(`notifications/${id}/read`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": window.csrfToken,
+            },
+            credentials: "same-origin",
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to mark as read");
+                setNotifications((prev) =>
+                    prev.map((n) =>
+                        n.id === id ? { ...n, is_read: true } : n,
+                    ),
+                );
+            })
+            .catch((err) => console.error(err));
+    };
+
+    const formattedDate = (dateISO: string) => {
+        const date = new Date(dateISO).toLocaleString("id-ID", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+        return date;
+    };
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
@@ -279,6 +358,69 @@ export const MainLayout: React.FC<TMainLayout> = ({
                             </Typography>
                         </Flex>
                     </Flex>
+                    <Space align="center">
+                        <Dropdown
+                            trigger={["click"]}
+                            dropdownRender={() => (
+                                <div
+                                    style={{
+                                        width: 320,
+                                        maxHeight: 400,
+                                        overflowY: "auto",
+                                        background: "#fff",
+                                        borderRadius: 8,
+                                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                        padding: "0.5rem",
+                                    }}
+                                >
+                                    <List
+                                        dataSource={notifications}
+                                        locale={{
+                                            emptyText: "Tidak ada notifikasi",
+                                        }}
+                                        renderItem={(item) => (
+                                            <List.Item
+                                                onClick={() =>
+                                                    handleMarkAsRead(item.id)
+                                                }
+                                                style={{
+                                                    cursor: "pointer",
+                                                    backgroundColor:
+                                                        item.is_read
+                                                            ? "white"
+                                                            : "#e6f7ff",
+                                                    borderRadius: 6,
+                                                    transition:
+                                                        "background-color 0.2s",
+                                                }}
+                                            >
+                                                <List.Item.Meta
+                                                    title={item.message}
+                                                    description={formattedDate(
+                                                        item.time,
+                                                    )}
+                                                />
+                                            </List.Item>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                        >
+                            <Badge
+                                count={
+                                    notifications.filter((n) => !n.is_read)
+                                        .length
+                                }
+                            >
+                                <Button
+                                    type="text"
+                                    shape="circle"
+                                    icon={<BellOutlined />}
+                                />
+                            </Badge>
+                        </Dropdown>
+                    </Space>
+
                     <div
                         style={{
                             flex: 1,

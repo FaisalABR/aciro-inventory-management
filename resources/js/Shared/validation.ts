@@ -96,10 +96,9 @@ export const CreateBarangSchema = z.object({
         .string({
             required_error: "Nama harus diisi",
         })
-        .min(3, { message: "Nama minimal 3 karakter" })
-        .max(20, { message: "Nama maximal dari 20 karakter" }),
-    supplier: z.number({ required_error: "Supplier harus diisi" }),
-    satuan: z.number({ required_error: "Satuan harus diisi" }),
+        .min(3, { message: "Nama minimal 3 karakter" }),
+    supplier: z.string({ required_error: "Supplier harus diisi" }),
+    satuan: z.string({ required_error: "Satuan harus diisi" }),
     hargaJual: z
         .number({
             required_error: "Harga Jual wajib diisi",
@@ -133,17 +132,12 @@ export const CreateBarangSchema = z.object({
 });
 
 export const CreateBarangMasukSchema = z.object({
-    nomor_referensi: z
-        .string({
-            required_error: "Nomor Referensi harus diisi",
-        })
-        .min(3, { message: "Nomor Referensi minimal 3 karakter" })
-        .max(20, { message: "Nomor Referensi maximal dari 20 karakter" }),
+    nomor_referensi: z.string().optional(),
     tanggal_masuk: z.coerce.date({
         invalid_type_error: "Tanggal masuk tidak valid",
         required_error: "Tanggal masuk harus diisi",
     }),
-    supplier_id: z.number({ required_error: "Supplier harus diisi" }),
+    supplier_id: z.string({ required_error: "Supplier harus diisi" }),
     catatan: z
         .string()
         .min(3, { message: "Catatan minimal 3 karakter" })
@@ -152,7 +146,7 @@ export const CreateBarangMasukSchema = z.object({
     items: z
         .array(
             z.object({
-                barang_id: z.number({ required_error: "Barang harus di isi" }),
+                barang_id: z.string({ required_error: "Barang harus di isi" }),
                 quantity: z.number({ required_error: "quantity harus di isi" }),
                 harga_beli: z.number({
                     required_error: "Harga Beli harus di isi",
@@ -176,7 +170,7 @@ export const CreateBarangKeluarSchema = z.object({
     items: z
         .array(
             z.object({
-                barang_id: z.number({ required_error: "Barang harus di isi" }),
+                barang_id: z.string({ required_error: "Barang harus di isi" }),
                 quantity: z.number({ required_error: "quantity harus di isi" }),
             }),
         )
@@ -189,7 +183,7 @@ export const CreatePurchaseOrderSchema = z.object({
         invalid_type_error: "Tanggal purchase order tidak valid",
         required_error: "Tanggal purchase order harus diisi",
     }),
-    supplier_id: z.number({ required_error: "Supplier harus diisi" }),
+    supplier_id: z.string({ required_error: "Supplier harus diisi" }),
     catatan: z
         .string()
         .min(3, { message: "Catatan minimal 3 karakter" })
@@ -198,7 +192,7 @@ export const CreatePurchaseOrderSchema = z.object({
     items: z
         .array(
             z.object({
-                barang_id: z.number({ required_error: "Barang harus di isi" }),
+                barang_id: z.string({ required_error: "Barang harus di isi" }),
                 quantity: z.number({ required_error: "quantity harus di isi" }),
                 harga_beli: z.number({
                     required_error: "Harga Beli harus di isi",

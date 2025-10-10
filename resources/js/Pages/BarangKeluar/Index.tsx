@@ -117,7 +117,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
     ];
 
     return (
-        <RootLayout type="main" title=" Barang Keluar">
+        <RootLayout type="main" title="Kelola Barang Keluar">
             <Table
                 dataSource={props.data}
                 columns={columns}
@@ -144,7 +144,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
                 title="Konfirmasi Eksekusi Barang Keluar"
                 onCancel={() => setIsModalOpen(false)}
                 onOk={handleConfirmExecute}
-                okText="Lanjut Eksekusi"
+                okText="Yakin"
                 cancelText="Batal"
             >
                 {warnings.length > 0 ? (

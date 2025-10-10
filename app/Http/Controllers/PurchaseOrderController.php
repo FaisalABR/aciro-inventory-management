@@ -28,20 +28,20 @@ class PurchaseOrderController extends Controller
     public function index()
     {
         $query = PurchaseOrder::with('supplier')->select(
-            'id',
+            'purchase_order_id',
             'uuid',
             'nomor_referensi',
             'tanggal_order',
             'supplier_id',
             'catatan',
             'status',
-            DB::raw('(SELECT COUNT (DISTINCT barang_id) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.id) as total_unique_items'),
-            DB::raw('(SELECT SUM(quantity) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.id) as total_quantity'),
+            DB::raw('(SELECT COUNT (DISTINCT barang_id) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.purchase_order_id) as total_unique_items'),
+            DB::raw('(SELECT SUM(quantity) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.purchase_order_id) as total_quantity'),
         );
 
         $formattedValue = $query->get()->map(function ($purchaseOrder) {
             return [
-                'id'                 => $purchaseOrder->id,
+                'id'                 => $purchaseOrder->purchase_order_id,
                 'uuid'               => $purchaseOrder->uuid,
                 'nomor_referensi'    => $purchaseOrder->nomor_referensi,
                 'tanggal_order'      => $purchaseOrder->tanggal_order,
@@ -49,7 +49,7 @@ class PurchaseOrderController extends Controller
                 'total_unique_items' => $purchaseOrder->total_unique_items,
                 'status'             => $purchaseOrder->status,
                 'supplier'           => [
-                    'id'   => $purchaseOrder->supplier->id,
+                    'id'   => $purchaseOrder->supplier->supplier_id,
                     'name' => $purchaseOrder->supplier->name,
                 ],
             ];
@@ -66,7 +66,7 @@ class PurchaseOrderController extends Controller
 
         $optionSupplier = $data->map(function ($supplier) {
             return [
-                'value' => $supplier->id,
+                'value' => $supplier->supplier_id,
                 'label' => $supplier->name,
             ];
         });
@@ -84,7 +84,7 @@ class PurchaseOrderController extends Controller
 
         $optionSupplier = $data->map(function ($supplier) {
             return [
-                'value' => $supplier->id,
+                'value' => $supplier->supplier_id,
                 'label' => $supplier->name,
             ];
         });
@@ -99,10 +99,10 @@ class PurchaseOrderController extends Controller
     public function showDetail($uuid)
     {
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
-        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
+        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with('barang')->get();
 
         $data = [
-            'id'                           => $po->id,
+            'id'                           => $po->purchase_order_id,
             'uuid'                         => $po->uuid,
             'nomor_referensi'              => $po->nomor_referensi,
             'tanggal_order'                => $po->tanggal_order,
@@ -113,7 +113,7 @@ class PurchaseOrderController extends Controller
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
             'supplier'                     => [
-                'id'   => $po->supplier->id,
+                'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
             ],
             'items' => $poItems,
@@ -173,9 +173,9 @@ class PurchaseOrderController extends Controller
         $validated = $request->validate([
             'tanggal_order'     => 'required|date',
             'catatan'           => 'nullable|string',
-            'supplier_id'       => 'required|exists:suppliers,id',
+            'supplier_id'       => 'required|exists:suppliers,supplier_id',
             'items'             => 'required|array|min:1',
-            'items.*.barang_id' => 'required|exists:barangs,id',
+            'items.*.barang_id' => 'required|exists:barangs,barang_id',
             'items.*.quantity'  => 'required|integer|min:1',
             'items.*.harga_beli' => 'required|integer|min:1',
         ]);
@@ -242,7 +242,7 @@ class PurchaseOrderController extends Controller
             $PO->verifikasi_kepala_pengadaan = true;
         }
 
-        if ($PO->verifikasi_kepala_gudang && $PO->verifikasi_kepala_toko && $PO->verifikasi_kepala_pengadaan && $PO->verifikasi_kepala_pengadaan) {
+        if ($PO->verifikasi_kepala_gudang && $PO->verifikasi_kepala_toko && $PO->verifikasi_kepala_pengadaan && $PO->verifikasi_kepala_accounting) {
             $PO->status = 'VERIFIKASI';
 
             if ($PO->status == 'VERIFIKASI') {
@@ -281,10 +281,10 @@ Tim Procurement Koperasi Karya Bersama Aciro
     public function showSupplierPortal($uuid)
     {
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
-        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
+        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with(['barang'])->get();
 
         $data = [
-            'id'                           => $po->id,
+            'id'                           => $po->purchase_order_id,
             'uuid'                         => $po->uuid,
             'nomor_referensi'              => $po->nomor_referensi,
             'tanggal_order'                => $po->tanggal_order,
@@ -295,7 +295,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
             'supplier'                     => [
-                'id'   => $po->supplier->id,
+                'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
             ],
             'items' => $poItems,
@@ -312,7 +312,6 @@ Tim Procurement Koperasi Karya Bersama Aciro
         // Cari user dengan role terkait
         $users = User::whereHas('roles', function ($q) {
             $q->whereIn('name', [
-                'kepala_gudang',
                 'kepala_toko',
                 'kepala_pengadaan',
             ]);
@@ -360,10 +359,10 @@ Tim Procurement Koperasi Karya Bersama Aciro
     public function showDetailScan($uuid)
     {
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
-        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->id)->with(['barang'])->get();
+        $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with(['barang'])->get();
 
         $data = [
-            'id'                           => $po->id,
+            'id'                           => $po->purchase_order_id,
             'uuid'                         => $po->uuid,
             'nomor_referensi'              => $po->nomor_referensi,
             'tanggal_order'                => $po->tanggal_order,
@@ -374,7 +373,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
             'supplier'                     => [
-                'id'   => $po->supplier->id,
+                'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
             ],
             'items' => $poItems,
@@ -389,7 +388,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
 
         try {
-            PurchaseOrderItem::where('purchase_order_id', $po->id)->delete();
+            PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->delete();
 
             $po->delete();
 

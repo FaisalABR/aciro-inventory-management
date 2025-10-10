@@ -93,10 +93,6 @@ class PermissionRoleSeeder extends Seeder
             ],
             [
                 'role_id'       => 2,
-                'permission_id' => 7,
-            ],
-            [
-                'role_id'       => 2,
                 'permission_id' => 8,
             ],
             [
@@ -106,10 +102,6 @@ class PermissionRoleSeeder extends Seeder
             [
                 'role_id'       => 2,
                 'permission_id' => 10,
-            ],
-            [
-                'role_id'       => 2,
-                'permission_id' => 11,
             ],
             [
                 'role_id'       => 2,
@@ -146,10 +138,6 @@ class PermissionRoleSeeder extends Seeder
             ],
             [
                 'role_id'       => 3,
-                'permission_id' => 7,
-            ],
-            [
-                'role_id'       => 3,
                 'permission_id' => 8,
             ],
             [
@@ -159,10 +147,6 @@ class PermissionRoleSeeder extends Seeder
             [
                 'role_id'       => 3,
                 'permission_id' => 10,
-            ],
-            [
-                'role_id'       => 3,
-                'permission_id' => 11,
             ],
             [
                 'role_id'       => 3,
@@ -177,7 +161,6 @@ class PermissionRoleSeeder extends Seeder
                 'role_id'       => 4,
                 'permission_id' => 1,
             ],
-            //
             [
                 'role_id'       => 4,
                 'permission_id' => 5,
@@ -206,7 +189,19 @@ class PermissionRoleSeeder extends Seeder
             ],
             [
                 'role_id'       => 6,
+                'permission_id' => 2,
+            ],
+            [
+                'role_id'       => 6,
+                'permission_id' => 3,
+            ],
+            [
+                'role_id'       => 6,
                 'permission_id' => 5,
+            ],
+            [
+                'role_id'       => 6,
+                'permission_id' => 13,
             ],
             // role_id 7 memiliki permission_id 1 dan 5
             [
@@ -217,6 +212,10 @@ class PermissionRoleSeeder extends Seeder
                 'role_id'       => 7,
                 'permission_id' => 5,
             ],
+            [
+                'role_id' => 7,
+                'permission_id' => 13,
+            ]
 
         ];
 

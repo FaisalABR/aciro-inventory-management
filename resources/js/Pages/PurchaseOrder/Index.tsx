@@ -22,9 +22,8 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: `Apakah anda yakin ingin menghapus ${reference}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -50,29 +49,7 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
             dataIndex: "tanggal_order",
             key: "tanggal_order",
         },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-            render: (_, record) => {
-                switch (record.status) {
-                    case "DRAFT":
-                        return <Tag color="grey">{record.status}</Tag>;
-                    case "BUTUH VERIFIKASI":
-                        return <Tag color="orange">{record.status}</Tag>;
-                    case "VERIFIKASI SEBAGIAN":
-                        return <Tag color="lime">{record.status}</Tag>;
-                    case "TERVEFIKASI":
-                        return <Tag color="green">{record.status}</Tag>;
-                    case "TERKIRIM":
-                        return <Tag color="geekblue">{record.status}</Tag>;
-                    case "KONFIRMASI SUPPLIER":
-                        return <Tag color="magenta">{record.status}</Tag>;
-                    case "BARANG DIKIRIM":
-                        return <Tag color="gold">{record.status}</Tag>;
-                }
-            },
-        },
+
         {
             title: "Supplier",
             dataIndex: ["supplier", "name"],
@@ -94,6 +71,29 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
             key: "total_pembelian",
             render: (_, record) => {
                 return formatRupiah(record.total_pembelian);
+            },
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (_, record) => {
+                switch (record.status) {
+                    case "DRAFT":
+                        return <Tag color="grey">{record.status}</Tag>;
+                    case "BUTUH VERIFIKASI":
+                        return <Tag color="orange">{record.status}</Tag>;
+                    case "VERIFIKASI SEBAGIAN":
+                        return <Tag color="lime">{record.status}</Tag>;
+                    case "TERVEFIKASI":
+                        return <Tag color="green">{record.status}</Tag>;
+                    case "TERKIRIM":
+                        return <Tag color="geekblue">{record.status}</Tag>;
+                    case "KONFIRMASI SUPPLIER":
+                        return <Tag color="magenta">{record.status}</Tag>;
+                    case "BARANG DIKIRIM":
+                        return <Tag color="gold">{record.status}</Tag>;
+                }
             },
         },
         {
@@ -146,7 +146,7 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data }) => {
     return (
         <RootLayout
             type="main"
-            title="Purchase Order"
+            title="Kelola Purchase Order"
             actions={[
                 <Link href={Route.CreatePurchaseOrder}>
                     <Button

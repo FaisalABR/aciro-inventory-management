@@ -1,4 +1,8 @@
-import { CheckCircleOutlined, PrinterOutlined } from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    CloseCircleOutlined,
+    PrinterOutlined,
+} from "@ant-design/icons";
 import { Head } from "@inertiajs/react";
 import {
     Button,
@@ -89,7 +93,7 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
         },
         {
             key: data?.supplier_id,
-            label: "Permintaan oleh",
+            label: "Supplier",
             children: data?.supplier?.name,
         },
         {
@@ -119,12 +123,11 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
     const handleKonfirmasi = () => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content:
                 data?.status === "TERKIRIM"
                     ? `Apakah anda yakin ingin konfirmasi ${data?.nomor_referensi}?`
                     : `Apakah anda yakin ingin kirim ${data?.nomor_referensi}?`,
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -200,7 +203,7 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                             justify="space-between"
                             style={{ marginBottom: "1rem" }}
                         >
-                            <Title level={2}>PO Supplier View</Title>
+                            <Title level={2}>Supplier Portal</Title>
                             <Flex
                                 align="center"
                                 justify="space-between"
@@ -212,7 +215,7 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                     icon={<PrinterOutlined />}
                                     onClick={handlePrint}
                                 >
-                                    Print PO
+                                    Print
                                 </Button>
                                 <Button
                                     type="primary"
@@ -221,17 +224,43 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                         (item) => item === data?.status,
                                     )}
                                     icon={<CheckCircleOutlined />}
-                                    onClick={handleKonfirmasi}
+                                    onClick={
+                                        data?.status !== "KONFIRMASI SUPPLIER"
+                                            ? () => {
+                                                  router.put(
+                                                      route(
+                                                          Route.KonfirmasiPOSupplier,
+                                                          {
+                                                              uuid: data?.uuid,
+                                                          },
+                                                      ),
+                                                  );
+                                              }
+                                            : handleKonfirmasi
+                                    }
                                 >
                                     {data?.status === "TERKIRIM"
                                         ? "Konfirmasi"
                                         : "Kirim Barang"}
                                 </Button>
+                                <Button
+                                    danger
+                                    type="primary"
+                                    size="large"
+                                    icon={<CloseCircleOutlined />}
+                                    onClick={handlePrint}
+                                    disabled={[
+                                        "KONFIRMASI SUPPLIER",
+                                        "BARANG DIKIRIM",
+                                    ].some((item) => item === data?.status)}
+                                >
+                                    Tolak
+                                </Button>
                             </Flex>
                         </Flex>
                         <Card style={{ marginBottom: "1rem" }}>
                             <Descriptions
-                                title="Barang Keluar"
+                                title="Informasi Purchase Order"
                                 layout="vertical"
                                 bordered
                                 items={descItems}

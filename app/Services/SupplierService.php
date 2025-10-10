@@ -85,7 +85,7 @@ class SupplierService implements SupplierServiceInterface
 
         $options = $data->map(function ($supplier) {
             return [
-                'value' => $supplier->id,
+                'value' => $supplier->supplier_id,
                 'label' => $supplier->name,
             ];
         });

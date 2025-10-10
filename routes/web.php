@@ -6,6 +6,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HeaderDeadstockController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StockController;
@@ -24,6 +25,9 @@ Route::get('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'showSupp
 Route::put('/suppliers/{uuid}/views', [PurchaseOrderController::class, 'konfirmasi']);
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
     Route::get('/unauthorized', function () {
         return Inertia::render('Unauthorized');
     });
@@ -61,8 +65,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Kelola Master Barang
     Route::get('/master/barang/', [BarangController::class, 'index']);
-    Route::get('/master/barang/{uuid}', [BarangController::class, 'showDetail']);
     Route::get('/master/barang/create', [BarangController::class, 'showCreate']);
+    Route::get('/master/barang/{uuid}', [BarangController::class, 'showDetail']);
     Route::post('/master/barang/create', [BarangController::class, 'create']);
     Route::get('/master/barang/edit/{uuid}', [BarangController::class, 'showEdit']);
     Route::put('/master/barang/edit/{uuid}', [BarangController::class, 'update']);
@@ -80,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/permintaan-barang-keluar/create', [BarangKeluarController::class, 'showCreate']);
     Route::get('/permintaan-barang-keluar/{uuid}', [BarangKeluarController::class, 'showDetail']);
     Route::post('/permintaan-barang-keluar/create', [BarangKeluarController::class, 'create']);
+    Route::delete('/permintaan-barang-keluar/delete/{uuid}', [BarangKeluarController::class, 'destroy']);
     Route::put('/permintaan-barang-keluar/{uuid}/approved', [BarangKeluarController::class, 'verifikasi']);
 
     // Kelola Barang Keluar
@@ -103,6 +108,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan-deadstocks', [HeaderDeadstockController::class, 'index']);
     Route::post('/laporan-deadstocks/create', [HeaderDeadstockController::class, 'evaluasiITR']);
     Route::get('/laporan-deadstocks/{uuid}', [HeaderDeadstockController::class, 'showDetail']);
+    Route::get('/laporan-deadstocks/{uuid}/delete', [HeaderDeadstockController::class, 'destroy']);
 
     Route::get('/logout', [AuthController::class, 'logout']);
 

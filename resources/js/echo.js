@@ -3,13 +3,11 @@ import Pusher from "pusher-js";
 
 window.Pusher = Pusher;
 // Get CSRF token
-const csrfToken = document
-    .querySelector('meta[name="csrf-token"]')
-    ?.getAttribute("content");
+const csrfToken = window.csrfToken;
 
 if (!csrfToken) {
     console.error(
-        "❌ CSRF token not found! Make sure meta tag is present in HTML head.",
+        "❌ CSRF token not found! Pastikan window.csrfToken disuntikkan di Blade.",
     );
 }
 

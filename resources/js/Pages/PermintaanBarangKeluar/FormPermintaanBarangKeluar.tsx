@@ -81,6 +81,8 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
                 Modal.confirm({
                     title: "ROP Warning",
                     width: 800,
+                    okText: "Yakin",
+                    cancelText: "Batal",
                     content: (
                         <Table
                             dataSource={ropWarnings}
@@ -140,7 +142,9 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
                             ? "Form Edit Permintaan Barang Keluar"
                             : "Form Tambah Permintaan Barang Keluar"}
                     </Title>
-                    <Title level={5}>Informasi Umum Permintaan</Title>
+                    <Title level={5}>
+                        Informasi Umum Permintaan Barang Keluar
+                    </Title>
                     <Form
                         form={form}
                         initialValues={{
@@ -153,9 +157,9 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
                         <Form.Item
                             rules={[zodSync]}
                             name="nomor_referensi"
-                            label="Nomor Referensi"
+                            label="Nomor Referensi (Auto Generated)"
                         >
-                            <Input placeholder="BM-06072025-001" />
+                            <Input placeholder="BM-06072025-001" disabled />
                         </Form.Item>
                         <Flex gap="small">
                             <Form.Item

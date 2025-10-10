@@ -55,13 +55,12 @@ const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
     const handleDeleteSupplier = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
             content: (
                 <p>
                     Apakah anda yakin ingin menghapus <b>{name}</b>?
                 </p>
             ),
-            okText: "Yes",
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -140,7 +139,7 @@ const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
     return (
         <RootLayout
             type="main"
-            title="Master Supplier"
+            title="Kelola Supplier"
             actions={[
                 <Link href={Route.CreateMasterSupplier}>
                     <Button
@@ -156,7 +155,7 @@ const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
             <Input
                 size="large"
                 prefix={<SearchOutlined />}
-                placeholder="Cari satuan berdasarkan supplier"
+                placeholder="Cari supplier berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
                 value={search}
                 onChange={handleSearch}

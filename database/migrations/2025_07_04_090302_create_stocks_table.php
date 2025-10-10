@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stocks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('restrict')->onUpdate('cascade');
+            $table->string('stock_id')->primary();
+            $table->string('barang_id');
+            $table->foreign('barang_id')->references('barang_id')->on('barangs')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('quantity');
             $table->integer('potensi_penjualan');
             $table->decimal('itr', 10, 2)->nullable();

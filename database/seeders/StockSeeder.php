@@ -14,7 +14,7 @@ class StockSeeder extends Seeder
     {
         $stocks = [
             [
-                'barang_id'         => 1,
+                'barang_id'         => 'BR0000001',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -24,7 +24,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 2,
+                'barang_id'         => 'BR0000002',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -34,7 +34,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 3,
+                'barang_id'         => 'BR0000003',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -44,7 +44,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 4,
+                'barang_id'         => 'BR0000004',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -54,7 +54,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 5,
+                'barang_id'         => 'BR0000005',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -64,7 +64,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 6,
+                'barang_id'         => 'BR0000006',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -74,7 +74,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 7,
+                'barang_id'         => 'BR0000007',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -84,7 +84,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 8,
+                'barang_id'         => 'BR0000008',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -94,7 +94,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 9,
+                'barang_id'         => 'BR0000009',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -104,7 +104,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 10,
+                'barang_id'         => 'BR0000010',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,
@@ -114,7 +114,7 @@ class StockSeeder extends Seeder
                 'last_evaluated'    => null,
             ],
             [
-                'barang_id'         => 11,
+                'barang_id'         => 'BR0000011',
                 'quantity'          => 0,
                 'potensi_penjualan' => 0.0,
                 'itr'               => null,

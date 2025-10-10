@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('header_deadstocks', function (Blueprint $table) {
-            $table->string('header_deadstock_id')->primary();
-            $table->uuid()->unique();
-            $table->string('nomor_referensi');
-            $table->date('periode_mulai');
-            $table->text('periode_akhir');
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->id();
+            $table->string('role'); // role tujuan notif
+            $table->string('message');
+            $table->boolean('is_read')->default(false);
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('header_deadstocks');
+        Schema::dropIfExists('notifications');
     }
 };

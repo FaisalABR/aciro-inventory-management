@@ -21,9 +21,27 @@ class User extends Authenticatable
     protected static function booted(): void
     {
         static::creating(function ($model) {
+            if (!$model->user_id) {
+                $lastUser = User::orderBy('user_id', 'desc')->first();
+                if ($lastUser) {
+                    // Ambil angka terakhir, misal "USR_001" -> 1
+                    $num = (int) substr($lastUser->user_id, 3);
+                    $newNum = str_pad($num + 1, 7, '0', STR_PAD_LEFT);
+                } else {
+                    $newNum = "0000001";
+                }
+                $model->user_id = "USR" . $newNum;
+            }
+        });
+
+        static::creating(function ($model) {
             $model->uuid = (string) Str::uuid();
         });
     }
+
+    protected $primaryKey = 'user_id'; // nama field PK
+    public $incrementing = false;      // bukan auto increment
+    protected $keyType = 'string';
 
     protected $fillable = [
         'uuid',

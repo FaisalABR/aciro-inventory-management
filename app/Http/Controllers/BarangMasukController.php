@@ -73,12 +73,12 @@ class BarangMasukController extends Controller
     {
         try {
             $validated = $request->validate([
-                'nomor_referensi'    => 'required',
+                'nomor_referensi'    => 'sometimes|nullable',
                 'supplier_id'        => 'required',
                 'tanggal_masuk'      => 'required',
                 'catatan'            => 'nullable',
                 'items'              => 'required|array|min:1',
-                'items.*.barang_id'  => 'required|exists:barangs,id',
+                'items.*.barang_id'  => 'required|exists:barangs,barang_id',
                 'items.*.quantity'   => 'required|integer|min:1',
                 'items.*.harga_beli' => 'required|numeric|min:0',
             ]);
@@ -91,7 +91,7 @@ class BarangMasukController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Terjadi error tak terduga saat membuat barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat membuat barang: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
@@ -106,7 +106,7 @@ class BarangMasukController extends Controller
         } catch (BarangException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Terjadi error tak terduga saat menghapus barang: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Terjadi error tak terduga saat menghapus barang: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()->back()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }

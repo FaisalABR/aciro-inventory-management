@@ -12,15 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('barangs', function (Blueprint $table) {
-            $table->id();
+            $table->string('barang_id')->primary();
             $table->uuid()->unique();
             $table->string('name');
-            $table->foreignId('supplier_id')
-                ->constrained('suppliers')
+            $table->string('supplier_id');
+            $table->foreign('supplier_id')
+                ->references('supplier_id')->on('suppliers')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
-            $table->foreignId('satuan_id')
-                ->constrained('satuans')
+
+            $table->string('satuan_id');
+            $table->foreign('satuan_id')
+                ->references('satuan_id')->on('satuans')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
             $table->decimal('hargaJual', 10, 2);

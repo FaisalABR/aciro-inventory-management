@@ -26,9 +26,11 @@ class BarangMasukService implements BarangMasukServiceInterface
     public function create(array $data)
     {
         try {
+            $totalBarangMasuk = BarangMasuk::count();
+
             DB::beginTransaction();
             $barangMasuk = BarangMasuk::create([
-                'nomor_referensi' => $data['nomor_referensi'],
+                'nomor_referensi' => sprintf('BM-%s-%04d', now()->format('Ymd'), $totalBarangMasuk + 1),
                 'tanggal_masuk'   => $data['tanggal_masuk'],
                 'supplier_id'     => $data['supplier_id'],
                 'catatan'         => $data['catatan'] ?? null,
@@ -36,7 +38,7 @@ class BarangMasukService implements BarangMasukServiceInterface
 
             foreach ($data['items'] as $item) {
                 BarangMasukItem::create([
-                    'barang_masuk_id' => $barangMasuk->id,
+                    'barang_masuk_id' => $barangMasuk->barang_masuk_id,
                     'barang_id'       => $item['barang_id'],
                     'quantity'        => $item['quantity'],
                     'harga_beli'      => $item['harga_beli'],
@@ -71,7 +73,7 @@ class BarangMasukService implements BarangMasukServiceInterface
             return $barangMasuk;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal membuat barang masuk'.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal membuat barang masuk' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi masalah saat membuat barang masuk. Silakan coba lagi nanti.', 500);
         }
     }
@@ -80,20 +82,20 @@ class BarangMasukService implements BarangMasukServiceInterface
     {
         try {
             $query = BarangMasuk::with(['supplier'])->select(
-                'id',
+                'barang_masuk_id',
                 'uuid',
                 'nomor_referensi',
                 'tanggal_masuk',
                 'supplier_id',
                 'catatan',
-                DB::raw('(SELECT COUNT(DISTINCT barang_id) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.id) as total_unique_items'),
-                DB::raw('(SELECT SUM(quantity) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.id) as total_quantity'),
-                DB::raw('(SELECT SUM(quantity * harga_beli) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.id) as total_harga')
+                DB::raw('(SELECT COUNT(DISTINCT barang_id) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_unique_items'),
+                DB::raw('(SELECT SUM(quantity) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_quantity'),
+                DB::raw('(SELECT SUM(quantity * harga_beli) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_harga')
             );
 
             $formatted = $query->get()->map(function ($barangMasuk) {
                 return [
-                    'id'                 => $barangMasuk->id,
+                    'id'                 => $barangMasuk->barang_masuk_id,
                     'uuid'               => $barangMasuk->uuid,
                     'nomor_referensi'    => $barangMasuk->nomor_referensi,
                     'tanggal_masuk'      => $barangMasuk->tanggal_masuk,
@@ -106,7 +108,7 @@ class BarangMasukService implements BarangMasukServiceInterface
 
             return $formatted;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan semua barang '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan semua barang ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam server saat mendapatkan semua barang', 500);
         }
     }
@@ -115,10 +117,10 @@ class BarangMasukService implements BarangMasukServiceInterface
     {
         try {
             $barangMasuk = BarangMasuk::where('uuid', $uuid)->with(['supplier'])->firstOrFail();
-            $barangItems = BarangMasukItem::where('barang_masuk_id', $barangMasuk->id)->with(['barangs'])->get();
+            $barangItems = BarangMasukItem::where('barang_masuk_id', $barangMasuk->barang_masuk_id)->with(['barangs'])->get();
 
             $data = [
-                'id'              => $barangMasuk->id,
+                'id'              => $barangMasuk->barang_masuk_id,
                 'uuid'            => $barangMasuk->uuid,
                 'nomor_referensi' => $barangMasuk->nomor_referensi,
                 'tanggal_masuk'   => $barangMasuk->tanggal_masuk,
@@ -129,7 +131,7 @@ class BarangMasukService implements BarangMasukServiceInterface
 
             return $data;
         } catch (\Exception $e) {
-            Log::error('Gagal mendapatkan barang masuk dengan ID: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Gagal mendapatkan barang masuk dengan ID: ' . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Barang Masuk tidak ditemukan', 404);
         }
     }
@@ -143,7 +145,7 @@ class BarangMasukService implements BarangMasukServiceInterface
         }
 
         try {
-            $barangItems = BarangMasukItem::where('barang_masuk_id', $barangMasuk->id)->get();
+            $barangItems = BarangMasukItem::where('barang_masuk_id', $barangMasuk->barang_masuk_id)->get();
 
             foreach ($barangItems as $item) {
                 $stockBarang = Stock::where('barang_id', $item['barang_id'])->first();
@@ -170,7 +172,7 @@ class BarangMasukService implements BarangMasukServiceInterface
 
             return true;
         } catch (\Exception $e) {
-            Log::error("Gagal menghapus barang masuk dengan ID {$uuid}".$e->getMessage(), ['exception' => $e]);
+            Log::error("Gagal menghapus barang masuk dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam menghapus barang. Silahkan coba lagi nanti');
         }
     }

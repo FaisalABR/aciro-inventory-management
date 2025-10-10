@@ -53,12 +53,15 @@ const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
         );
     };
 
-    const handleDeleteUser = (uuid: string) => {
+    const handleDeleteUser = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
-            title: "Konfirmasi",
-            content: "Apakah anda yakin ingin menghapus?",
-            okText: "Yes",
+            content: (
+                <p>
+                    Apakah anda yakin ingin menghapus <b>{reference}</b>?
+                </p>
+            ),
+            okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
                 type: "primary",
@@ -116,13 +119,14 @@ const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
                             </Button>
                         </Link>
                         <Button
-                            onClick={() => handleDeleteUser(record.uuid)}
+                            onClick={() =>
+                                handleDeleteUser(record.uuid, record.name)
+                            }
                             type="primary"
                             danger
                         >
                             <DeleteOutlined />
                         </Button>
-                        <EyeOutlined />
                     </div>
                 );
             },
@@ -136,7 +140,7 @@ const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
     return (
         <RootLayout
             type="main"
-            title="Kelola User"
+            title="Kelola Pengguna"
             actions={[
                 <Link href={Route.CreateUser}>
                     <Button
@@ -144,7 +148,7 @@ const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
                         type="primary"
                         size="large"
                     >
-                        Tambah User
+                        Tambah Pengguna
                     </Button>
                 </Link>,
             ]}

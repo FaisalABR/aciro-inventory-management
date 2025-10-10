@@ -72,7 +72,7 @@ const Login: React.FC = () => {
                             htmlType="submit"
                             style={{ fontWeight: "bold", width: "100%" }}
                         >
-                            Masuk
+                            Login
                         </Button>
                         <Col
                             style={{

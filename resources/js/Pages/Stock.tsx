@@ -26,7 +26,7 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
 
     const columns: ColumnsType = [
         {
-            title: "Name",
+            title: "Nama",
             dataIndex: ["barangs", "name"],
             key: "name",
         },
@@ -85,6 +85,11 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
                         return <Tag color="grey">Not Evaluated</Tag>;
                 }
             },
+        },
+        {
+            title: "Terakhir Dievaluasi",
+            dataIndex: "last_evaluated",
+            key: "last_evaluated",
         },
     ];
 
@@ -179,7 +184,7 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
                 <Input
                     size="large"
                     prefix={<SearchOutlined />}
-                    placeholder="Cari barang berdasarkan nama"
+                    placeholder="Cari stok berdasarkan nama"
                     value={search}
                     onChange={handleSearch}
                 />

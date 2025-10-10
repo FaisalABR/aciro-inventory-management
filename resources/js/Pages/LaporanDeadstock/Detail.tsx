@@ -135,7 +135,7 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
         >
             <Card style={{ marginBottom: "1rem" }}>
                 <Descriptions
-                    title="Header Deadstock"
+                    title="Informasi Header Deadstock"
                     layout="vertical"
                     bordered
                     items={descItems}
