@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
 use App\Models\Barang;
 use App\Models\BarangMasuk;
 use App\Models\BarangMasukItem;
+use App\Models\Role;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -68,7 +70,14 @@ class BarangMasukService implements BarangMasukServiceInterface
                 $stockBarang->save();
             }
 
+            $roles = Role::whereIn('name', ['kepala_gudang', 'kepala_toko'])->get();
+            foreach ($roles as $role) {
+                // Send whatsapp ke kepala toko dan kepala gudang
+                event(new ROPNotification("Ada barang masuk dengan nomor referensi {$barangMasuk->nomor_referensi}", $role->name));
+            }
             DB::commit();
+
+
 
             return $barangMasuk;
         } catch (\Exception $e) {

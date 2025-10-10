@@ -101,7 +101,6 @@ class BarangKeluarController extends Controller
             $permintaanBarangKeluar->items()->create($item);
         }
 
-        $roles = Role::whereIn('name', ['kepala_gudang', 'kepala_toko'])->get();
 
         $users    = User::whereHas('roles', function ($q) {
             $q->whereIn('name', ['kepala_gudang', 'kepala_toko']);
@@ -112,6 +111,7 @@ class BarangKeluarController extends Controller
             SendWhatsappJob::dispatch($user->noWhatsapp, "Ada permintaan baru dengan nomor {$permintaanBarangKeluar->nomor_referensi} perlu diverifikasi!");
         }
 
+        $roles = Role::whereIn('name', ['kepala_gudang', 'kepala_toko'])->get();
         foreach ($roles as $role) {
             // Send whatsapp ke kepala toko dan kepala gudang
             event(new ROPNotification("Ada permintaan baru dengan nomor {$permintaanBarangKeluar->nomor_referensi} perlu diverifikasi!", $role->name));
