@@ -13,7 +13,7 @@ import {
     Select,
 } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { route, Route } from "../../Common/Route";
 import RootLayout from "../../Layouts/RootLayout";
 import Title from "antd/es/typography/Title";
@@ -41,6 +41,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
     const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [scannedUuid, setScannedUuid] = useState(null);
+    const qrRef = useRef();
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -104,24 +105,58 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
         return;
     };
 
-    const stopCamera = () => {
+    const stopAllCameraTracks = () => {
+        // Meminta semua MediaStream yang mungkin sedang berjalan
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+            devices.forEach((device) => {
+                if (device.kind === "videoinput") {
+                    // Mencoba mendapatkan stream dari perangkat (ini mungkin memerlukan izin ulang,
+                    // tapi seringkali cukup untuk menghentikan track yang sudah aktif)
+                    navigator.mediaDevices
+                        .getUserMedia({ video: true })
+                        .then((stream) => {
+                            stream.getTracks().forEach((track) => {
+                                console.log(`Stopping track: ${track.label}`);
+                                track.stop(); // Hentikan track
+                            });
+                        })
+                        .catch((err) => {
+                            // console.warn("Tidak dapat mendapatkan stream untuk pembersihan:", err);
+                        });
+                }
+            });
+        });
+
+        // Pertahankan juga logika stopCamera Anda untuk membersihkan elemen DOM yang ada
         const videoEl = document.querySelector("video");
         if (videoEl && videoEl.srcObject) {
-            const stream = videoEl.srcObject as MediaStream;
-            stream.getTracks().forEach((track) => track.stop());
+            (videoEl.srcObject as MediaStream)
+                .getTracks()
+                .forEach((track) => track.stop());
             videoEl.srcObject = null;
         }
+
+        console.log("Semua kamera telah dipaksa berhenti.");
     };
 
     const handleScan = async (result: any) => {
         console.log("result", result);
         if (result) {
-            setScannedUuid(result);
+            // --- LANGKAH 1: Segera Hentikan Kamera & Mulai Proses Unmount ---
+            // Panggil pembersihan sebelum state apapun diubah
+            stopAllCameraTracks();
+
+            // Segera tutup modal. Unmount QrReader harus mematikan kamera.
+            // Kita tidak lagi butuh setTimeout di sini karena kamera sudah kita hentikan duluan
+            setIsOpenQR(false);
+
+            // --- LANGKAH 2: Proses Data Setelah Kamera Mati ---
+            setScannedUuid(result); // Set state yang memicu UI, dilakukan setelah kamera dimatikan
             try {
                 const response = await fetch(`/api/po-scan/${result}`);
-
                 const data = await response.json();
 
+                // Lanjutkan pembaruan state/form
                 form.setFieldValue("supplier_id", data?.supplier?.id);
                 const barangPO = data?.items?.map((item: any) => ({
                     barang_id: item.barang_id,
@@ -129,8 +164,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 }));
                 fetchBarangBySupplier(data?.supplier?.id);
                 form.setFieldValue("items", barangPO);
-                stopCamera();
-                setIsOpenQR(false);
+
                 notification.success({
                     message: "Success",
                     description: "Berhasil Scan PO",
@@ -141,9 +175,11 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                     message: "Error",
                     description: "Something went wrong",
                 });
+
+                // Catatan: Karena kita sudah memanggil setIsOpenQR(false) di awal,
+                // modal sudah tertutup meskipun terjadi error di API.
             }
         }
-        // return;
     };
 
     return (
@@ -306,7 +342,12 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 <Modal
                     title="Tambah Data"
                     open={isOpenQR}
-                    onCancel={() => setIsOpenQR(false)}
+                    onCancel={() => {
+                        stopAllCameraTracks();
+                        setTimeout(() => {
+                            setIsOpenQR(false);
+                        }, 100);
+                    }}
                     cancelText="Batal"
                 >
                     {isOpenQR && (
