@@ -2,6 +2,7 @@ import RootLayout from "../../Layouts/RootLayout";
 import React, { useEffect, useState } from "react";
 import { TPurchaseOrder } from "../../Types/entities";
 import {
+    Alert,
     Button,
     Card,
     DatePicker,
@@ -11,6 +12,7 @@ import {
     Form,
     Input,
     InputNumber,
+    Modal,
     QRCode as QRCodeAntd,
     Select,
     Table,
@@ -49,6 +51,8 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const zodSync = createSchemaFieldRule(CreatePembayaranPOSchema);
     const [form] = Form.useForm();
+    const pembayaran = props?.data?.pembayaran[0];
+
     const handleVerification = () => {
         // hitung total verifikator
         const verifikator = [
@@ -197,6 +201,11 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             children: data?.supplier?.name,
         },
         {
+            key: data?.tanggal_sampai,
+            label: "Tanggal Sampai",
+            children: data?.tanggal_sampai,
+        },
+        {
             key: data?.catatan || "catatan",
             label: "Catatan",
             children: data?.catatan,
@@ -301,37 +310,57 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
-        console.log(values);
-        try {
-            // Buat FormData untuk kirim file
-            const formData = new FormData();
-            Object.keys(values).forEach((key) => {
-                if (values[key] instanceof dayjs) {
-                    // format date ke string
-                    formData.append(key, values[key].format("YYYY-MM-DD"));
-                } else {
-                    formData.append(key, values[key]);
-                }
-            });
 
-            // Tambahkan file upload
-            if (fileList.length > 0) {
-                formData.append("bukti_pembayaran", fileList[0].originFileObj);
-            }
-            router.post(
-                route(Route.PembayaranPurchaseOrder, {
-                    id: data.id,
-                }),
-                formData,
-                {
-                    forceFormData: true,
-                    onFinish: () => setIsLoading(false),
-                },
-            );
-        } catch (error) {
-            setIsLoading(false);
-        }
+        Modal.confirm({
+            content:
+                "Apakah Anda yakin ingin mengirim melakukan pembayaran, data yang sudah di submit tidak bisa diubah?",
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: { type: "primary", danger: true },
+            centered: true,
+            onOk: async () => {
+                setIsLoading(true);
+
+                try {
+                    const formData = new FormData();
+                    Object.keys(values).forEach((key) => {
+                        const value = values[key];
+                        if (value?.format) {
+                            // format date
+                            formData.append(key, value.format("YYYY-MM-DD"));
+                        } else {
+                            formData.append(key, value);
+                        }
+                    });
+
+                    if (fileList.length > 0) {
+                        formData.append(
+                            "bukti_pembayaran",
+                            fileList[0].originFileObj,
+                        );
+                    }
+
+                    router.post(
+                        route(Route.PembayaranPurchaseOrder, { id: data.id }),
+                        formData,
+                        {
+                            forceFormData: true,
+                            onFinish: () => setIsLoading(false),
+                        },
+                    );
+                } catch (error) {
+                    console.error(error);
+                    setIsLoading(false);
+                }
+            },
+        });
     };
+
+    const afterPaymentStatus = [
+        "SUDAH DIBAYAR",
+        "BARANG DIKIRIM",
+        "BARANG SAMPAI",
+    ].some((item) => item === data?.status);
 
     return (
         <RootLayout
@@ -402,14 +431,34 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                 />
             </Card>
             {userRole === "kepala_accounting" &&
-                data?.status === "MENUNGGU PEMBAYARAN" && (
+                [
+                    "MENUNGGU PEMBAYARAN",
+                    "BARANG DIKIRIM",
+                    "BARANG SAMPAI",
+                    "SUDAH DIBAYAR",
+                ].some((item) => item === data?.status) && (
                     <Card style={{ marginBottom: "1rem" }}>
                         <Flex vertical style={{ width: "50%" }}>
+                            {afterPaymentStatus && (
+                                <Alert
+                                    message="Informational Notes"
+                                    description="Anda sudah melakukan pembayaran dan tidak bisa mengubahnya."
+                                    type="info"
+                                    showIcon
+                                    style={{ marginBottom: "1rem" }}
+                                />
+                            )}
                             <Title level={4}>Formulir Pembayaran</Title>
                             <Form
                                 form={form}
                                 initialValues={{
-                                    ...props.data,
+                                    ...pembayaran,
+                                    tanggal_pembayaran:
+                                        pembayaran?.tanggal_pembayaran
+                                            ? dayjs(
+                                                  pembayaran?.tanggal_pembayaran,
+                                              )
+                                            : null,
                                 }}
                                 layout="vertical"
                                 onFinish={onFinish}
@@ -421,6 +470,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                     rules={[zodSync]}
                                 >
                                     <Select
+                                        disabled={afterPaymentStatus}
                                         options={[
                                             {
                                                 value: "Transfer",
@@ -436,28 +486,31 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                     name="nama_bank"
                                     rules={[zodSync]}
                                 >
-                                    <Input />
+                                    <Input disabled={afterPaymentStatus} />
                                 </Form.Item>
                                 <Form.Item
                                     label="Nomor Rekening"
                                     name="nomor_rekening"
                                     rules={[zodSync]}
                                 >
-                                    <Input />
+                                    <Input disabled={afterPaymentStatus} />
                                 </Form.Item>
                                 <Form.Item
                                     label="Jumlah"
                                     name="jumlah"
                                     rules={[zodSync]}
                                 >
-                                    <InputNumber style={{ width: "100%" }} />
+                                    <InputNumber
+                                        disabled={afterPaymentStatus}
+                                        style={{ width: "100%" }}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label="Tanggal Pembayaran"
                                     name="tanggal_pembayaran"
                                     rules={[zodSync]}
                                 >
-                                    <DatePicker />
+                                    <DatePicker disabled={afterPaymentStatus} />
                                 </Form.Item>
                                 <Form.Item
                                     label="Bukti Pembayaran"
@@ -472,7 +525,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                         }
                                         accept=".jpg,.png,.pdf"
                                     >
-                                        <Button>Upload Bukti</Button>
+                                        <Button disabled={afterPaymentStatus}>
+                                            Upload Bukti
+                                        </Button>
                                     </Upload>
                                 </Form.Item>
                                 <Form.Item
@@ -480,12 +535,16 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                     name="catatan"
                                     rules={[zodSync]}
                                 >
-                                    <Input.TextArea rows={3} />
+                                    <Input.TextArea
+                                        rows={3}
+                                        disabled={afterPaymentStatus}
+                                    />
                                 </Form.Item>
                                 <Button
                                     type="primary"
                                     htmlType="submit"
                                     loading={isLoading}
+                                    disabled={afterPaymentStatus}
                                 >
                                     Kirim Pembayaran
                                 </Button>

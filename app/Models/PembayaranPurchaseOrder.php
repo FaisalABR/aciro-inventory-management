@@ -37,7 +37,7 @@ class PembayaranPurchaseOrder extends Model
         'jumlah',
         'bukti_pembayaran',
         'catatan',
-        'tanggal_order',
+        'tanggal_pembayaran',
     ];
 
     public function purchaseOrder()

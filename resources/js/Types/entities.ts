@@ -100,6 +100,7 @@ export type TPurchaseOrder = {
     uuid: string;
     nomor_referensi: string;
     tanggal_order: string;
+    tanggal_sampai: string;
     catatan: string | null;
     supplier_id: number;
     supplier: TSupplier;
@@ -115,6 +116,7 @@ export type TPurchaseOrder = {
     catatan_penolakan_supplier: string;
     status: string;
     items: TPurchaseOrderItem[];
+    pembayaran: any;
 };
 
 export type TPurchaseOrderItem = {

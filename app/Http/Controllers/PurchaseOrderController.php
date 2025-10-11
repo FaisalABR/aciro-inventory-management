@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
 use App\Jobs\SendWhatsappJob;
+use App\Models\PembayaranPurchaseOrder;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Role;
@@ -101,6 +102,7 @@ class PurchaseOrderController extends Controller
     {
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
         $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with('barang')->get();
+        $pembayaranPO = PembayaranPurchaseOrder::where('purchase_order_id', $po->purchase_order_id)->get();
 
         $data = [
             'id'                           => $po->purchase_order_id,
@@ -119,6 +121,8 @@ class PurchaseOrderController extends Controller
             'kepala_accounting_menolak' => $po->kepala_accounting_menolak,
             'catatan_penolakan' => $po->catatan_penolakan,
             'catatan_penolakan_supplier' => $po->catatan_penolakan_supplier,
+            'tanggal_sampai' => $po->tanggal_sampai,
+            'pembayaran'                   => $pembayaranPO,
             'supplier'                     => [
                 'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
@@ -353,6 +357,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
     {
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
         $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with(['barang'])->get();
+        $pembayaranPO = PembayaranPurchaseOrder::where('purchase_order_id', $po->purchase_order_id)->get();
 
         $data = [
             'id'                           => $po->purchase_order_id,
@@ -366,6 +371,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
             'verifikasi_kepala_pengadaan'  => $po->verifikasi_kepala_pengadaan,
             'verifikasi_kepala_accounting' => $po->verifikasi_kepala_accounting,
             'catatan_penolakan_supplier'   => $po->catatan_penolakan_supplier,
+            'pembayaran'                   => $pembayaranPO,
             'supplier'                     => [
                 'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,

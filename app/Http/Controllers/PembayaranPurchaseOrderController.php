@@ -36,7 +36,7 @@ class PembayaranPurchaseOrderController extends Controller
             'jumlah' => $validated['jumlah'],
             'bukti_pembayaran' => $validated['bukti_pembayaran'],
             'catatan' => $validated['catatan'],
-            'tanggal_order' => $validated['tanggal_pembayaran']
+            'tanggal_pembayaran' => $validated['tanggal_pembayaran']
         ]);
 
         // update status PO jadi sudah dibayar

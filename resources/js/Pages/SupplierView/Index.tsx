@@ -1,6 +1,7 @@
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
+    FilePdfOutlined,
     PrinterOutlined,
     TruckOutlined,
 } from "@ant-design/icons";
@@ -12,6 +13,7 @@ import {
     Descriptions,
     DescriptionsProps,
     Flex,
+    Image,
     Layout,
     Row,
     Table,
@@ -27,6 +29,7 @@ import { TemplatePOPDF } from "../PurchaseOrder/TemplatePOPDF";
 import { pdf } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 import TextArea from "antd/es/input/TextArea";
+import { formatRupiah } from "../../Shared/utils";
 
 const { Title } = Typography;
 
@@ -36,6 +39,9 @@ type TPOSupplierView = {
 
 const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
     const [qrData, setQrData] = useState<string>("");
+    const pembayaran = data?.pembayaran[0];
+    const fileUrl = `/storage/${pembayaran?.bukti_pembayaran}`;
+    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
     const descItems: DescriptionsProps["items"] = [
         {
             key: data?.uuid,
@@ -107,6 +113,59 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
             key: data?.catatan || "catatan",
             label: "Catatan Penolakan Supplier",
             children: data?.catatan_penolakan_supplier,
+        },
+    ];
+
+    const descPembayaran: DescriptionsProps["items"] = [
+        {
+            key: pembayaran?.metode_pembayaran,
+            label: "Metode Pembayaran",
+            children: pembayaran?.metode_pembayaran,
+        },
+        {
+            key: pembayaran?.nama_bank,
+            label: "Nama Bank",
+            children: pembayaran?.nama_bank,
+        },
+        {
+            key: pembayaran?.tanggal_pembayaran,
+            label: "Tanggal Pembayaran",
+            children: pembayaran?.tanggal_pembayaran,
+        },
+        {
+            key: pembayaran?.jumlah,
+            label: "Jumlah",
+            children: formatRupiah(pembayaran?.jumlah),
+        },
+        {
+            key: pembayaran?.bukti_pembayaran,
+            label: "Bukti Pembayaran",
+            children: isImage ? (
+                <Image
+                    width={200}
+                    src={fileUrl}
+                    alt="Bukti Pembayaran"
+                    style={{
+                        borderRadius: 8,
+                        border: "1px solid #f0f0f0",
+                        padding: 4,
+                    }}
+                />
+            ) : (
+                <Button
+                    icon={<FilePdfOutlined />}
+                    type="primary"
+                    href={fileUrl}
+                    target="_blank"
+                >
+                    Lihat File PDF
+                </Button>
+            ),
+        },
+        {
+            key: pembayaran?.catatan,
+            label: "Catatan",
+            children: pembayaran?.catatan,
         },
     ];
 
@@ -230,6 +289,12 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
         }
     };
 
+    const afterPaymentStatus = [
+        "SUDAH DIBAYAR",
+        "BARANG DIKIRIM",
+        "BARANG SAMPAI",
+    ].some((item) => item === data?.status);
+
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Head title={`PO Supplier View | Aciro Inventory Management`} />
@@ -258,7 +323,7 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                 <Button
                                     type="primary"
                                     size="large"
-                                    disabled={["BARANG DIKIRIM"].some(
+                                    disabled={["BARANG SAMPAI"].some(
                                         (item) => item === data?.status,
                                     )}
                                     icon={
@@ -284,6 +349,8 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                         "KONFIRMASI SUPPLIER",
                                         "MENUNGGU PEMBAYARAN",
                                         "BARANG DIKIRIM",
+                                        "BARANG SAMPAI",
+                                        "SUDAH DIBAYAR",
                                     ].some((item) => item === data?.status)}
                                 >
                                     Tolak
@@ -298,6 +365,16 @@ const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
                                 items={descItems}
                             />
                         </Card>
+                        {afterPaymentStatus && (
+                            <Card style={{ marginBottom: "1rem" }}>
+                                <Descriptions
+                                    title="Informasi Pembayaran"
+                                    layout="vertical"
+                                    bordered
+                                    items={descPembayaran}
+                                />
+                            </Card>
+                        )}
                         <Card>
                             <Table columns={columns} dataSource={dataTable} />
                         </Card>
