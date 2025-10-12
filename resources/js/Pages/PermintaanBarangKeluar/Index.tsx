@@ -11,6 +11,7 @@ import {
 import { ColumnsType } from "antd/es/table";
 import { TBarangKeluar } from "../../Types/entities";
 import { useModal } from "../../Shared/hooks";
+import usePagePolling from "../../Shared/usePagePooling";
 
 type TPermintaanBarangKeluarIndexProps = {
     data: TBarangKeluar[];
@@ -18,6 +19,7 @@ type TPermintaanBarangKeluarIndexProps = {
 };
 
 const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",

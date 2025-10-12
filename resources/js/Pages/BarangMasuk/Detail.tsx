@@ -1,4 +1,5 @@
 import RootLayout from "../../Layouts/RootLayout";
+import usePagePolling from "../../Shared/usePagePooling";
 import React from "react";
 import { TBarangMasuk } from "../../Types/entities";
 import { Card, Descriptions, DescriptionsProps, Table } from "antd";
@@ -10,6 +11,7 @@ type TDetailBarangMasukProps = {
 };
 
 const Detail: React.FC<TDetailBarangMasukProps> = (props) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const { data } = props;
 
     const descItems: DescriptionsProps["items"] = [

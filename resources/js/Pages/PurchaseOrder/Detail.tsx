@@ -38,6 +38,7 @@ import Title from "antd/es/typography/Title";
 import { createSchemaFieldRule } from "antd-zod";
 import { CreatePembayaranPOSchema } from "../../Shared/validation";
 import dayjs from "dayjs";
+import usePagePolling from "../../Shared/usePagePooling";
 
 type TDetailPurchaseOrderProps = {
     data: TPurchaseOrder;
@@ -45,9 +46,10 @@ type TDetailPurchaseOrderProps = {
 };
 
 const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const { data } = props;
     const [qrData, setQrData] = useState<string>("");
-    const [fileList, setFileList] = useState([]);
+    const [fileList, setFileList] = useState<any>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const zodSync = createSchemaFieldRule(CreatePembayaranPOSchema);
     const [form] = Form.useForm();
@@ -249,6 +251,32 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             setQrData(qr);
         };
         generateQR();
+    }, []);
+
+    useEffect(() => {
+        let interval: any;
+
+        const startPolling = () => {
+            console.log("Jalan");
+            interval = setInterval(() => {
+                router.reload({ only: ["data"] });
+            }, 5000);
+        };
+
+        const stopPolling = () => {
+            clearInterval(interval);
+        };
+
+        window.addEventListener("focus", startPolling);
+        window.addEventListener("blur", stopPolling);
+
+        startPolling();
+
+        return () => {
+            stopPolling();
+            window.removeEventListener("focus", startPolling);
+            window.removeEventListener("blur", stopPolling);
+        };
     }, []);
 
     const handlePrint = async () => {

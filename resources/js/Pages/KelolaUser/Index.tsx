@@ -13,6 +13,7 @@ import { ColumnsType } from "antd/es/table";
 import { Paginate, TUser } from "../../Types/entities";
 import { generateRolesName } from "../../Shared/utils";
 import RootLayout from "../../Layouts/RootLayout";
+import usePagePolling from "../../Shared/usePagePooling";
 import { useModal } from "../../Shared/hooks";
 import { debounce } from "lodash";
 
@@ -24,6 +25,7 @@ type TUserIndexProps = {
 };
 
 const Index: React.FC<TUserIndexProps> = ({ data, filters }) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const [search, setSearch] = useState(filters.search || "");
 
     const debounceSearch = useMemo(

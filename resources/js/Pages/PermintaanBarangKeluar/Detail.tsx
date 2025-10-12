@@ -1,5 +1,5 @@
 import RootLayout from "../../Layouts/RootLayout";
-import React from "react";
+import React, { useEffect } from "react";
 import { TBarangKeluar } from "../../Types/entities";
 import {
     Button,
@@ -15,6 +15,7 @@ import { useModal } from "../../Shared/hooks";
 import { router } from "@inertiajs/react";
 import { Route, route } from "../../Common/Route";
 import TextArea from "antd/es/input/TextArea";
+import usePagePolling from "../../Shared/usePagePooling";
 
 type TDetailPermintaanBarangKeluarProps = {
     data: TBarangKeluar;
@@ -185,6 +186,8 @@ const Detail: React.FC<TDetailPermintaanBarangKeluarProps> = (props) => {
               </Button>,
           ]
         : [];
+
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     return (
         <RootLayout

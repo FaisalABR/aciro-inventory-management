@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
+import usePagePolling from "../../../Shared/usePagePooling";
 import { route, Route } from "../../../Common/Route";
 import { Link, router } from "@inertiajs/react";
 import { Button, Input, Table } from "antd";
@@ -23,6 +24,7 @@ type TSatuanIndexProps = {
 };
 
 const Satuan: React.FC<TSatuanIndexProps> = ({ data, filters }) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const [search, setSearch] = useState(filters.search || "");
 
     const debounceSearch = useMemo(

@@ -1,5 +1,6 @@
 import React from "react";
 import RootLayout from "../../Layouts/RootLayout";
+import usePagePolling from "../../Shared/usePagePooling";
 import { useModal } from "../../Shared/hooks";
 import { Link, router } from "@inertiajs/react";
 import { Route, route } from "../../Common/Route";
@@ -20,6 +21,7 @@ type TPurchaseOrderIndexProps = {
 };
 
 const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",

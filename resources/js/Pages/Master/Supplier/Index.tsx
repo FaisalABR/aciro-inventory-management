@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
+import usePagePolling from "../../../Shared/usePagePooling";
 import { Paginate, TSupplier } from "../../../Types/entities";
 import { useModal } from "../../../Shared/hooks";
 import { Link, router } from "@inertiajs/react";
@@ -24,6 +25,7 @@ type TSupplierIndexProps = {
 
 const Supplier: React.FC<TSupplierIndexProps> = ({ data, filters }) => {
     const [search, setSearch] = useState(filters.search || "");
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     const debounceSearch = useMemo(
         () =>

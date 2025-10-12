@@ -3,6 +3,7 @@ import RootLayout from "../../../Layouts/RootLayout";
 import { route, Route } from "../../../Common/Route";
 import { Link, router } from "@inertiajs/react";
 import { Button, Input, Table } from "antd";
+import usePagePolling from "../../../Shared/usePagePooling";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -157,6 +158,7 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
         },
     ];
 
+    usePagePolling({ interval: 5000, only: ["data"] });
     const barangData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });

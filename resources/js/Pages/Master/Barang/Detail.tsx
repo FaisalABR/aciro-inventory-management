@@ -1,4 +1,5 @@
 import RootLayout from "../../../Layouts/RootLayout";
+import usePagePolling from "../../../Shared/usePagePooling";
 import React from "react";
 import { TBarang } from "../../../Types/entities";
 import { Card, Descriptions, DescriptionsProps } from "antd";
@@ -9,6 +10,7 @@ type TBDetailBarangProps = {
 
 const Detail: React.FC<TBDetailBarangProps> = (props) => {
     const { data } = props;
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     const descItems: DescriptionsProps["items"] = [
         {

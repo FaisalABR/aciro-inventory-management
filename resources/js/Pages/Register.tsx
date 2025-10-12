@@ -5,7 +5,7 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Route } from "../Common/Route";
 import RootLayout from "../Layouts/RootLayout";
 
-const Register: React.FC = ({ data }: { data: any }) => {
+const Register: React.FC<{ data: any }> = ({ data }) => {
     const [form] = Form.useForm();
 
     const onSubmit = async (values: any) => {

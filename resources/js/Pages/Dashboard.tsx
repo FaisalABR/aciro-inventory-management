@@ -17,12 +17,12 @@ type TDashboardProps = {
 const Home: React.FC<TDashboardProps> = ({ data }) => {
     const [dateRange, setDateRange] = React.useState<[any, any] | null>(null);
 
-    const barangMasuk = data?.graph?.barangMasuk.map((item) => ({
+    const barangMasuk = data?.graph?.barangMasuk.map((item: any) => ({
         nama: item.nama,
         value: Number(item.value), // pastikan number
     }));
 
-    const barangKeluar = data?.graph?.barangKeluar.map((item) => ({
+    const barangKeluar = data?.graph?.barangKeluar.map((item: any) => ({
         nama: item.nama,
         value: Number(item.value), // pastikan number
     }));

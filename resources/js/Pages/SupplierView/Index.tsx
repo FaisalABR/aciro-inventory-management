@@ -1,3 +1,4 @@
+import usePagePolling from "../../Shared/usePagePooling";
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
@@ -39,6 +40,7 @@ type TPOSupplierView = {
 
 const SupplierView: React.FC<TPOSupplierView> = ({ data }) => {
     const [qrData, setQrData] = useState<string>("");
+    usePagePolling({ interval: 5000, only: ["data"] });
     const pembayaran = data?.pembayaran[0];
     const fileUrl = `/storage/${pembayaran?.bukti_pembayaran}`;
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);

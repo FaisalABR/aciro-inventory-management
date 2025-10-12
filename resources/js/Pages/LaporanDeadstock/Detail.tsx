@@ -6,6 +6,7 @@ import { ColumnsType } from "antd/es/table";
 import { PrinterFilled } from "@ant-design/icons";
 import { TemplateDeadstockPDF } from "./TemplateDeadstockPDF";
 import { pdf } from "@react-pdf/renderer";
+import usePagePolling from "../../Shared/usePagePooling";
 
 type TDetailLaporanDeadstockProps = {
     data: TLaporanDeadstock;
@@ -13,6 +14,7 @@ type TDetailLaporanDeadstockProps = {
 
 const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
     const { data } = props;
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     const descItems: DescriptionsProps["items"] = [
         {

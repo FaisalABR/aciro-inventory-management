@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import RootLayout from "../../Layouts/RootLayout";
-import { Link, router } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import { route, Route } from "../../Common/Route";
+import usePagePolling from "../../Shared/usePagePooling";
 import { Button, Modal, notification, Table, Tooltip } from "antd";
-import { PlusSquareOutlined, SwapOutlined } from "@ant-design/icons";
+import { SwapOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import { TBarangKeluar } from "../../Types/entities";
-import { useModal } from "../../Shared/hooks";
 
 type TBarangKeluarIndexProps = {
     data: TBarangKeluar[];
@@ -16,6 +16,7 @@ const Index: React.FC<TBarangKeluarIndexProps> = (props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [warnings, setWarnings] = useState([]);
     const [selectedUuid, setSelectedUuid] = useState("");
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     const handleCheckExecute = async (uuid: string) => {
         setSelectedUuid(uuid);

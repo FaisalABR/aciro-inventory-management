@@ -3,6 +3,7 @@ import RootLayout from "../../Layouts/RootLayout";
 import { Link, router } from "@inertiajs/react";
 import { route, Route } from "../../Common/Route";
 import { Button, Table } from "antd";
+import usePagePolling from "../../Shared/usePagePooling";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -20,6 +21,8 @@ type TBarangIndexProps = {
 };
 
 const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
+    // Poll page data every 5s (only reload 'data' prop)
+    usePagePolling({ interval: 5000, only: ["data"] });
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
@@ -135,7 +138,7 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
             title="Kelola Barang Masuk"
             actions={showActions}
         >
-            <Table dataSource={formattedData} columns={columns} />;
+            <Table dataSource={formattedData} columns={columns} />
         </RootLayout>
     );
 };

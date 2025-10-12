@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import RootLayout from "../../Layouts/RootLayout";
+import usePagePolling from "../../Shared/usePagePooling";
 import { useModal } from "../../Shared/hooks";
 import { Link, router } from "@inertiajs/react";
 import { Route, route } from "../../Common/Route";
@@ -19,6 +20,7 @@ type TDeadstockIndexProps = {
 const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
+    usePagePolling({ interval: 5000, only: ["data"] });
 
     const columns: ColumnsType = [
         {

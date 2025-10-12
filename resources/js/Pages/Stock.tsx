@@ -2,6 +2,7 @@ import { Flex, Input, Select, Table, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import RootLayout from "../Layouts/RootLayout";
 import React, { useMemo, useState } from "react";
+import usePagePolling from "../Shared/usePagePooling";
 import { record } from "zod";
 import { ColumnsType } from "antd/es/table";
 import { formatRupiah } from "../Shared/utils";
@@ -20,6 +21,7 @@ type TStockIndexProps = {
 };
 
 const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const [search, setSearch] = useState(filters.search || "");
     const [statusROP, setStatusROP] = useState(filters.statusROP);
     const [statusITR, setStatusITR] = useState(filters.statusITR || "");

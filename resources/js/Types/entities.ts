@@ -35,6 +35,8 @@ export type TStock = {
 export type TBarang = {
     uuid: string;
     name: string;
+    satuan_id: number;
+    supplier_id: number;
     supplier: TSupplier;
     satuan: TSatuan;
     hargaJual: number;
