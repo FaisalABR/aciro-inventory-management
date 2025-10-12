@@ -151,7 +151,7 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
     ];
 
     const userRole = auth?.user?.roles?.[0];
-    const isStaffPengadaan = ["staff_pengadaan", "admin_sistem"].includes(
+    const isStaffPengadaan = ["admin_pengadaan", "admin_sistem"].includes(
         userRole,
     );
 

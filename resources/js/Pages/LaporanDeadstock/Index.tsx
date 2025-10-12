@@ -108,7 +108,7 @@ const DeadstockIndex: React.FC<TDeadstockIndexProps> = ({ data }) => {
         >
             <Table dataSource={data} columns={columns} />;
             <Modal
-                title="Tambah Data"
+                title="Evaluasi ITR"
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}

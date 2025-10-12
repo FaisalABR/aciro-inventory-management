@@ -89,7 +89,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
     const handleArrived = () => {
         return useModal({
             type: "confirm",
-            content: `Apakah anda yakin ingin ${data?.nomor_referensi} sudah sampai?`,
+            content: `Apakah yakin untuk konfirmasi ${data?.nomor_referensi} sudah sampai?`,
             okText: "Yakin",
             cancelText: "Batal",
             okButtonProps: {
@@ -300,6 +300,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         (userRole === "kepala_accounting" &&
             data?.verifikasi_kepala_accounting) ||
         (userRole === "kepala_pengadaan" && data?.verifikasi_kepala_pengadaan);
+
     const isDisabled = [
         "TOLAK",
         "TOLAK SUPPLIER",
@@ -362,65 +363,81 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         "BARANG SAMPAI",
     ].some((item) => item === data?.status);
 
+    const showActions = [
+        "kepala_toko",
+        "kepala_pengadaan",
+        "kepala_gudang",
+        "kepala_accounting",
+    ].some((item) => item === userRole)
+        ? [
+              <Button
+                  type="default"
+                  size="large"
+                  icon={<PrinterFilled />}
+                  onClick={handlePrint}
+              >
+                  Print
+              </Button>,
+              <Button
+                  type="primary"
+                  size="large"
+                  disabled={
+                      [
+                          "DRAFT",
+                          "VERIFIKASI",
+                          "TERKIRIM",
+                          "KONFIRMASI SUPPLIER",
+                          "BARANG DIKIRIM",
+                          "TOLAK",
+                          "TOLAK SUPPLIER",
+                          "MENUNGGU PEMBAYARAN",
+                      ].some((item) => item === data?.status) || disabledByRole
+                  }
+                  icon={<CheckCircleOutlined />}
+                  onClick={handleVerification}
+              >
+                  Verifikasi
+              </Button>,
+              <Button
+                  key="reject"
+                  danger
+                  type="primary"
+                  size="large"
+                  icon={<CloseCircleOutlined />}
+                  onClick={handleReject}
+                  disabled={isDisabled || disabledByRole}
+              >
+                  Tolak
+              </Button>,
+          ]
+        : [
+              <Button
+                  type="default"
+                  size="large"
+                  icon={<PrinterFilled />}
+                  onClick={handlePrint}
+              >
+                  Print
+              </Button>,
+              data?.status === "BARANG DIKIRIM" && (
+                  <Button
+                      type="primary"
+                      size="large"
+                      icon={<ProductOutlined />}
+                      onClick={handleArrived}
+                      disabled={["BARANG SAMPAI"].some(
+                          (item) => item === data?.status,
+                      )}
+                  >
+                      Barang Sampai
+                  </Button>
+              ),
+          ];
     return (
         <RootLayout
             type="main"
             title="Detail Purchase Order"
-            actions={[
-                <Button
-                    type="default"
-                    size="large"
-                    icon={<PrinterFilled />}
-                    onClick={handlePrint}
-                >
-                    Print
-                </Button>,
-                <Button
-                    type="primary"
-                    size="large"
-                    disabled={
-                        [
-                            "DRAFT",
-                            "VERIFIKASI",
-                            "TERKIRIM",
-                            "KONFIRMASI SUPPLIER",
-                            "BARANG DIKIRIM",
-                            "TOLAK",
-                            "TOLAK SUPPLIER",
-                            "MENUNGGU PEMBAYARAN",
-                        ].some((item) => item === data?.status) ||
-                        disabledByRole
-                    }
-                    icon={<CheckCircleOutlined />}
-                    onClick={handleVerification}
-                >
-                    Verifikasi
-                </Button>,
-                <Button
-                    key="reject"
-                    danger
-                    type="primary"
-                    size="large"
-                    icon={<CloseCircleOutlined />}
-                    onClick={handleReject}
-                    disabled={isDisabled || disabledByRole}
-                >
-                    Tolak
-                </Button>,
-                data?.status === "BARANG DIKIRIM" && (
-                    <Button
-                        type="primary"
-                        size="large"
-                        icon={<ProductOutlined />}
-                        onClick={handleArrived}
-                        disabled={["BARANG SAMPAI"].some(
-                            (item) => item === data?.status,
-                        )}
-                    >
-                        Barang Sampai
-                    </Button>
-                ),
-            ]}
+            actions={showActions}
         >
             <Card style={{ marginBottom: "1rem" }}>
                 <Descriptions

@@ -41,7 +41,6 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
     const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [scannedUuid, setScannedUuid] = useState(null);
-    const qrRef = useRef();
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
