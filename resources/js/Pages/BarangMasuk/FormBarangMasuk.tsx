@@ -41,6 +41,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
     const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [scannedUuid, setScannedUuid] = useState(null);
+    const items = Form.useWatch("items", form);
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -329,7 +330,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                             <Button
                                 htmlType="submit"
                                 type="primary"
-                                disabled={isLoading}
+                                disabled={isLoading || !items}
                                 style={{ fontWeight: "medium" }}
                             >
                                 {isLoading ? <LoadingOutlined /> : "Submit"}

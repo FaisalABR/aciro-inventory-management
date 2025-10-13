@@ -52,6 +52,7 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
     const zodSync = createSchemaFieldRule(CreateBarangKeluarSchema);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
+    const items = Form.useWatch("items", form);
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -242,7 +243,7 @@ const FormPermintaanBarangKeluar: React.FC<TFormPermintaanBarangKeluarProps> = (
                             <Button
                                 htmlType="submit"
                                 type="primary"
-                                disabled={isLoading}
+                                disabled={isLoading || !items}
                                 style={{ fontWeight: "medium" }}
                             >
                                 {isLoading ? <LoadingOutlined /> : "Submit"}

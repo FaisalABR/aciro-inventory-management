@@ -36,6 +36,7 @@ class PembayaranPurchaseOrder extends Model
         'nomor_rekening',
         'jumlah',
         'bukti_pembayaran',
+        'invoice_supplier',
         'catatan',
         'tanggal_pembayaran',
     ];

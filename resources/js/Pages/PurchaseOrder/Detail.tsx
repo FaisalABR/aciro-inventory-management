@@ -475,7 +475,7 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                     items={descItems}
                 />
             </Card>
-            {userRole === "kepala_accounting" &&
+            {userRole === "staff_accounting" &&
                 [
                     "MENUNGGU PEMBAYARAN",
                     "BARANG DIKIRIM",

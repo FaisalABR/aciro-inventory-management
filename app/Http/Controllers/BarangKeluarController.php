@@ -17,12 +17,12 @@ use App\Services\WhatsappServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class BarangKeluarController extends Controller
 {
     private $barangKeluarService;
-
     private $whatsappService;
 
     public function __construct(
@@ -123,7 +123,7 @@ class BarangKeluarController extends Controller
         return redirect('/permintaan-barang-keluar')->with('success', 'Permintaan Barang Keluar berhasil ditambahkan!');
     }
 
-    public function verifikasi(Request $request, $uuid)
+    public function verifikasi($uuid)
     {
         $barangKeluar = BarangKeluar::where('uuid', $uuid)->first();
 
@@ -349,7 +349,6 @@ class BarangKeluarController extends Controller
     public function destroy($uuid)
     {
         $barangKeluar = BarangKeluar::where('uuid', $uuid)->first();
-
 
         try {
             BarangKeluarItem::where('barang_keluar_id', $barangKeluar->barang_keluar_id)->delete();

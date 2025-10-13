@@ -34,6 +34,7 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
     const [filteredBarangOptions, setFilteredBarangOptions] = useState([]);
+    const items = Form.useWatch("items", form);
 
     const onFinish = async () => {
         const values = form.getFieldsValue();
@@ -254,7 +255,7 @@ const FormPurchaseOrder: React.FC<TFormPurchaseOrderProps> = (props) => {
                             <Button
                                 htmlType="submit"
                                 type="primary"
-                                disabled={isLoading}
+                                disabled={isLoading || !items}
                                 style={{ fontWeight: "medium" }}
                             >
                                 {isLoading ? <LoadingOutlined /> : "Submit"}

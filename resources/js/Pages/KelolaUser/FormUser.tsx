@@ -120,6 +120,10 @@ const FormUser: React.FC<TUserFormProps> = (props) => {
                                         value: 7,
                                         label: <span>Staff Toko</span>,
                                     },
+                                    {
+                                        value: 9,
+                                        label: <span>Staff Accounting</span>,
+                                    },
                                 ]}
                             />
                         </Form.Item>

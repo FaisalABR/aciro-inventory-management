@@ -18,12 +18,17 @@ class PembayaranPurchaseOrderController extends Controller
             'nomor_rekening' => 'nullable|string',
             'jumlah' => 'required|numeric',
             'bukti_pembayaran' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+            'invoice_supplier' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
             'catatan' => 'nullable|string',
             'tanggal_pembayaran' => 'required',
         ]);
 
         if ($request->hasFile('bukti_pembayaran')) {
             $validated['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('bukti-pembayaran', 'public');
+        }
+
+        if ($request->hasFile('invoice_supplier')) {
+            $validated['invoice_supplier'] = $request->file('invoice_supplier')->store('invoice-supplier', 'public');
         }
 
         $purchaseOrder = PurchaseOrder::where('purchase_order_id', $id);
@@ -35,6 +40,7 @@ class PembayaranPurchaseOrderController extends Controller
             'nomor_rekening' => $validated['nomor_rekening'],
             'jumlah' => $validated['jumlah'],
             'bukti_pembayaran' => $validated['bukti_pembayaran'],
+            'invoice_supplier' => $validated['invoice_supplier'],
             'catatan' => $validated['catatan'],
             'tanggal_pembayaran' => $validated['tanggal_pembayaran']
         ]);
