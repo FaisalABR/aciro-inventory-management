@@ -310,6 +310,26 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                     }}
                                                 />
                                             </Form.Item>
+                                            <Form.Item
+                                                label="Nomor Batch"
+                                                name={[
+                                                    field.name,
+                                                    "nomor_batch",
+                                                ]}
+                                                rules={[zodSync]}
+                                            >
+                                                <Input placeholder="AX21321" />
+                                            </Form.Item>
+                                            <Form.Item
+                                                label="Tanggal Expired"
+                                                name={[
+                                                    field.name,
+                                                    "tanggal_expired",
+                                                ]}
+                                                rules={[zodSync]}
+                                            >
+                                                <DatePicker />
+                                            </Form.Item>
                                         </Card>
                                     ))}
 

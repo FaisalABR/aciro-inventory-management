@@ -86,6 +86,8 @@ class BarangMasukController extends Controller
                 'items.*.barang_id'  => 'required|exists:barangs,barang_id',
                 'items.*.quantity'   => 'required|integer|min:1',
                 'items.*.harga_beli' => 'required|numeric|min:0',
+                'items.*.nomor_batch'   => 'required',
+                'items.*.tanggal_expired'   => 'required',
             ]);
 
             $this->barangMasukService->create($validated);

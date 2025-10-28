@@ -151,6 +151,13 @@ export const CreateBarangMasukSchema = z.object({
                 harga_beli: z.number({
                     required_error: "Harga Beli harus di isi",
                 }),
+                nomor_batch: z.string({
+                    required_error: "Nomor batch harus diisi",
+                }),
+                tanggal_expired: z.coerce.date({
+                    invalid_type_error: "Tanggal expired tidak valid",
+                    required_error: "Tanggal expired harus diisi",
+                }),
             }),
         )
         .min(1, { message: "Minimal 1 barang dimasukkan" }),

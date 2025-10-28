@@ -23,6 +23,31 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
     const { data } = props;
     usePagePolling({ interval: 5000, only: ["data"] });
 
+    const parseTgl = (tglString: string) => {
+        if (!tglString) return null; // Handle null/undefined input
+
+        // Contoh tglString: "23-10-2025 04:00:20"
+        const [tglBagian, _] = tglString.split(" ");
+
+        // Pecah bagian tanggal DD-MM-YYYY
+        const [hari, bulan, tahun] = tglBagian.split("-");
+
+        // Susun ulang menjadi YYYY-MM-DD
+        return `${tahun}-${bulan}-${hari}`;
+    };
+
+    const hitungSelisihHari = (tanggalAwal: string, tanggalAkhir: string) => {
+        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        const tanggalMulaiBersih = parseTgl(tanggalAwal);
+        const tanggalMulai = new Date(tanggalMulaiBersih!);
+        const tanggalExpired = new Date(tanggalAkhir);
+        tanggalMulai.setHours(0, 0, 0, 0);
+        tanggalExpired.setHours(0, 0, 0, 0);
+        const diffTime = tanggalExpired.getTime() - tanggalMulai.getTime();
+        const selisihHari = Math.ceil(diffTime / MS_PER_DAY);
+        return selisihHari;
+    };
+
     const descItems: DescriptionsProps["items"] = [
         {
             key: data?.uuid,
@@ -43,6 +68,11 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
             key: data?.periode_akhir,
             label: "Periode Akhir",
             children: data?.periode_akhir,
+        },
+        {
+            key: data?.created_at,
+            label: "Tanggal Dibuat",
+            children: data?.created_at,
         },
     ];
 
@@ -94,8 +124,53 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
         },
     ];
 
+    const columnsExpired: ColumnsType = [
+        {
+            title: "Nama Barang",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "Tanggal Expired",
+            dataIndex: "tanggal_expired",
+            key: "tanggal_expired",
+        },
+        {
+            title: "Sisa Umur Simpan (Hari)",
+            dataIndex: "menuju_expired",
+            key: "menuju_expired",
+            render: (_, record) => {
+                const selisihHari = hitungSelisihHari(
+                    data?.created_at,
+                    record?.tanggal_expired,
+                );
+                return selisihHari;
+            },
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            render: (_, record) => {
+                const selisihHari = hitungSelisihHari(
+                    data?.created_at,
+                    record?.tanggal_expired,
+                );
+
+                if (selisihHari > 0) {
+                    return <Tag color="orange">Hampir Expired</Tag>;
+                }
+
+                return <Tag color="red">Expired</Tag>;
+            },
+        },
+    ];
+
     const dataTable = data?.items.map((item) => {
         return { ...item, key: item?.barang_id, name: item?.barang.name };
+    });
+
+    const dataRelatedExpired = data?.related_expired.map((item: any) => {
+        return { ...item, key: item?.barang_id, name: item?.barangs.name };
     });
 
     const handlePrint = async () => {
@@ -165,8 +240,14 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
                     items={descItems}
                 />
             </Card>
-            <Card>
+            <Card style={{ marginBottom: "1rem" }}>
                 <Table columns={columns} dataSource={dataTable} />
+            </Card>
+            <Card>
+                <Table
+                    columns={columnsExpired}
+                    dataSource={dataRelatedExpired}
+                />
             </Card>
         </RootLayout>
     );

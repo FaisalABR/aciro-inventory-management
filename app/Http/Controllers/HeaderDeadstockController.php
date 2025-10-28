@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\Barang\BarangException;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
+use App\Models\BarangMasukItem;
 use App\Models\DeadstockItem;
 use App\Models\HeaderDeadstock;
 use App\Models\Stock;
@@ -69,6 +70,8 @@ class HeaderDeadstockController extends Controller
     {
         $deadstock      = HeaderDeadstock::where('uuid', $uuid)->firstOrFail();
         $deadstockItems = DeadstockItem::where('header_deadstock_id', $deadstock->header_deadstock_id)->with(['barang'])->get();
+        $tanggalDibuatDeadstock = $deadstock->created_at;
+        $barangMendekatiExpired = BarangMasukItem::with('barangs')->whereBetween('tanggal_expired', [$tanggalDibuatDeadstock, $tanggalDibuatDeadstock->copy()->addDays((30))])->get();
 
         $data = [
             'id'                           => $deadstock->header_deadstock_id,
@@ -78,6 +81,7 @@ class HeaderDeadstockController extends Controller
             'periode_akhir'                => Carbon::parse($deadstock->periode_akhir)->format('d-m-Y'),
             'created_at' => Carbon::parse($deadstock->created_at)->format('d-m-Y H:i:s'),
             'items' => $deadstockItems,
+            'related_expired' => $barangMendekatiExpired,
         ];
 
         return Inertia::render('LaporanDeadstock/Detail', [

@@ -44,6 +44,8 @@ class BarangMasukService implements BarangMasukServiceInterface
                     'barang_id'       => $item['barang_id'],
                     'quantity'        => $item['quantity'],
                     'harga_beli'      => $item['harga_beli'],
+                    'nomor_batch'      => $item['nomor_batch'],
+                    'tanggal_expired'      => $item['tanggal_expired'],
                 ]);
             }
 

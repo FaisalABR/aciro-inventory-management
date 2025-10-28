@@ -139,7 +139,9 @@ export type TLaporanDeadstock = {
     nomor_referensi: string;
     periode_mulai: string;
     periode_akhir: string;
+    created_at: string;
     items: TITRItem[];
+    related_expired: any;
 };
 
 export type TITRItem = {
