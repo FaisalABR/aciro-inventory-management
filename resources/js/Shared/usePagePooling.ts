@@ -19,7 +19,6 @@ export default function usePagePolling({
 
     const startPolling = () => {
         if (intervalRef.current) return; // prevent double start
-        console.log("▶️ start polling");
 
         intervalRef.current = window.setInterval(() => {
             router.reload({ only });
@@ -30,7 +29,6 @@ export default function usePagePolling({
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
-            console.log("⏹️ stop polling");
         }
     };
 

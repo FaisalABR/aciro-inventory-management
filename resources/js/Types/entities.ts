@@ -72,6 +72,9 @@ export type TBarangMasuk = {
     supplier: string;
     catatan: string | null;
     items: TBarangMasukItem[];
+    verifikasi_kepala_toko: boolean;
+    verifikasi_kepala_gudang: boolean;
+    status: string;
 };
 
 export type TBarangKeluarItem = {
@@ -116,9 +119,11 @@ export type TPurchaseOrder = {
     kepala_pengadaan_menolak: boolean;
     catatan_penolakan: string;
     catatan_penolakan_supplier: string;
+    total_pembelian: number;
     status: string;
     items: TPurchaseOrderItem[];
     pembayaran: any;
+    dokumen_pengiriman: string;
 };
 
 export type TPurchaseOrderItem = {

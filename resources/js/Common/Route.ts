@@ -39,6 +39,7 @@ export enum Route {
     CreateBarangMasuk = "/barang-masuk/create",
     EditBarangMasuk = "/barang-masuk/edit/:uuid",
     DeleteBarangMasuk = "/barang-masuk/delete/:uuid",
+    VerifikasiBarangMasuk = "/barang-masuk/:uuid/approved",
 
     // Kelola User
     KelolaUser = "/kelola-user",
@@ -75,6 +76,7 @@ export enum Route {
     SampaiPurchaseOrder = "/purchase-orders/:uuid/arrived",
     TolakPurchaseOrder = "/purchase-orders/:uuid/reject",
     PembayaranPurchaseOrder = "/purchase-orders/:id/payments",
+    UploadDokumenPengirimanPO = "/purchase-orders/:uuid/docs-dispatch",
 
     // Kelola Laporan Deadstock
     LaporanDeadstock = "/laporan-deadstocks",

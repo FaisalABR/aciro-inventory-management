@@ -41,7 +41,7 @@ class BarangKeluarService implements BarangKeluarServiceInterface
                 DB::raw('(SELECT SUM(quantity) FROM barang_keluar_items WHERE barang_keluar_id = barang_keluars.barang_keluar_id) as total_quantity'),
             );
 
-            $formattedValue = $query->get()->map(function ($barangKeluar) {
+            $formattedValue = $query->orderBy('created_at', 'desc')->get()->map(function ($barangKeluar) {
                 return [
                     'id'                 => $barangKeluar->barang_keluar_id,
                     'uuid'               => $barangKeluar->uuid,

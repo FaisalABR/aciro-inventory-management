@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
+use App\Models\Barang;
+use App\Models\BarangMasuk;
+use App\Models\Stock;
 use App\Services\BarangMasukServiceInterface;
 use App\Services\BarangServiceInterface;
 use App\Services\SupplierServiceInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -110,5 +115,62 @@ class BarangMasukController extends Controller
 
             return redirect()->back()->with('error', 'Terjadi kesalahan server. Silakan coba lagi nanti.');
         }
+    }
+
+    public function verifikasi($uuid)
+    {
+        $barangMasuk = BarangMasuk::with('items')->where('uuid', $uuid)->first();
+
+        if (Auth::user()->hasRole('kepala_toko')) {
+            $barangMasuk->verifikasi_kepala_toko = true;
+        }
+
+        if (Auth::user()->hasRole('kepala_gudang')) {
+            $barangMasuk->verifikasi_kepala_gudang = true;
+        }
+
+        $barangMasuk->save();
+
+        // Refresh supaya nilai terbaru terbaca dari database
+        $barangMasuk->refresh();
+
+        if ($barangMasuk->verifikasi_kepala_gudang && $barangMasuk->verifikasi_kepala_toko) {
+            $barangMasuk->status = 'Disetujui';
+
+            DB::beginTransaction();
+
+            foreach ($barangMasuk->items as $item) {
+
+                $stockBarang = Stock::firstOrNew(['barang_id' => $item['barang_id']]);
+
+                if (! $stockBarang->exists) {
+                    $stockBarang->rop = 10;
+                }
+
+                $stockBarang->quantity += $item['quantity'];
+
+                $barangMaster = Barang::find($item['barang_id']);
+                if ($barangMaster) {
+                    $stockBarang->potensi_penjualan = $barangMaster->hargaJual * $item['quantity'];
+                }
+
+                if ($stockBarang->quantity == 0) {
+                    $stockBarang->status_rop = 'Out Of Stock';
+                } elseif ($stockBarang->quantity > $stockBarang->rop) {
+                    $stockBarang->status_rop = 'In Stock';
+                } else {
+                    $stockBarang->status_rop = 'Need Restock';
+                }
+
+                $stockBarang->save();
+            }
+            DB::commit();
+        } else {
+            $barangMasuk->status = 'Disetujui sebagian';
+        }
+
+        $barangMasuk->save();
+
+        return back()->with('success', 'Barang masuk berhasil disetujui');
     }
 }

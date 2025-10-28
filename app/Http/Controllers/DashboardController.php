@@ -20,13 +20,13 @@ class DashboardController extends Controller
         $totalBarangMasuk  = BarangMasukItem::sum('quantity');
         $totalBarangKeluar = BarangKeluarItem::sum('quantity');
         $totalPO           = PurchaseOrder::count();
-        $periodeMulai      = $request->input('periode_mulai')
+        $periodeMulai = $request->input('periode_mulai')
             ? Carbon::parse($request->input('periode_mulai'))->startOfDay()
-            : Carbon::now()->subMonth()->startOfDay(); // default 1 bulan lalu
+            : null;
 
         $periodeAkhir = $request->input('periode_akhir')
             ? Carbon::parse($request->input('periode_akhir'))->endOfDay()
-            : Carbon::now()->endOfDay(); // default hari ini
+            : null;
 
         // Ambil semua barang
         $barangs = Barang::all();
@@ -35,7 +35,9 @@ class DashboardController extends Controller
         $barangMasukGrafik = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
             $totalMasuk = BarangMasukItem::where('barang_id', $barang->barang_id)
                 ->whereHas('barangMasuk', function ($q) use ($periodeMulai, $periodeAkhir) {
-                    $q->whereBetween('tanggal_masuk', [$periodeMulai, $periodeAkhir]);
+                    if ($periodeMulai && $periodeAkhir) {
+                        $q->whereBetween('tanggal_masuk', [$periodeMulai, $periodeAkhir]);
+                    }
                 })
                 ->sum('quantity');
 
@@ -49,7 +51,9 @@ class DashboardController extends Controller
         $barangKeluarGrafik = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
             $totalMasuk = BarangKeluarItem::where('barang_id', $barang->barang_id)
                 ->whereHas('barangKeluar', function ($q) use ($periodeMulai, $periodeAkhir) {
-                    $q->whereBetween('tanggal_keluar', [$periodeMulai, $periodeAkhir]);
+                    if ($periodeMulai && $periodeAkhir) {
+                        $q->whereBetween('tanggal_keluar', [$periodeMulai, $periodeAkhir]);
+                    }
                 })
                 ->sum('quantity');
 
@@ -58,6 +62,67 @@ class DashboardController extends Controller
                 'value' => $totalMasuk,
             ];
         });
+
+        // Loop untuk hitung total barang masuk per barang
+        $barangMasuk = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
+            // Ambil semua item barang masuk untuk barang ini dalam periode
+            $items = BarangMasukItem::where('barang_id', $barang->barang_id)
+                ->with('barangMasuk')
+                ->whereHas('barangMasuk', function ($q) use ($periodeMulai, $periodeAkhir) {
+                    if ($periodeMulai && $periodeAkhir) {
+                        $q->whereBetween('tanggal_masuk', [$periodeMulai, $periodeAkhir]);
+                    }
+                })
+                ->get();
+
+            // Kelompokkan berdasarkan tanggal_masuk dari relasi barangMasuk
+            $groupedByDate = $items->groupBy(fn($item) => $item->barangMasuk->tanggal_masuk);
+
+            // Bentuk array rincian per tanggal
+            $rincianPerTanggal = $groupedByDate->map(function ($group, $tanggal) {
+                return [
+                    'tanggal' => $tanggal,
+                    'jumlah'  => $group->sum('quantity'),
+                ];
+            })->values();
+
+            return [
+                'nama'                => $barang->name,
+                'total_masuk'         => $items->sum('quantity'),
+                'rincian_per_tanggal' => $rincianPerTanggal,
+            ];
+        });
+
+        $barangKeluar = $barangs->map(function ($barang) use ($periodeMulai, $periodeAkhir) {
+            // Ambil semua item barang masuk untuk barang ini dalam periode
+            $items = BarangKeluarItem::where('barang_id', $barang->barang_id)
+                ->with('barangKeluar')
+                ->whereHas('barangKeluar', function ($q) use ($periodeMulai, $periodeAkhir) {
+                    if ($periodeMulai && $periodeAkhir) {
+                        $q->whereBetween('tanggal_keluar', [$periodeMulai, $periodeAkhir]);
+                    }
+                })
+                ->get();
+
+            // Kelompokkan berdasarkan tanggal_masuk dari relasi barangMasuk
+            $groupedByDate = $items->groupBy(fn($item) => $item->barangKeluar->tanggal_keluar);
+
+            // Bentuk array rincian per tanggal
+            $rincianPerTanggal = $groupedByDate->map(function ($group, $tanggal) {
+                return [
+                    'tanggal' => $tanggal,
+                    'jumlah'  => $group->sum('quantity'),
+                ];
+            })->values();
+
+            return [
+                'nama'                => $barang->name,
+                'total_keluar'         => $items->sum('quantity'),
+                'rincian_per_tanggal' => $rincianPerTanggal,
+            ];
+        });
+
+
 
         return Inertia::render('Dashboard', [
             'data' => [
@@ -93,6 +158,8 @@ class DashboardController extends Controller
                     'barangMasuk'  => $barangMasukGrafik,
                     'barangKeluar' => $barangKeluarGrafik,
                 ],
+                'barangMasuk' => $barangMasuk,
+                'barangKeluar' => $barangKeluar,
             ],
         ]);
     }

@@ -22,6 +22,8 @@ type TPurchaseOrderIndexProps = {
 
 const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
     usePagePolling({ interval: 5000, only: ["data"] });
+    const userRole = auth?.user?.roles?.[0];
+
     const handleDelete = (uuid: string, reference: string) => {
         return useModal({
             type: "confirm",
@@ -112,7 +114,7 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Link
+                        {/* <Link
                             href={
                                 record.status !== "DRAFT"
                                     ? "#"
@@ -124,19 +126,21 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
                             <Button disabled={record.status !== "DRAFT"}>
                                 <EditOutlined />
                             </Button>
-                        </Link>
-                        <Button
-                            onClick={() =>
-                                handleDelete(
-                                    record.uuid,
-                                    record.nomor_referensi,
-                                )
-                            }
-                            type="primary"
-                            danger
-                        >
-                            <DeleteOutlined />
-                        </Button>
+                        </Link> */}
+                        {userRole === "admin_sistem" && (
+                            <Button
+                                onClick={() =>
+                                    handleDelete(
+                                        record.uuid,
+                                        record.nomor_referensi,
+                                    )
+                                }
+                                type="primary"
+                                danger
+                            >
+                                <DeleteOutlined />
+                            </Button>
+                        )}
                         <Link
                             href={route(Route.PurchaseOrderDetail, {
                                 uuid: record.uuid,
@@ -152,31 +156,22 @@ const PurchaseIndex: React.FC<TPurchaseOrderIndexProps> = ({ data, auth }) => {
         },
     ];
 
-    const userRole = auth?.user?.roles?.[0];
-    const isStaffPengadaan = ["admin_pengadaan", "admin_sistem"].includes(
-        userRole,
-    );
-
-    const showActions = isStaffPengadaan
-        ? [
-              <Link href={Route.CreatePurchaseOrder}>
-                  <Button
-                      icon={<PlusSquareOutlined />}
-                      type="primary"
-                      size="large"
-                  >
-                      Tambah Purchase Order
-                  </Button>
-              </Link>,
-          ]
-        : [];
+    // const showActions = isStaffPengadaan
+    //     ? [
+    //           <Link href={Route.CreatePurchaseOrder}>
+    //               <Button
+    //                   icon={<PlusSquareOutlined />}
+    //                   type="primary"
+    //                   size="large"
+    //               >
+    //                   Tambah Purchase Order
+    //               </Button>
+    //           </Link>,
+    //       ]
+    //     : [];
 
     return (
-        <RootLayout
-            type="main"
-            title="Kelola Purchase Order"
-            actions={showActions}
-        >
+        <RootLayout type="main" title="Kelola Purchase Order" actions={[]}>
             <Table dataSource={data} columns={columns} />;
         </RootLayout>
     );

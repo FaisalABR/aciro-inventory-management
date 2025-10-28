@@ -1,7 +1,14 @@
 import RootLayout from "../../Layouts/RootLayout";
 import React from "react";
 import { TLaporanDeadstock } from "../../Types/entities";
-import { Button, Card, Descriptions, DescriptionsProps, Table } from "antd";
+import {
+    Button,
+    Card,
+    Descriptions,
+    DescriptionsProps,
+    Table,
+    Tag,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
 import { PrinterFilled } from "@ant-design/icons";
 import { TemplateDeadstockPDF } from "./TemplateDeadstockPDF";
@@ -69,6 +76,21 @@ const Detail: React.FC<TDetailLaporanDeadstockProps> = (props) => {
             title: "Status",
             dataIndex: "status",
             key: "status",
+            render: (_, record) => {
+                switch (record.status) {
+                    case "Slow Moving":
+                        return <Tag color="orange">{record.status}</Tag>;
+                    case "Deadstock":
+                        return <Tag color="red">{record.status}</Tag>;
+                    case "Fast Moving":
+                        return <Tag color="green">{record.status}</Tag>;
+                }
+            },
+        },
+        {
+            title: "Tindakan",
+            dataIndex: "tindakan",
+            key: "tindakan",
         },
     ];
 

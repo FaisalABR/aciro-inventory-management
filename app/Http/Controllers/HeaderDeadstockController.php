@@ -25,7 +25,7 @@ class HeaderDeadstockController extends Controller
             'periode_akhir',
         );
 
-        $formattedValue = $query->get()->map(function ($deadstock) {
+        $formattedValue = $query->orderBy('created_at', 'desc')->get()->map(function ($deadstock) {
             return [
                 'id'              => $deadstock->header_deadstock_id,
                 'uuid'            => $deadstock->uuid,
@@ -170,7 +170,7 @@ class HeaderDeadstockController extends Controller
             $stock->update([
                 'itr'            => $ITR,
                 'status_itr'     => $status,
-                'last_evaluated' => now()->format('d-m-Y'),
+                'last_evaluated' => now()->format('Y-m-d'),
             ]);
         }
 

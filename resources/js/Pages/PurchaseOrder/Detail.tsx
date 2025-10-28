@@ -10,8 +10,10 @@ import {
     DescriptionsProps,
     Flex,
     Form,
+    Image,
     Input,
     InputNumber,
+    message,
     Modal,
     QRCode as QRCodeAntd,
     Select,
@@ -23,9 +25,10 @@ import { ColumnsType } from "antd/es/table";
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
-    LoadingOutlined,
+    FilePdfOutlined,
     PrinterFilled,
     ProductOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
 import { useModal } from "../../Shared/hooks";
 import { router } from "@inertiajs/react";
@@ -39,6 +42,7 @@ import { createSchemaFieldRule } from "antd-zod";
 import { CreatePembayaranPOSchema } from "../../Shared/validation";
 import dayjs from "dayjs";
 import usePagePolling from "../../Shared/usePagePooling";
+import { formatRupiah } from "../../Shared/utils";
 
 type TDetailPurchaseOrderProps = {
     data: TPurchaseOrder;
@@ -49,11 +53,26 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
     usePagePolling({ interval: 5000, only: ["data"] });
     const { data } = props;
     const [qrData, setQrData] = useState<string>("");
-    const [fileList, setFileList] = useState<any>([]);
+    const [invoiceList, setInvoiceList] = useState<any>([]);
+    const [buktiList, setBuktiList] = useState<any>([]);
+    const [isVerifying, setIsVerifying] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const zodSync = createSchemaFieldRule(CreatePembayaranPOSchema);
     const [form] = Form.useForm();
     const pembayaran = props?.data?.pembayaran[0];
+    const userRole = props?.auth?.user?.roles?.[0];
+    const dokumenPengirimanURL = `/storage/${data?.dokumen_pengiriman}`;
+    const invoiceSupplier = `/storage/${pembayaran?.invoice_supplier}`;
+    const buktiPembayaran = `/storage/${pembayaran?.bukti_pembayaran}`;
+    const isDocsImage = /\.(jpg|jpeg|png|gif)$/i.test(dokumenPengirimanURL);
+    const totalKeseluruhan = props?.data?.items.reduce(
+        (sum: number, item: any) => sum + item.harga_beli * item.quantity,
+        0,
+    );
+
+    const checkIsImage = (link: string) => {
+        return /\.(jpg|jpeg|png|gif)$/i.test(link);
+    };
 
     const handleVerification = () => {
         // hitung total verifikator
@@ -83,6 +102,40 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                     route(Route.VerifikasiPurchaseOrder, {
                         uuid: data?.uuid,
                     }),
+                    {},
+                    {
+                        preserveScroll: true,
+                        preserveState: true,
+                        onStart: () => {
+                            setIsVerifying(true);
+                            message.loading({
+                                content:
+                                    "Sedang memverifikasi dan mengirim email...",
+                                key: "verifikasi",
+                                duration: 0, // biar loading message gak hilang
+                            });
+                        },
+                        onSuccess: () => {
+                            message.success({
+                                content:
+                                    "Berhasil diverifikasi dan email terkirim!",
+                                key: "verifikasi",
+                            });
+                            setIsVerifying(false);
+                        },
+                        onError: () => {
+                            message.error({
+                                content:
+                                    "Gagal melakukan verifikasi atau kirim email.",
+                                key: "verifikasi",
+                            });
+                            setIsVerifying(false);
+                        },
+                        onFinish: () => {
+                            setIsVerifying(false);
+                            message.destroy("verifikasi");
+                        },
+                    },
                 );
             },
         });
@@ -138,6 +191,88 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         });
     };
 
+    const handleUpload = (file: any) => {
+        Modal.confirm({
+            content:
+                "Apakah anda yakin ingin mengupload dokumen pengiriman ini? upload dokumen pengiriman mengubah status PO menjadi BARANG DIKIRIM",
+            okText: "Yakin",
+            cancelText: "Batal",
+            onOk: async () => {
+                const formData = new FormData();
+                console.log("file", file[0].originFileObj);
+                formData.append("dokumen_pengiriman", file[0].originFileObj);
+
+                setIsLoading(true);
+
+                router.post(
+                    route(Route.UploadDokumenPengirimanPO, { uuid: data.uuid }),
+                    formData,
+                    {
+                        forceFormData: true,
+                        onFinish: () => setIsLoading(false),
+                        onError: () =>
+                            message.error("Gagal mengupload dokumen."),
+                    },
+                );
+            },
+        });
+        // penting: return false agar AntD tidak upload otomatis
+        return false;
+    };
+
+    const handleKonfirmasiSupplier = () => {
+        return useModal({
+            type: "confirm",
+            content:
+                data?.status === "TERKIRIM"
+                    ? `Apakah anda yakin ingin konfirmasi ${data?.nomor_referensi}?`
+                    : `Apakah anda yakin ingin kirim ${data?.nomor_referensi}?`,
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: {
+                type: "primary",
+            },
+            onOk: () => {
+                router.put(
+                    route(Route.KonfirmasiPOSupplier, {
+                        uuid: data?.uuid,
+                    }),
+                );
+            },
+        });
+    };
+
+    const handleRejectSupplier = () => {
+        let reason = "";
+        return useModal({
+            type: "confirm",
+            content: (
+                <div>
+                    <p>Apakah anda yakin menolak {data?.nomor_referensi}?</p>
+                    <TextArea
+                        rows={3}
+                        style={{ marginTop: "1rem" }}
+                        placeholder="Masukkan alasan penolakan"
+                        onChange={(e) => (reason = e.target.value)} // simpan ke variabel
+                    />
+                </div>
+            ),
+            okText: "Yakin",
+            cancelText: "Batal",
+            okButtonProps: {
+                type: "primary",
+            },
+            onOk: () => {
+                router.put(
+                    route(Route.TolakPurchaseOrderSupplier, {
+                        uuid: data?.uuid,
+                    }),
+                    { reason },
+                );
+            },
+        });
+    };
+
     const descItems: DescriptionsProps["items"] = [
         {
             key: data?.uuid,
@@ -155,10 +290,41 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             children: data?.tanggal_order,
         },
         {
+            key: totalKeseluruhan,
+            label: "Total Pembelian",
+            children: formatRupiah(totalKeseluruhan),
+        },
+        {
             key: data?.status,
             label: "Status",
-            children: data?.status,
+            children: (() => {
+                switch (data?.status) {
+                    case "DRAFT":
+                        return <Tag color="grey">{data?.status}</Tag>;
+                    case "BUTUH VERIFIKASI":
+                        return <Tag color="orange">{data?.status}</Tag>;
+                    case "VERIFIKASI SEBAGIAN":
+                        return <Tag color="lime">{data?.status}</Tag>;
+                    case "TERVERIFIKASI":
+                        return <Tag color="green">{data?.status}</Tag>;
+                    case "TERKIRIM":
+                        return <Tag color="geekblue">{data?.status}</Tag>;
+                    case "KONFIRMASI SUPPLIER":
+                        return <Tag color="magenta">{data?.status}</Tag>;
+                    case "BARANG DIKIRIM":
+                        return <Tag color="gold">{data?.status}</Tag>;
+                    case "MENUNGGU PEMBAYARAN":
+                        return <Tag color="cyan">{data?.status}</Tag>;
+                    case "SUDAH DIBAYAR":
+                        return <Tag color="cyan">{data?.status}</Tag>;
+                    case "BARANG SAMPAI":
+                        return <Tag color="blue">{data?.status}</Tag>;
+                    default:
+                        return <Tag color="default">{data?.status ?? "-"}</Tag>;
+                }
+            })(),
         },
+
         {
             key: "verifikasi kepala toko" + data?.uuid,
             label: "Verifikasi Kepala Toko",
@@ -218,14 +384,63 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             children: data?.catatan_penolakan,
         },
         {
-            key: data?.catatan || "catatan",
+            key: data?.catatan_penolakan_supplier || "catatan",
             label: "Catatan Penolakan Supplier",
             children: data?.catatan_penolakan_supplier,
         },
         {
+            key: data?.uuid,
             label: "QR Code",
             children: <QRCodeAntd value={data?.uuid} />,
         },
+        ...(userRole === "admin_pengadaan"
+            ? [
+                  {
+                      key: data?.dokumen_pengiriman || "dokumen_pengiriman",
+                      label: "Dokumen Pengiriman",
+                      children: data?.dokumen_pengiriman ? (
+                          checkIsImage(dokumenPengirimanURL) ? (
+                              <Image
+                                  width={200}
+                                  src={dokumenPengirimanURL}
+                                  alt="Dokumen Pengiriman"
+                                  style={{
+                                      borderRadius: 8,
+                                      border: "1px solid #f0f0f0",
+                                      padding: 4,
+                                  }}
+                              />
+                          ) : (
+                              <Button
+                                  icon={<FilePdfOutlined />}
+                                  type="primary"
+                                  href={dokumenPengirimanURL}
+                                  target="_blank"
+                              >
+                                  Lihat File PDF
+                              </Button>
+                          )
+                      ) : (
+                          <Upload
+                              beforeUpload={() => false} // biar file tidak langsung upload otomatis
+                              onChange={({ fileList }) => {
+                                  console.log(fileList);
+                                  handleUpload(fileList);
+                              }}
+                              showUploadList={false}
+                              disabled={data?.status !== "SUDAH DIBAYAR"}
+                          >
+                              <Button
+                                  icon={<UploadOutlined />}
+                                  disabled={data?.status !== "SUDAH DIBAYAR"}
+                              >
+                                  Upload Dokumen Pengiriman
+                              </Button>
+                          </Upload>
+                      ),
+                  },
+              ]
+            : []),
     ];
 
     const columns: ColumnsType = [
@@ -251,32 +466,6 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
             setQrData(qr);
         };
         generateQR();
-    }, []);
-
-    useEffect(() => {
-        let interval: any;
-
-        const startPolling = () => {
-            console.log("Jalan");
-            interval = setInterval(() => {
-                router.reload({ only: ["data"] });
-            }, 5000);
-        };
-
-        const stopPolling = () => {
-            clearInterval(interval);
-        };
-
-        window.addEventListener("focus", startPolling);
-        window.addEventListener("blur", stopPolling);
-
-        startPolling();
-
-        return () => {
-            stopPolling();
-            window.removeEventListener("focus", startPolling);
-            window.removeEventListener("blur", stopPolling);
-        };
     }, []);
 
     const handlePrint = async () => {
@@ -321,7 +510,6 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
         }
     };
 
-    const userRole = props?.auth?.user?.roles?.[0];
     const disabledByRole =
         (userRole === "kepala_toko" && data?.verifikasi_kepala_toko) ||
         (userRole === "kepala_gudang" && data?.verifikasi_kepala_gudang) ||
@@ -362,10 +550,19 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                         }
                     });
 
-                    if (fileList.length > 0) {
+                    // tambahkan file invoice supplier (jika ada)
+                    if (invoiceList.length > 0) {
+                        formData.append(
+                            "invoice_supplier",
+                            invoiceList[0].originFileObj,
+                        );
+                    }
+
+                    // tambahkan bukti pembayaran (jika ada)
+                    if (buktiList.length > 0) {
                         formData.append(
                             "bukti_pembayaran",
-                            fileList[0].originFileObj,
+                            buktiList[0].originFileObj,
                         );
                     }
 
@@ -419,7 +616,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                           "TOLAK",
                           "TOLAK SUPPLIER",
                           "MENUNGGU PEMBAYARAN",
-                      ].some((item) => item === data?.status) || disabledByRole
+                      ].some((item) => item === data?.status) ||
+                      disabledByRole ||
+                      isVerifying
                   }
                   icon={<CheckCircleOutlined />}
                   onClick={handleVerification}
@@ -433,34 +632,77 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                   size="large"
                   icon={<CloseCircleOutlined />}
                   onClick={handleReject}
-                  disabled={isDisabled || disabledByRole}
+                  disabled={isDisabled || disabledByRole || isVerifying}
               >
                   Tolak
               </Button>,
           ]
-        : [
-              <Button
-                  type="default"
-                  size="large"
-                  icon={<PrinterFilled />}
-                  onClick={handlePrint}
-              >
-                  Print
-              </Button>,
-              data?.status === "BARANG DIKIRIM" && (
-                  <Button
-                      type="primary"
-                      size="large"
-                      icon={<ProductOutlined />}
-                      onClick={handleArrived}
-                      disabled={["BARANG SAMPAI"].some(
-                          (item) => item === data?.status,
-                      )}
-                  >
-                      Barang Sampai
-                  </Button>
-              ),
-          ];
+        : userRole === "admin_pengadaan"
+          ? [
+                <Button
+                    type="default"
+                    size="large"
+                    icon={<PrinterFilled />}
+                    onClick={handlePrint}
+                >
+                    Print
+                </Button>,
+                <Button
+                    type="primary"
+                    size="large"
+                    disabled={[
+                        "VERIFIKASI SEBAGIAN",
+                        "MENUNGGU PEMBAYARAN",
+                        "SUDAH DIBAYAR",
+                        "BARANG DIKIRIM",
+                        "BARANG SAMPAI",
+                    ].some((item) => item === data?.status)}
+                    icon={<CheckCircleOutlined />}
+                    onClick={handleKonfirmasiSupplier}
+                >
+                    Konfirmasi Supplier
+                </Button>,
+                <Button
+                    danger
+                    type="primary"
+                    size="large"
+                    icon={<CloseCircleOutlined />}
+                    onClick={handleRejectSupplier}
+                    disabled={[
+                        "VERIFIKASI SEBAGIAN",
+                        "KONFIRMASI SUPPLIER",
+                        "MENUNGGU PEMBAYARAN",
+                        "BARANG DIKIRIM",
+                        "BARANG SAMPAI",
+                        "SUDAH DIBAYAR",
+                    ].some((item) => item === data?.status)}
+                >
+                    Tolak Supplier
+                </Button>,
+                data?.status === "BARANG DIKIRIM" && (
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<ProductOutlined />}
+                        onClick={handleArrived}
+                        disabled={["BARANG SAMPAI"].some(
+                            (item) => item === data?.status,
+                        )}
+                    >
+                        Barang Sampai
+                    </Button>
+                ),
+            ]
+          : [
+                <Button
+                    type="default"
+                    size="large"
+                    icon={<PrinterFilled />}
+                    onClick={handlePrint}
+                >
+                    Print
+                </Button>,
+            ];
     return (
         <RootLayout
             type="main"
@@ -475,7 +717,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                     items={descItems}
                 />
             </Card>
-            {userRole === "staff_accounting" &&
+            {["staff_accounting", "admin_sistem"].some(
+                (item) => item === userRole,
+            ) &&
                 [
                     "MENUNGGU PEMBAYARAN",
                     "BARANG DIKIRIM",
@@ -504,6 +748,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                                   pembayaran?.tanggal_pembayaran,
                                               )
                                             : null,
+                                    jumlah:
+                                        pembayaran?.jumlah ||
+                                        data?.total_pembelian,
                                 }}
                                 layout="vertical"
                                 onFinish={onFinish}
@@ -558,15 +805,59 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                     <DatePicker disabled={afterPaymentStatus} />
                                 </Form.Item>
                                 <Form.Item
+                                    label="Invoice Supplier"
+                                    name="invoice_supplier"
+                                    rules={[zodSync]}
+                                >
+                                    <Upload
+                                        beforeUpload={() => false} // cegah upload otomatis
+                                        fileList={invoiceList}
+                                        onChange={({ fileList }) =>
+                                            setInvoiceList(fileList)
+                                        }
+                                        accept=".jpg,.png,.pdf"
+                                    >
+                                        <Button disabled={afterPaymentStatus}>
+                                            Upload Invoice Supplier
+                                        </Button>
+                                    </Upload>
+                                </Form.Item>
+                                {pembayaran?.invoice_supplier ? (
+                                    checkIsImage(
+                                        pembayaran.invoice_supplier,
+                                    ) ? (
+                                        <Image
+                                            width={200}
+                                            src={invoiceSupplier}
+                                            alt="Dokumen Pengiriman"
+                                            style={{
+                                                borderRadius: 8,
+                                                border: "1px solid #f0f0f0",
+                                                padding: 4,
+                                            }}
+                                        />
+                                    ) : (
+                                        <Button
+                                            icon={<FilePdfOutlined />}
+                                            type="primary"
+                                            href={invoiceSupplier}
+                                            target="_blank"
+                                        >
+                                            Lihat File PDF
+                                        </Button>
+                                    )
+                                ) : null}
+
+                                <Form.Item
                                     label="Bukti Pembayaran"
                                     name="bukti_pembayaran"
                                     rules={[zodSync]}
                                 >
                                     <Upload
                                         beforeUpload={() => false} // cegah upload otomatis
-                                        fileList={fileList}
+                                        fileList={buktiList}
                                         onChange={({ fileList }) =>
-                                            setFileList(fileList)
+                                            setBuktiList(fileList)
                                         }
                                         accept=".jpg,.png,.pdf"
                                     >
@@ -575,6 +866,32 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                         </Button>
                                     </Upload>
                                 </Form.Item>
+                                {pembayaran?.bukti_pembayaran ? (
+                                    checkIsImage(
+                                        pembayaran.bukti_pembayaran,
+                                    ) ? (
+                                        <Image
+                                            width={200}
+                                            src={buktiPembayaran}
+                                            alt="Dokumen Pengiriman"
+                                            style={{
+                                                borderRadius: 8,
+                                                border: "1px solid #f0f0f0",
+                                                padding: 4,
+                                            }}
+                                        />
+                                    ) : (
+                                        <Button
+                                            icon={<FilePdfOutlined />}
+                                            type="primary"
+                                            href={buktiPembayaran}
+                                            target="_blank"
+                                        >
+                                            Lihat File PDF
+                                        </Button>
+                                    )
+                                ) : null}
+
                                 <Form.Item
                                     label="Catatan"
                                     name="catatan"

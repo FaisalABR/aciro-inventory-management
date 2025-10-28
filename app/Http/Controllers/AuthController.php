@@ -37,7 +37,7 @@ class AuthController extends Controller
         ]);
 
         if ($this->authService->login($credentials)) {
-            return redirect('/')->with('success', 'Anda berhasil login');
+            return redirect('/barang-stock')->with('success', 'Anda berhasil login');
         }
 
         return back()->with(

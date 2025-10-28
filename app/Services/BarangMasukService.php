@@ -30,12 +30,12 @@ class BarangMasukService implements BarangMasukServiceInterface
         try {
             $totalBarangMasuk = BarangMasuk::count();
 
-            DB::beginTransaction();
             $barangMasuk = BarangMasuk::create([
                 'nomor_referensi' => sprintf('BM-%s-%04d', now()->format('Ymd'), $totalBarangMasuk + 1),
                 'tanggal_masuk'   => $data['tanggal_masuk'],
                 'supplier_id'     => $data['supplier_id'],
                 'catatan'         => $data['catatan'] ?? null,
+                'status'          => 'Menunggu Verifikasi'
             ]);
 
             foreach ($data['items'] as $item) {
@@ -45,39 +45,13 @@ class BarangMasukService implements BarangMasukServiceInterface
                     'quantity'        => $item['quantity'],
                     'harga_beli'      => $item['harga_beli'],
                 ]);
-
-                $stockBarang = Stock::firstOrNew(['barang_id' => $item['barang_id']]);
-
-                if (! $stockBarang->exists) {
-                    $stockBarang->rop = 10;
-                }
-
-                $stockBarang->quantity += $item['quantity'];
-
-                $barangMaster = Barang::find($item['barang_id']);
-                if ($barangMaster) {
-                    $stockBarang->potensi_penjualan = $barangMaster->hargaJual * $item['quantity'];
-                }
-
-                if ($stockBarang->quantity == 0) {
-                    $stockBarang->status_rop = 'Out Of Stock';
-                } elseif ($stockBarang->quantity > $stockBarang->rop) {
-                    $stockBarang->status_rop = 'In Stock';
-                } else {
-                    $stockBarang->status_rop = 'Need Restock';
-                }
-
-                $stockBarang->save();
             }
 
             $roles = Role::whereIn('name', ['kepala_gudang', 'kepala_toko'])->get();
             foreach ($roles as $role) {
                 // Send whatsapp ke kepala toko dan kepala gudang
-                event(new ROPNotification("Ada barang masuk dengan nomor referensi {$barangMasuk->nomor_referensi}", $role->name));
+                event(new ROPNotification("Ada barang masuk dengan nomor referensi {$barangMasuk->nomor_referensi} butuh verifikasi", $role->name));
             }
-            DB::commit();
-
-
 
             return $barangMasuk;
         } catch (\Exception $e) {
@@ -97,12 +71,13 @@ class BarangMasukService implements BarangMasukServiceInterface
                 'tanggal_masuk',
                 'supplier_id',
                 'catatan',
+                'status',
                 DB::raw('(SELECT COUNT(DISTINCT barang_id) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_unique_items'),
                 DB::raw('(SELECT SUM(quantity) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_quantity'),
                 DB::raw('(SELECT SUM(quantity * harga_beli) FROM barang_masuk_items WHERE barang_masuk_id = barang_masuks.barang_masuk_id) as total_harga')
             );
 
-            $formatted = $query->get()->map(function ($barangMasuk) {
+            $formatted = $query->orderBy('created_at', 'desc')->get()->map(function ($barangMasuk) {
                 return [
                     'id'                 => $barangMasuk->barang_masuk_id,
                     'uuid'               => $barangMasuk->uuid,
@@ -112,6 +87,7 @@ class BarangMasukService implements BarangMasukServiceInterface
                     'total_quantity'     => $barangMasuk->total_quantity,
                     'total_unique_items' => $barangMasuk->total_unique_items,
                     'total_harga'        => $barangMasuk->total_harga,
+                    'status'             => $barangMasuk->status,
                 ];
             });
 
@@ -136,6 +112,9 @@ class BarangMasukService implements BarangMasukServiceInterface
                 'supplier'        => $barangMasuk->supplier->name,
                 'catatan'         => $barangMasuk->catatan,
                 'items'           => $barangItems,
+                'verifikasi_kepala_toko' => $barangMasuk->verifikasi_kepala_toko,
+                'verifikasi_kepala_gudang' => $barangMasuk->verifikasi_kepala_gudang,
+                'status' => $barangMasuk->status,
             ];
 
             return $data;

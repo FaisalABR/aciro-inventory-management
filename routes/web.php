@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/home', function () {
-        return redirect('/');
+        return redirect('/barang-stock');
     });
 
     // Dashboard
@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/barang-masuk/{uuid}', [BarangMasukController::class, 'showDetail']);
     Route::post('/barang-masuk/create', [BarangMasukController::class, 'create']);
     Route::delete('/barang-masuk/delete/{uuid}', [BarangMasukController::class, 'destroy']);
+    Route::put('/barang-masuk/{uuid}/approved', [BarangMasukController::class, 'verifikasi']);
 
     // Kelola Permintaan Barang Keluar
     Route::get('/permintaan-barang-keluar', [BarangKeluarController::class, 'index'])->middleware('permission:view-permintaan-barang-keluar');
@@ -109,8 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/purchase-orders/{uuid}/reject', [PurchaseOrderController::class, 'tolak']);
     Route::delete('/purchase-orders/delete/{uuid}', [PurchaseOrderController::class, 'destroy']);
     Route::post('/purchase-orders/{id}/payments', [PembayaranPurchaseOrderController::class, 'create']);
+    Route::post('/purchase-orders/{uuid}/docs-dispatch', [PurchaseOrderController::class, 'saveDokumenPengiriman']);
     Route::put('/purchase-orders/{uuid}/arrived', [PurchaseOrderController::class, 'konfirmasiSampai']);
-
 
 
     // Kelola Laporan Deadstock

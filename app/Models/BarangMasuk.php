@@ -47,7 +47,7 @@ class BarangMasuk extends Model
 
     public function items()
     {
-        return $this->hasMany(BarangMasukItem::class, 'barang_masuk_item_id', 'barang_masuk_item_id');
+        return $this->hasMany(BarangMasukItem::class, 'barang_masuk_id', 'barang_masuk_id');
     }
 
     public function supplier()

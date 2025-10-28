@@ -161,6 +161,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 const barangPO = data?.items?.map((item: any) => ({
                     barang_id: item.barang_id,
                     quantity: item.quantity,
+                    harga_beli: Number(item.harga_beli),
                 }));
                 fetchBarangBySupplier(data?.supplier?.id);
                 form.setFieldValue("items", barangPO);
