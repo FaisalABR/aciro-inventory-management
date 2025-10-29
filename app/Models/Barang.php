@@ -84,6 +84,6 @@ class Barang extends Model
 
     public function stock()
     {
-        return $this->hasOne(Stock::class, 'stock_id', 'stock_id');
+        return $this->hasOne(Stock::class, 'barang_id', 'barang_id');
     }
 }
