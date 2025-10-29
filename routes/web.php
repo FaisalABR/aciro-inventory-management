@@ -6,6 +6,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HeaderDeadstockController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PembayaranPurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -49,6 +50,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kelola-user/edit/{uuid}', [UserController::class, 'showEdit']);
     Route::put('/kelola-user/edit/{uuid}', [UserController::class, 'update']);
     Route::delete('/kelola-user/delete/{uuid}', [UserController::class, 'destroy']);
+
+    // Kelola Master Kategori
+    Route::get('/master/kategori', [KategoriController::class, 'index'])->middleware('permission:view-master-satuan');
+    Route::get('/master/kategori/create', [KategoriController::class, 'showCreate']);
+    Route::post('/master/kategori/create', [KategoriController::class, 'create']);
+    Route::get('/master/kategori/edit/{uuid}', [KategoriController::class, 'showEdit']);
+    Route::put('/master/kategori/edit/{uuid}', [KategoriController::class, 'update']);
+    Route::delete('/master/kategori/delete/{uuid}', [KategoriController::class, 'destroy']);
 
     // Kelola Master Satuan
     Route::get('/master/satuan', [SatuanController::class, 'index'])->middleware('permission:view-master-satuan');
@@ -125,11 +134,5 @@ Route::middleware(['auth'])->group(function () {
     // Master Page
     Route::get('/master', function () {
         return redirect('/master/satuan');
-    });
-
-    Route::get('/master/kategori', function () {
-        return Inertia::render('Master/Kategori', [
-            'name' => 'Faisal',
-        ]);
     });
 });

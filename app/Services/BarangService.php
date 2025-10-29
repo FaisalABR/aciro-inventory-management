@@ -58,7 +58,7 @@ class BarangService implements BarangServiceInterface
     public function getAll($search = null, $perPage = 10)
     {
         try {
-            $data = Barang::with(['supplier', 'satuan'])->when($search, function ($query, $search) {
+            $data = Barang::with(['supplier', 'satuan', 'kategori'])->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
                 });

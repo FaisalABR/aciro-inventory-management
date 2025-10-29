@@ -83,7 +83,7 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
             nama: { alias: "Nama Barang" },
             value: { alias: "Jumlah Masuk" },
         },
-        color: "#1890ff", // warna batang
+        color: "#FF0000", // warna batang
     };
 
     const handleDownload = async () => {

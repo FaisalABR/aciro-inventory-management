@@ -51,6 +51,8 @@ export const CreateSatuanSchema = z.object({
         .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
 });
 
+export const CreateKategoriSchema = CreateSatuanSchema;
+
 export const CreateSupplierSchema = z.object({
     name: z
         .string({
@@ -99,6 +101,7 @@ export const CreateBarangSchema = z.object({
         .min(3, { message: "Nama minimal 3 karakter" }),
     supplier: z.string({ required_error: "Supplier harus diisi" }),
     satuan: z.string({ required_error: "Satuan harus diisi" }),
+    kategori: z.string({ required_error: "Kategori harus diisi" }),
     hargaJual: z
         .number({
             required_error: "Harga Jual wajib diisi",

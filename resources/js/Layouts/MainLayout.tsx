@@ -132,6 +132,11 @@ const items: MenuItem[] = [
                 permission: PERMISSIONS_VIEW_MASTER_SATUAN,
             },
             {
+                key: Route.MasterKategori,
+                label: <Link href={Route.MasterKategori}>Kelola Kategori</Link>,
+                permission: PERMISSIONS_VIEW_MASTER_SATUAN,
+            },
+            {
                 key: Route.MasterSupplier,
                 label: <Link href={Route.MasterSupplier}>Kelola Supplier</Link>,
                 permission: PERMISSIONS_VIEW_MASTER_SUPPLIER,

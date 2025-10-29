@@ -21,6 +21,13 @@ export type TSatuan = {
     description: string;
 };
 
+export type TKategori = {
+    uuid: string;
+    name: string;
+    code: string;
+    description: string;
+};
+
 export type TStock = {
     barang: TBarang;
     name: string;
@@ -36,9 +43,11 @@ export type TBarang = {
     uuid: string;
     name: string;
     satuan_id: number;
+    kategori_id: number;
     supplier_id: number;
     supplier: TSupplier;
     satuan: TSatuan;
+    kategori: TKategori;
     hargaJual: number;
     hargaBeli: number;
     maximal_quantity: number;

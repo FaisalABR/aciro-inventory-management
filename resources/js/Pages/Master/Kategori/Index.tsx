@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
 import RootLayout from "../../../Layouts/RootLayout";
+import usePagePolling from "../../../Shared/usePagePooling";
 import { route, Route } from "../../../Common/Route";
 import { Link, router } from "@inertiajs/react";
 import { Button, Input, Table } from "antd";
-import usePagePolling from "../../../Shared/usePagePooling";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -12,32 +12,30 @@ import {
     SearchOutlined,
 } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
-import { Paginate, TBarang } from "../../../Types/entities";
+import { Paginate, TKategori } from "../../../Types/entities";
 import { useModal } from "../../../Shared/hooks";
-import { formatRupiah } from "../../../Shared/utils";
 import { debounce } from "lodash";
 
-type TBarangIndexProps = {
-    data: Paginate<TBarang>;
+type TKategoriIndexProps = {
+    data: Paginate<TKategori>;
     filters: {
         search: string;
     };
 };
 
-const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
+const Kategori: React.FC<TKategoriIndexProps> = ({ data, filters }) => {
+    usePagePolling({ interval: 5000, only: ["data"] });
     const [search, setSearch] = useState(filters.search || "");
 
-    const debouncedSearch = useMemo(
+    const debounceSearch = useMemo(
         () =>
-            debounce(
-                (value: any) =>
-                    router.get(
-                        Route.MasterBarang,
-                        { search: value, page: 1 },
-                        { preserveState: true },
-                    ),
-                500,
-            ),
+            debounce((value: any) => {
+                router.get(
+                    Route.MasterKategori,
+                    { search: value, page: 1 },
+                    { preserveState: true },
+                );
+            }, 500),
         [],
     );
 
@@ -45,18 +43,18 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
         const value = e.target.value;
 
         setSearch(value);
-        debouncedSearch(value);
+        debounceSearch(value);
     };
 
     const handleChangePage = (page: any, pageSize: any) => {
         router.get(
-            Route.MasterBarang,
+            Route.MasterKategori,
             { search, page, per_page: pageSize },
             { preserveState: true },
         );
     };
 
-    const handleDeleteBarang = (uuid: string, name: string) => {
+    const handleDeleteKategori = (uuid: string, name: string) => {
         return useModal({
             type: "confirm",
             content: (
@@ -72,7 +70,7 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
             },
             onOk: () => {
                 router.delete(
-                    route(Route.DeleteMasterBarang, {
+                    route(Route.DeleteMasterKategori, {
                         uuid,
                     }),
                 );
@@ -87,44 +85,14 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
             key: "name",
         },
         {
-            title: "Supplier",
-            dataIndex: "supplier",
-            key: "supplier",
-            render: (_, record) => {
-                return <span>{record.supplier.name}</span>;
-            },
+            title: "Kode",
+            dataIndex: "code",
+            key: "code",
         },
         {
-            title: "Satuan",
-            dataIndex: "satuan",
-            key: "satuan",
-            render: (_, record) => {
-                return <span>{record.satuan.name}</span>;
-            },
-        },
-        {
-            title: "Kategori",
-            dataIndex: "kategori",
-            key: "kategori",
-            render: (_, record) => {
-                return <span>{record.kategori.name}</span>;
-            },
-        },
-        {
-            title: "Harga Jual",
-            dataIndex: "hargaJual",
-            key: "hargaJual",
-            render: (_, record) => {
-                return formatRupiah(record.hargaJual);
-            },
-        },
-        {
-            title: "Harga Beli",
-            dataIndex: "hargaBeli",
-            key: "hargaBeli",
-            render: (_, record) => {
-                return formatRupiah(record.hargaBeli);
-            },
+            title: "Deskripsi",
+            dataIndex: "description",
+            key: "description",
         },
         {
             title: "Actions",
@@ -134,7 +102,7 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
                         <Link
-                            href={route(Route.EditMasterBarang, {
+                            href={route(Route.EditMasterKategori, {
                                 uuid: record.uuid,
                             })}
                         >
@@ -144,45 +112,35 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
                         </Link>
                         <Button
                             onClick={() =>
-                                handleDeleteBarang(record.uuid, record.name)
+                                handleDeleteKategori(record.uuid, record.name)
                             }
                             type="primary"
                             danger
                         >
                             <DeleteOutlined />
                         </Button>
-                        <Link
-                            href={route(Route.MasterBarangDetail, {
-                                uuid: record.uuid,
-                            })}
-                        >
-                            <Button>
-                                <EyeOutlined />
-                            </Button>
-                        </Link>
                     </div>
                 );
             },
         },
     ];
 
-    usePagePolling({ interval: 5000, only: ["data"] });
-    const barangData = data?.data?.map((item) => {
+    const kategoriData = data?.data?.map((item) => {
         return { ...item, key: item?.uuid };
     });
 
     return (
         <RootLayout
             type="main"
-            title="Kelola Barang"
+            title="Kelola Kategori"
             actions={[
-                <Link href={Route.CreateMasterBarang}>
+                <Link href={Route.CreateMasterKategori}>
                     <Button
                         icon={<PlusSquareOutlined />}
                         type="primary"
                         size="large"
                     >
-                        Tambah Barang
+                        Tambah Kategori
                     </Button>
                 </Link>,
             ]}
@@ -190,13 +148,13 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
             <Input
                 size="large"
                 prefix={<SearchOutlined />}
-                placeholder="Cari Barang berdasarkan nama"
+                placeholder="Cari kategori berdasarkan nama"
                 style={{ marginBottom: "1rem" }}
                 value={search}
                 onChange={handleSearch}
             />
             <Table
-                dataSource={barangData}
+                dataSource={kategoriData ? kategoriData : []}
                 columns={columns}
                 pagination={{
                     current: data.current_page,
@@ -211,4 +169,4 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
     );
 };
 
-export default Barang;
+export default Kategori;

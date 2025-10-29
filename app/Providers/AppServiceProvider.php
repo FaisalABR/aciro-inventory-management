@@ -10,6 +10,8 @@ use App\Services\BarangMasukService;
 use App\Services\BarangMasukServiceInterface;
 use App\Services\BarangService;
 use App\Services\BarangServiceInterface;
+use App\Services\KategoriService;
+use App\Services\KategoriServiceInterface;
 use App\Services\SatuanService;
 use App\Services\SatuanServiceInterface;
 use App\Services\SupplierService;
@@ -35,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             UserServiceInterface::class,
             UserService::class,
+        );
+        $this->app->bind(
+            KategoriServiceInterface::class,
+            KategoriService::class,
         );
         $this->app->bind(
             SatuanServiceInterface::class,

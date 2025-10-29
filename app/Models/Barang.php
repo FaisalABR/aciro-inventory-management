@@ -48,6 +48,7 @@ class Barang extends Model
         'name',
         'supplier_id',
         'satuan_id',
+        'kategori_id',
         'hargaJual',
         'hargaBeli',
         'maximal_quantity',
@@ -64,6 +65,11 @@ class Barang extends Model
     public function satuan()
     {
         return $this->belongsTo(Satuan::class, 'satuan_id', 'satuan_id');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id', 'kategori_id');
     }
 
     public function barangMasukItems()
