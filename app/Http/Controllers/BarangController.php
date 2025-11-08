@@ -94,12 +94,12 @@ class BarangController extends Controller
                 'name'        => 'required',
                 'supplier_id' => 'required',
                 'satuan_id'   => 'required',
+                'kategori_id' => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
                 'maximal_quantity' => 'required',
                 'rata_rata_permintaan_harian' => 'required',
                 'leadtime' => 'required',
-                'safety_stock' => 'required',
             ]);
 
             $this->barangService->create($validated);
@@ -139,12 +139,12 @@ class BarangController extends Controller
                 'name'        => 'required',
                 'supplier_id' => 'required',
                 'satuan_id'   => 'required',
+                'kategori_id' => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
                 'maximal_quantity' => 'required',
                 'rata_rata_permintaan_harian' => 'required',
                 'leadtime' => 'required',
-                'safety_stock' => 'required',
             ]);
 
             $result = $this->barangService->update($validated, $uuid);

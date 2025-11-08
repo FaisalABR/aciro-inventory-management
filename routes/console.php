@@ -12,4 +12,7 @@ Schedule::command('inventory:check-expired')
     ->dailyAt('08:00') // Jadwal yang diinginkan
     ->onOneServer();
 
+// Schedule::command('inventory:check-expired')
+//     ->everyMinute();
+
 // routes/console.php

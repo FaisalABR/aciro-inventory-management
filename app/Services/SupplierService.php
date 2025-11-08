@@ -39,7 +39,7 @@ class SupplierService implements SupplierServiceInterface
             $query->where('name', 'ILIKE', "%{$search}%")->orWhere('contactPerson', 'ILIKE', "%{$search}%");
         }
 
-        return $query->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     public function get($uuid)

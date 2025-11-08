@@ -33,11 +33,11 @@ class BarangService implements BarangServiceInterface
         }
 
         try {
+            $zScore = 1.65;
+            $safetyStock = ceil($zScore * $data['rata_rata_permintaan_harian'] * sqrt($data['leadtime']));
             $barang = Barang::create($data);
 
-            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $barang->safety_stock;
-
-
+            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $safetyStock;
 
             Stock::create([
                 'barang_id' => $barang->barang_id,
@@ -58,7 +58,7 @@ class BarangService implements BarangServiceInterface
     public function getAll($search = null, $perPage = 10)
     {
         try {
-            $data = Barang::with(['supplier', 'satuan', 'kategori'])->when($search, function ($query, $search) {
+            $data = Barang::with(['supplier', 'satuan', 'kategori'])->orderBy('created_at', 'desc')->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
                 });
@@ -89,10 +89,11 @@ class BarangService implements BarangServiceInterface
 
         try {
             $barang = Barang::where('uuid', $uuid)->first();
-
+            $zScore = 1.65;
+            $safetyStock = ceil($zScore * $data['rata_rata_permintaan_harian'] * sqrt($data['leadtime']));
             $barang->update($data);
             $barang->refresh();
-            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $barang->safety_stock;
+            $rop = ($barang->rata_rata_permintaan_harian * $barang->leadtime) + $safetyStock;
 
             $stock = Stock::where('barang_id', $barang->barang_id)->first();
 

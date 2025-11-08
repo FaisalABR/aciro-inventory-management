@@ -163,19 +163,6 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                                 }}
                             />
                         </Form.Item>
-                        <Form.Item
-                            rules={[zodSync]}
-                            name="safety_stock"
-                            label="Safety Stock"
-                        >
-                            <InputNumber
-                                min={1}
-                                placeholder="10"
-                                style={{
-                                    width: "100%",
-                                }}
-                            />
-                        </Form.Item>
 
                         <Flex gap="small">
                             <Button

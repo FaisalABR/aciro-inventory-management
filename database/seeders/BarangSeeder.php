@@ -21,6 +21,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 200000.00,
                 'hargaBeli'        => 150000.00,
                 'maximal_quantity' => 200,
+                'rata_rata_permintaan_harian' => 4,
+                'leadtime' => 3,
             ],
             [
                 'name'             => 'Beras Ramos 5kg',
@@ -30,6 +32,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 75000.00,
                 'hargaBeli'        => 68000.00,
                 'maximal_quantity' => 300,
+                'rata_rata_permintaan_harian' => 10,
+                'leadtime' => 4,
             ],
             [
                 'name'             => 'Gula Pasir 1kg',
@@ -39,6 +43,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 15000.00,
                 'hargaBeli'        => 13000.00,
                 'maximal_quantity' => 210,
+                'rata_rata_permintaan_harian' => 24,
+                'leadtime' => 2,
             ],
             [
                 'name'             => 'Minyak Goreng Bimoli 2L',
@@ -48,6 +54,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 45000.00,
                 'hargaBeli'        => 42000.00,
                 'maximal_quantity' => 400,
+                'rata_rata_permintaan_harian' => 10,
+                'leadtime' => 4,
             ],
             [
                 'name'             => 'Susu Ultra 1L',
@@ -57,6 +65,9 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 18000.00,
                 'hargaBeli'        => 16000.00,
                 'maximal_quantity' => 220,
+                'rata_rata_permintaan_harian' => 20,
+                'leadtime' => 3,
+
             ],
             [
                 'name'             => 'Kopi Kapal Api 380g',
@@ -66,6 +77,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 35000.00,
                 'hargaBeli'        => 31000.00,
                 'maximal_quantity' => 270,
+                'rata_rata_permintaan_harian' => 10,
+                'leadtime' => 5,
             ],
             [
                 'name'             => 'Teh Sosro Botol 1L',
@@ -75,6 +88,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 12000.00,
                 'hargaBeli'        => 10000.00,
                 'maximal_quantity' => 280,
+                'rata_rata_permintaan_harian' => 24,
+                'leadtime' => 2,
             ],
             [
                 'name'             => 'Sabun Lifebuoy 100g',
@@ -84,6 +99,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 8000.00,
                 'hargaBeli'        => 6000.00,
                 'maximal_quantity' => 100,
+                'rata_rata_permintaan_harian' => 10,
+                'leadtime' => 4,
             ],
             [
                 'name'             => 'Shampoo Sunsilk 170ml',
@@ -93,6 +110,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 25000.00,
                 'hargaBeli'        => 22000.00,
                 'maximal_quantity' => 420,
+                'rata_rata_permintaan_harian' => 4,
+                'leadtime' => 2,
             ],
             [
                 'name'             => 'Detergen Rinso 2kg',
@@ -102,6 +121,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 38000.00,
                 'hargaBeli'        => 34000.00,
                 'maximal_quantity' => 230,
+                'rata_rata_permintaan_harian' => 10,
+                'leadtime' => 3,
             ],
             [
                 'name'             => 'Tepung Terigu Segitiga Biru 1kg',
@@ -111,6 +132,8 @@ class BarangSeeder extends Seeder
                 'hargaJual'        => 13000.00,
                 'hargaBeli'        => 11000.00,
                 'maximal_quantity' => 225,
+                'rata_rata_permintaan_harian' => 12,
+                'leadtime' => 3,
             ],
         ];
 

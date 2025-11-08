@@ -61,6 +61,12 @@ class UserSeeder extends Seeder
                 'noWhatsapp' => '085511155566',
                 'password'   => Hash::make('pengadaan123'),
             ],
+            [
+                'name'       => 'Rudiger',
+                'email'      => 'accounting@mail.com',
+                'noWhatsapp' => '085511155566',
+                'password'   => Hash::make('accounting123'),
+            ],
         ];
 
         foreach ($users as $user) {

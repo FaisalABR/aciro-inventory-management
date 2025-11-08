@@ -127,11 +127,6 @@ export const CreateBarangSchema = z.object({
             required_error: "Lead time wajib diisi",
         })
         .min(0, { message: "Lead time tidak boleh 0" }),
-    safety_stock: z
-        .number({
-            required_error: "Safety stock wajib diisi",
-        })
-        .min(0, { message: "Safety stock tidak boleh 0" }),
 });
 
 export const CreateBarangMasukSchema = z.object({
