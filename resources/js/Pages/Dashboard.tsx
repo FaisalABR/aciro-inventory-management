@@ -24,12 +24,12 @@ type TDashboardProps = {
 const Home: React.FC<TDashboardProps> = ({ data }) => {
     const [dateRange, setDateRange] = React.useState<[any, any] | null>(null);
 
-    console.log("dateRange", dateRange);
-
     const barangMasuk = data?.graph?.barangMasuk.map((item: any) => ({
         nama: item.nama,
         value: Number(item.value), // pastikan number
     }));
+
+    console.log("barangMasuk", barangMasuk);
 
     const barangKeluar = data?.graph?.barangKeluar.map((item: any) => ({
         nama: item.nama,
@@ -40,50 +40,14 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
         data: barangMasuk,
         xField: "nama", // sumbu X menampilkan nama barang
         yField: "value", // sumbu Y menampilkan jumlah masuk
-        label: {
-            position: "middle",
-            style: {
-                fill: "#FFFFFF",
-                opacity: 0.6,
-            },
-        },
-        tooltip: {
-            showMarkers: true,
-            formatter: (datum: any) => ({
-                name: datum.nama,
-                value: datum.value,
-            }),
-        },
-        meta: {
-            nama: { alias: "Nama Barang" },
-            value: { alias: "Jumlah Masuk" },
-        },
-        color: "#1890ff", // warna batang
+        colorField: "#1890ff", // warna batang
     };
 
     const barangKeluarConfig = {
         data: barangKeluar,
         xField: "nama", // sumbu X menampilkan nama barang
         yField: "value", // sumbu Y menampilkan jumlah masuk
-        label: {
-            position: "middle",
-            style: {
-                fill: "#FFFFFF",
-                opacity: 0.6,
-            },
-        },
-        tooltip: {
-            showMarkers: true,
-            formatter: (datum: any) => ({
-                name: datum.nama,
-                value: datum.value,
-            }),
-        },
-        meta: {
-            nama: { alias: "Nama Barang" },
-            value: { alias: "Jumlah Masuk" },
-        },
-        color: "#FF0000", // warna batang
+        colorField: "#FF0000", // warna batang
     };
 
     const handleDownload = async () => {
