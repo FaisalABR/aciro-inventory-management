@@ -12,6 +12,10 @@ services:
         value: production
       - key: APP_DEBUG
         value: "false"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        value: aciro-db
 
   - type: worker
     name: aciro-project-worker
