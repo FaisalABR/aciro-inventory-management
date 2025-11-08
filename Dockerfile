@@ -11,7 +11,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts --no-progress
 COPY . .
-RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress --no-scripts
 
 FROM php:8.3-fpm-alpine
 RUN apk add --no-cache nginx supervisor bash git icu-dev libzip-dev oniguruma-dev postgresql-dev \ 
