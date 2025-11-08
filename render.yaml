@@ -5,7 +5,7 @@ services:
     repo: https://github.com/FaisalABR/aciro-inventory-management
     branch: skripsi-version
     dockerfilePath: ./Dockerfile
-    region: oregon
+    region: singapore
     plan: free
     envVars:
       - key: APP_ENV
@@ -40,7 +40,7 @@ cron_jobs:
 
 databases:
   - name: aciro-db
-    region: oregon
+    region: singapore
     plan: free
     postgresVersion: 15
 
@@ -48,4 +48,4 @@ addons:
   - type: redis
     name: my-redis
     plan: free
-    region: oregon
+    region: singapore
