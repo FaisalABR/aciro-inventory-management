@@ -43,7 +43,7 @@ class UserRoleSeeder extends Seeder
                 'user_id' => 'USR0000006',
                 'role_id' => 6,
             ],
-            // Thomas disign ke staff pengadaan
+            // Thomas disign ke admin pengadaan
             [
                 'user_id' => 'USR0000007',
                 'role_id' => 7,
@@ -52,6 +52,11 @@ class UserRoleSeeder extends Seeder
             [
                 'user_id' => 'USR0000008',
                 'role_id' => 8,
+            ],
+            // Rudiger disign ke staff accounting
+            [
+                'user_id' => 'USR0000009',
+                'role_id' => 9,
             ],
         ];
 

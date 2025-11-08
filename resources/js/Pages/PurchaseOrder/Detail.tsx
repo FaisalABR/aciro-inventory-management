@@ -42,7 +42,7 @@ import { createSchemaFieldRule } from "antd-zod";
 import { CreatePembayaranPOSchema } from "../../Shared/validation";
 import dayjs from "dayjs";
 import usePagePolling from "../../Shared/usePagePooling";
-import { formatRupiah } from "../../Shared/utils";
+import { formatRupiah, parser } from "../../Shared/utils";
 
 type TDetailPurchaseOrderProps = {
     data: TPurchaseOrder;
@@ -792,7 +792,9 @@ const Detail: React.FC<TDetailPurchaseOrderProps> = (props) => {
                                     name="jumlah"
                                     rules={[zodSync]}
                                 >
-                                    <InputNumber
+                                    <InputNumber<number>
+                                        formatter={formatRupiah}
+                                        parser={parser}
                                         disabled={afterPaymentStatus}
                                         style={{ width: "100%" }}
                                     />

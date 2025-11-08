@@ -50,8 +50,13 @@ class RoleSeeder extends Seeder
             ],
             // id 8
             [
-                'name'        => 'staff_pengadaan',
-                'description' => 'Staff Pengadaan',
+                'name'        => 'admin_pengadaan',
+                'description' => 'Admin Pengadaan',
+            ],
+            //id 9
+            [
+                'name'        => 'staff_accounting',
+                'description' => 'Staff Accounting',
             ],
         ];
 

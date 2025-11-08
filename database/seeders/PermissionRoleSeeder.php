@@ -185,10 +185,6 @@ class PermissionRoleSeeder extends Seeder
             // role_id 6 memiliki permission_id 1 dan 5
             [
                 'role_id'       => 6,
-                'permission_id' => 1,
-            ],
-            [
-                'role_id'       => 6,
                 'permission_id' => 2,
             ],
             [
@@ -206,10 +202,6 @@ class PermissionRoleSeeder extends Seeder
             // role_id 7 memiliki permission_id 1 dan 5
             [
                 'role_id'       => 7,
-                'permission_id' => 1,
-            ],
-            [
-                'role_id'       => 7,
                 'permission_id' => 5,
             ],
             [
@@ -217,10 +209,7 @@ class PermissionRoleSeeder extends Seeder
                 'permission_id' => 13,
             ],
             // role staff pengadaan, lihat dashboard, stock barang, dan kelola purchase order
-            [
-                'role_id'       => 8,
-                'permission_id' => 1,
-            ],
+
             [
                 'role_id'       => 8,
                 'permission_id' => 5,
@@ -228,7 +217,19 @@ class PermissionRoleSeeder extends Seeder
             [
                 'role_id' => 8,
                 'permission_id' => 4,
+            ],
+            // role staff pengadaan, lihat dashboard, stock barang, dan kelola purchase order
+
+            [
+                'role_id'       => 9,
+                'permission_id' => 5,
+            ],
+            [
+                'role_id' => 9,
+                'permission_id' => 4,
             ]
+
+
 
         ];
 

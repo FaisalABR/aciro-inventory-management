@@ -318,7 +318,7 @@ class BarangKeluarController extends Controller
                     PurchaseOrderItem::create([
                         'purchase_order_id' => $po->purchase_order_id,
                         'barang_id'         => $item->barang_id,
-                        'quantity'          => $item->barangs->maximal_quantity - $stock->rop ?? 0,
+                        'quantity'          => $item->barangs->maximal_quantity,
                         'harga_beli'        => $item->barangs->hargaBeli,
                     ]);
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));

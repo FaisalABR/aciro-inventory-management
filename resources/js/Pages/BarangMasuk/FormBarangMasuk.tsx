@@ -26,6 +26,7 @@ import { CreateBarangMasukSchema } from "../../Shared/validation";
 import { TBarang } from "../../Types/entities";
 import { BaseOptionType } from "antd/es/select";
 import QrReader from "react-qr-reader-es6";
+import { formatRupiah, parser } from "../../Shared/utils";
 
 type TFormBarangMasukProps = {
     isUpdate: boolean;
@@ -302,12 +303,10 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                 ]}
                                                 rules={[zodSync]}
                                             >
-                                                <InputNumber
-                                                    min={1}
-                                                    placeholder="10"
-                                                    style={{
-                                                        width: "100%",
-                                                    }}
+                                                <InputNumber<number>
+                                                    formatter={formatRupiah}
+                                                    parser={parser}
+                                                    style={{ width: "100%" }}
                                                 />
                                             </Form.Item>
                                             <Form.Item
