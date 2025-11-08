@@ -15,7 +15,7 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interacti
 
 FROM php:8.3-fpm-alpine
 RUN apk add --no-cache nginx supervisor bash git icu-dev libzip-dev oniguruma-dev postgresql-dev \ 
-    && docker-php-ext-install pdo pdo_pgsql zip intl bcmath opcache
+    && docker-php-ext-install pdo pdo_pgsql zip intl bcmath opcache pcntl
 
 COPY --from=php_builder /app /var/www/html
 COPY --from=node_builder /app/public/build /var/wwww/html/public/build
