@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY resources resources
-COPY vite.config.js ./
+COPY vite.config.ts ./
 RUN npm run build
 
 FROM composer:2.7 AS php_builder
