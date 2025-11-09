@@ -1,0 +1,10 @@
+{
+    "build": {
+        "builder": "DOCKERFILE"
+    },
+    "deploy": {
+        "startCommand": "/usr/bin/supervisord -c /etc/supervisord.conf",
+        "healthcheckPath": "/",
+        "port": 80
+    }
+}
