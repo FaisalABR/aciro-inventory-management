@@ -10,10 +10,12 @@ ARG VITE_REVERB_HOST
 ARG VITE_REVERB_PORT  
 ARG VITE_REVERB_SCHEME             
 # Install dependencies & build
-COPY package*.json ./
+
+COPY . .
+# COPY package*.json ./
 RUN npm ci
-COPY resources resources
-COPY vite.config.ts ./
+# COPY resources resources
+# COPY vite.config.ts ./
 
 RUN npm run build
 
