@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm ci
 COPY resources resources
 COPY vite.config.ts ./
-RUN npm run build
+# RUN npm run build
 
 # ======================
 # 2️⃣ Build Backend (Laravel)
