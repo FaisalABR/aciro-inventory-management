@@ -38,6 +38,8 @@ const echoOptions = {
     },
 };
 
+console.log("VITE_REVERB_APP_KEY:", import.meta.env.VITE_REVERB_APP_KEY);
+
 window.Echo = new Echo(echoOptions);
 
 // Add connection event listeners for debugging
