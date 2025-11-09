@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/health', function () {
+    return response('OK', 200);
+});
 // Auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/login', [AuthController::class, 'index'])->name('login');

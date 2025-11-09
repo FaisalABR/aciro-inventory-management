@@ -4,7 +4,7 @@
     },
     "deploy": {
         "startCommand": "/usr/bin/supervisord -c /etc/supervisord.conf",
-        "healthcheckPath": "/",
+        "healthcheckPath": "/health",
         "port": 80
     }
 }
