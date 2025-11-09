@@ -19,4 +19,13 @@ export default defineConfig({
         "import.meta.env": {},
         "import.meta.glob": {},
     },
+    build: {
+        manifest: true,
+        outDir: "public/build",
+        rollupOptions: {
+            output: {
+                manualChunks: undefined, // ✅ Disable code splitting if issues persist
+            },
+        },
+    },
 });
