@@ -60,16 +60,14 @@ console.log("VITE_REVERB_APP_KEY:", import.meta.env.VITE_REVERB_APP_KEY);
 window.Echo = new Echo(echoOptions);
 
 // Add connection event listeners for debugging
-if (window.Echo.connector && window.Echo.connector.pusher) {
-    window.Echo.connector.pusher.connection.bind("connected", () => {
-        console.log("✅ Reverb connected successfully");
-    });
+window.Echo.connector.connection.bind("connected", () => {
+    console.log("✅ Reverb connected successfully");
+});
 
-    window.Echo.connector.pusher.connection.bind("error", (err) => {
-        console.error("❌ Reverb connection error:", err);
-    });
+window.Echo.connector.connection.bind("error", (err) => {
+    console.error("❌ Reverb connection error:", err);
+});
 
-    window.Echo.connector.pusher.connection.bind("state_change", (states) => {
-        console.log("🔄 Reverb state change:", states);
-    });
-}
+window.Echo.connector.connection.bind("state_change", (states) => {
+    console.log("🔄 Reverb state change:", states);
+});

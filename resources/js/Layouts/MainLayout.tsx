@@ -240,27 +240,27 @@ export const MainLayout: React.FC<TMainLayout> = ({
         };
     }, [auth.user]);
 
-    useEffect(() => {
-        if (window.Echo && window.Echo.connector?.pusher?.connection) {
-            console.log(
-                "Echo config auth",
-                window.Echo.connector.pusher.config.auth,
-            );
-            console.log("Echo instance:", window.Echo);
-            console.log(
-                "State:",
-                window.Echo.connector.pusher.connection.state,
-            );
+    // useEffect(() => {
+    //     if (window.Echo && window.Echo.connector?.pusher?.connection) {
+    //         console.log(
+    //             "Echo config auth",
+    //             window.Echo.connector.pusher.config.auth,
+    //         );
+    //         console.log("Echo instance:", window.Echo);
+    //         console.log(
+    //             "State:",
+    //             window.Echo.connector.pusher.connection.state,
+    //         );
 
-            window.Echo.connector.pusher.connection.bind("connected", () => {
-                console.log("Connected ke Soketi!");
-            });
+    //         window.Echo.connector.pusher.connection.bind("connected", () => {
+    //             console.log("Connected ke Soketi!");
+    //         });
 
-            window.Echo.connector.pusher.connection.bind("error", (err) => {
-                console.error("Error koneksi:", err);
-            });
-        }
-    }, []);
+    //         window.Echo.connector.pusher.connection.bind("error", (err) => {
+    //             console.error("Error koneksi:", err);
+    //         });
+    //     }
+    // }, []);
 
     const defaultOpenedKey = useMemo(
         () =>
