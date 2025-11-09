@@ -17,7 +17,6 @@ RUN apk add --no-cache nginx supervisor bash git icu-dev libzip-dev oniguruma-de
     && docker-php-ext-install pdo pdo_pgsql zip intl bcmath opcache pcntl
 
 COPY --from=php_builder /app /var/www/html
-COPY --from=node_builder /app/public/build /var/www/html/public/build
 
 WORKDIR /var/www/html
 
