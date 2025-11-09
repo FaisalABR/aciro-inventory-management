@@ -4,7 +4,6 @@ COPY package*.json ./
 RUN npm ci
 COPY resources resources
 COPY vite.config.ts ./
-RUN npm run build
 
 FROM composer:2.7 AS php_builder
 WORKDIR /app
@@ -30,4 +29,6 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
