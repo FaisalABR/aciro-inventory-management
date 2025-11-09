@@ -4,13 +4,18 @@
 FROM node:18-alpine AS node_builder
 WORKDIR /app
 
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_PORT  
+ARG VITE_REVERB_SCHEME             
 # Install dependencies & build
 COPY package*.json ./
 RUN npm ci
 COPY resources resources
-COPY public public
 COPY vite.config.ts ./
-# RUN npm run build
+
+RUN npm run build
 
 # ======================
 # 2️⃣ Build Backend (Laravel)
