@@ -36,6 +36,10 @@ return [
     */
 
     'mailers' => [
+        'sendgrid' => [
+            'transport' => 'sendgrid',
+            'key' => env('SENDGRID_API_KEY'), // Mengambil Kunci API dari ENV
+        ],
 
         'smtp' => [
             'transport'    => 'smtp',
@@ -94,6 +98,8 @@ return [
                 'postmark',
             ],
         ],
+
+
 
     ],
 
