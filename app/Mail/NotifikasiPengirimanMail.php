@@ -11,10 +11,11 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Sichikawa\LaravelSendgridDriver\SendGrid;
 
 class NotifikasiPengirimanMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, SendGrid;
 
     public $po;
 

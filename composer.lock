@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8175e3851005e1aa2be9d804e0eeeb77",
+    "content-hash": "c140d1ef53e435ae306f531785de732c",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -4713,6 +4713,76 @@
             "time": "2024-06-11T12:45:25+00:00"
         },
         {
+            "name": "s-ichikawa/laravel-sendgrid-driver",
+            "version": "4.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/s-ichikawa/laravel-sendgrid-driver.git",
+                "reference": "710ea735fb545c6615a06b2e94a13bb32d282569"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/s-ichikawa/laravel-sendgrid-driver/zipball/710ea735fb545c6615a06b2e94a13bb32d282569",
+                "reference": "710ea735fb545c6615a06b2e94a13bb32d282569",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.2",
+                "illuminate/mail": "^9.0||^10.0||^11.0||^12.0",
+                "illuminate/notifications": "^9.0||^10.0||^11.0||^12.0",
+                "illuminate/support": "^9.0||^10.0||^11.0||^12.0"
+            },
+            "require-dev": {
+                "illuminate/container": "^9.0||^10.0||^11.0||^12.0",
+                "illuminate/filesystem": "^9.0||^10.0||^11.0||^12.0",
+                "laravel/helpers": "^1.2",
+                "phpunit/phpunit": "^9.5.8||^10.0",
+                "vlucas/phpdotenv": "^5.4.1"
+            },
+            "suggest": {
+                "s-ichikawa/sendgrid-api-builder": "support to build json for sendgrid api"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sichikawa\\LaravelSendgridDriver\\SendgridTransportServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sichikawa\\LaravelSendgridDriver\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "shingo.ichikawa",
+                    "email": "ichikawa.shingo.0829@gmail.com"
+                }
+            ],
+            "description": "This library adds a 'sendgrid' mail driver to Laravel.",
+            "keywords": [
+                "laravel",
+                "sendgrid"
+            ],
+            "support": {
+                "issues": "https://github.com/s-ichikawa/laravel-sendgrid-driver/issues",
+                "source": "https://github.com/s-ichikawa/laravel-sendgrid-driver/tree/4.0.10"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/s-ichikawa",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-07-22T04:55:15+00:00"
+        },
+        {
             "name": "sabberworm/php-css-parser",
             "version": "v8.9.0",
             "source": {
@@ -6764,81 +6834,6 @@
                 }
             ],
             "time": "2025-11-05T07:57:47+00:00"
-        },
-        {
-            "name": "symfony/sendgrid-mailer",
-            "version": "v7.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/sendgrid-mailer.git",
-                "reference": "2c22a2a421fa9e9b335036abe7a519d72b2e8d76"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/sendgrid-mailer/zipball/2c22a2a421fa9e9b335036abe7a519d72b2e8d76",
-                "reference": "2c22a2a421fa9e9b335036abe7a519d72b2e8d76",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "symfony/mailer": "^7.2"
-            },
-            "conflict": {
-                "symfony/http-foundation": "<6.4",
-                "symfony/mime": "<6.4",
-                "symfony/webhook": "<7.2"
-            },
-            "require-dev": {
-                "symfony/http-client": "^6.4|^7.0",
-                "symfony/webhook": "^7.2"
-            },
-            "type": "symfony-mailer-bridge",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Mailer\\Bridge\\Sendgrid\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Sendgrid Mailer Bridge",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/sendgrid-mailer/tree/v7.3.2"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-07-10T08:29:33+00:00"
         },
         {
             "name": "symfony/service-contracts",
