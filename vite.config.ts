@@ -15,8 +15,8 @@ export default defineConfig({
             },
         }),
     ],
-    define: {
-        "import.meta.env": {},
-        "import.meta.glob": {},
-    },
+    // define: {
+    //     "import.meta.env": {},
+    //     "import.meta.glob": {},
+    // },
 });

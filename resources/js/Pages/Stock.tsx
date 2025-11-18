@@ -1,5 +1,9 @@
-import { Flex, Input, Select, Table, Tag } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Flex, Input, Select, Table, Tabs, Tag } from "antd";
+import {
+    GroupOutlined,
+    SearchOutlined,
+    TableOutlined,
+} from "@ant-design/icons";
 import RootLayout from "../Layouts/RootLayout";
 import React, { useMemo, useState } from "react";
 import usePagePolling from "../Shared/usePagePooling";
@@ -12,7 +16,7 @@ import { Route } from "../Common/Route";
 import { debounce } from "lodash";
 
 type TStockIndexProps = {
-    data: Paginate<TStock>;
+    data: { per_barang: Paginate<TStock>; aggregate_kategori: any };
     filters: {
         search: string;
         statusROP: string;
@@ -25,6 +29,7 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
     const [search, setSearch] = useState(filters.search || "");
     const [statusROP, setStatusROP] = useState(filters.statusROP);
     const [statusITR, setStatusITR] = useState(filters.statusITR || "");
+    const [currentTab, setCurrentTab] = useState("detail");
 
     const columns: ColumnsType = [
         {
@@ -95,9 +100,15 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
         },
     ];
 
-    const stockData = data?.data?.map((item, idx) => {
+    const stockData = data?.per_barang?.data?.map((item, idx) => {
         return { ...item, key: idx };
     });
+
+    // --- Logika Pergantian Tab ---
+    const handleTabChange = (key: string) => {
+        // Atur state tab dan navigasi ke route yang benar untuk memuat data baru
+        setCurrentTab(key as "detail" | "agregat");
+    };
 
     const debounceSearch = useMemo(
         () =>
@@ -135,6 +146,73 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
             { preserveState: true },
         );
     };
+
+    const tabItems = [
+        {
+            key: "detail",
+            label: (
+                <span className="flex items-center">
+                    <TableOutlined /> Detail Item
+                </span>
+            ),
+            children: <Table dataSource={stockData} columns={columns} />,
+        },
+        {
+            key: "agregat",
+            label: (
+                <span className="flex items-center">
+                    <GroupOutlined /> Aggreagat Kategori
+                </span>
+            ),
+            children: (
+                <Table
+                    dataSource={data.aggregate_kategori}
+                    columns={[
+                        {
+                            title: "Nama",
+                            dataIndex: "name",
+                            key: "name",
+                        },
+                        {
+                            title: "Total",
+                            dataIndex: "total",
+                            key: "total",
+                            render: (_, record: any) => {
+                                const totalBarangPerKategori =
+                                    record?.barang?.reduce(
+                                        (acc: any, currVal: any) => {
+                                            return acc + currVal.stock.quantity;
+                                        },
+                                        0,
+                                    );
+                                return totalBarangPerKategori;
+                            },
+                        },
+                    ]}
+                    rowKey="uuid"
+                    expandable={{
+                        expandedRowRender: (record) => {
+                            const aggregateData = record?.barang?.map(
+                                (item: any, idx: number) => {
+                                    return {
+                                        ...item.stock,
+                                        key: idx,
+                                        barangs: { name: item.name },
+                                    };
+                                },
+                            );
+                            return (
+                                <Table
+                                    dataSource={aggregateData}
+                                    columns={columns}
+                                />
+                            );
+                        },
+                    }}
+                />
+            ),
+        },
+    ];
 
     return (
         <RootLayout type="main" title="Stock Barang">
@@ -191,7 +269,12 @@ const Stock: React.FC<TStockIndexProps> = ({ data, filters }) => {
                     onChange={handleSearch}
                 />
             </Flex>
-            <Table dataSource={stockData} columns={columns} />;
+            <Tabs
+                defaultActiveKey={currentTab}
+                activeKey={currentTab}
+                onChange={handleTabChange}
+                items={tabItems}
+            />
         </RootLayout>
     );
 };

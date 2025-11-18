@@ -40,7 +40,7 @@ class SatuanService implements SatuanServiceInterface
             $query->where('name', 'ILIKE', "%{$search}%"); // PostgreSQL case-insensitive
         }
 
-        return $query->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     public function get($uuid)

@@ -10,6 +10,8 @@ use App\Services\BarangMasukService;
 use App\Services\BarangMasukServiceInterface;
 use App\Services\BarangService;
 use App\Services\BarangServiceInterface;
+use App\Services\KategoriService;
+use App\Services\KategoriServiceInterface;
 use App\Services\SatuanService;
 use App\Services\SatuanServiceInterface;
 use App\Services\SupplierService;
@@ -18,6 +20,7 @@ use App\Services\UserService;
 use App\Services\UserServiceInterface;
 use App\Services\WhatsappService;
 use App\Services\WhatsappServiceInterface;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             UserServiceInterface::class,
             UserService::class,
+        );
+        $this->app->bind(
+            KategoriServiceInterface::class,
+            KategoriService::class,
         );
         $this->app->bind(
             SatuanServiceInterface::class,
@@ -68,6 +75,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // 1. Tambahkan pengecekan lingkungan (opsional tapi disarankan)
+        if (config('app.env') !== 'local') {
+            // 2. Beri tahu Laravel untuk selalu menghasilkan URL dengan HTTPS
+            URL::forceScheme('https');
+
+            // 3. (Opsional tapi direkomendasikan jika menggunakan load balancer)
+            // Atau, gunakan trusted proxies untuk mendeteksi skema HTTPS:
+            // \Illuminate\Support\Facades\Request::server('HTTP_X_FORWARDED_PROTO') == 'https'
+        }
     }
 }

@@ -16,6 +16,7 @@ type TFormBarangProps = {
     data: TBarang;
     optionSatuan: BaseOptionType[];
     optionSupplier: BaseOptionType[];
+    optionKategori: BaseOptionType[];
 };
 
 const FormBarang: React.FC<TFormBarangProps> = (props) => {
@@ -62,6 +63,7 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                             ...props.data,
                             name: props.data?.name,
                             satuan_id: props.data?.satuan_id,
+                            kategori_id: props.data?.kategori_id,
                             supplier_id: props.data?.supplier_id,
                             hargaBeli: props.data?.hargaBeli,
                             hargaJual: props.data?.hargaJual,
@@ -92,6 +94,13 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                             label="Satuan"
                         >
                             <Select options={props.optionSatuan} />
+                        </Form.Item>
+                        <Form.Item
+                            rules={[zodSync]}
+                            name="kategori_id"
+                            label="Kategori"
+                        >
+                            <Select options={props.optionKategori} />
                         </Form.Item>
                         <Form.Item
                             rules={[zodSync]}
@@ -145,19 +154,6 @@ const FormBarang: React.FC<TFormBarangProps> = (props) => {
                             rules={[zodSync]}
                             name="leadtime"
                             label="Lead Time"
-                        >
-                            <InputNumber
-                                min={1}
-                                placeholder="10"
-                                style={{
-                                    width: "100%",
-                                }}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            rules={[zodSync]}
-                            name="safety_stock"
-                            label="Safety Stock"
                         >
                             <InputNumber
                                 min={1}

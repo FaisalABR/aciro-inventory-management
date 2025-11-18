@@ -21,6 +21,13 @@ export type TSatuan = {
     description: string;
 };
 
+export type TKategori = {
+    uuid: string;
+    name: string;
+    code: string;
+    description: string;
+};
+
 export type TStock = {
     barang: TBarang;
     name: string;
@@ -36,9 +43,11 @@ export type TBarang = {
     uuid: string;
     name: string;
     satuan_id: number;
+    kategori_id: number;
     supplier_id: number;
     supplier: TSupplier;
     satuan: TSatuan;
+    kategori: TKategori;
     hargaJual: number;
     hargaBeli: number;
     maximal_quantity: number;
@@ -72,6 +81,9 @@ export type TBarangMasuk = {
     supplier: string;
     catatan: string | null;
     items: TBarangMasukItem[];
+    verifikasi_kepala_toko: boolean;
+    verifikasi_kepala_gudang: boolean;
+    status: string;
 };
 
 export type TBarangKeluarItem = {
@@ -116,9 +128,11 @@ export type TPurchaseOrder = {
     kepala_pengadaan_menolak: boolean;
     catatan_penolakan: string;
     catatan_penolakan_supplier: string;
+    total_pembelian: number;
     status: string;
     items: TPurchaseOrderItem[];
     pembayaran: any;
+    dokumen_pengiriman: string;
 };
 
 export type TPurchaseOrderItem = {
@@ -134,7 +148,9 @@ export type TLaporanDeadstock = {
     nomor_referensi: string;
     periode_mulai: string;
     periode_akhir: string;
+    created_at: string;
     items: TITRItem[];
+    related_expired: any;
 };
 
 export type TITRItem = {

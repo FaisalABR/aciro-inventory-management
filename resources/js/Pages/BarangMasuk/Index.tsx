@@ -2,7 +2,7 @@ import React from "react";
 import RootLayout from "../../Layouts/RootLayout";
 import { Link, router } from "@inertiajs/react";
 import { route, Route } from "../../Common/Route";
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
 import usePagePolling from "../../Shared/usePagePooling";
 import {
     DeleteOutlined,
@@ -59,6 +59,25 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
             key: "supplier_name",
         },
         {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (_, record) => {
+                switch (record.status) {
+                    case "Disetujui":
+                        return <Tag color="green">{record.status}</Tag>;
+                    case "Disetujui sebagian":
+                        return <Tag color="lime">{record.status}</Tag>;
+                    case "Menunggu Verifikasi":
+                        return <Tag color="orange">{record.status}</Tag>;
+                    case "Dieksekusi":
+                        return <Tag color="blue">{record.status}</Tag>;
+                    default:
+                        return <Tag color="grey">{record.status}</Tag>;
+                }
+            },
+        },
+        {
             title: "Jumlah Item Unik",
             dataIndex: "total_unique_items",
             key: "total_unique_items",
@@ -83,18 +102,20 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Button
-                            onClick={() =>
-                                handleDelete(
-                                    record.uuid,
-                                    record.nomor_referensi,
-                                )
-                            }
-                            type="primary"
-                            danger
-                        >
-                            <DeleteOutlined />
-                        </Button>
+                        {userRole === "admin_sistem" && (
+                            <Button
+                                onClick={() =>
+                                    handleDelete(
+                                        record.uuid,
+                                        record.nomor_referensi,
+                                    )
+                                }
+                                type="primary"
+                                danger
+                            >
+                                <DeleteOutlined />
+                            </Button>
+                        )}
                         <Link
                             href={route(Route.BarangMasukDetail, {
                                 uuid: record.uuid,
@@ -133,11 +154,7 @@ const BarangMasuk: React.FC<TBarangIndexProps> = (props) => {
         : [];
 
     return (
-        <RootLayout
-            type="main"
-            title="Kelola Barang Masuk"
-            actions={showActions}
-        >
+        <RootLayout type="main" title="Barang Masuk" actions={showActions}>
             <Table dataSource={formattedData} columns={columns} />
         </RootLayout>
     );

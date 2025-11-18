@@ -6,6 +6,7 @@ use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HeaderDeadstockController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PembayaranPurchaseOrderController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -17,6 +18,9 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/health', function () {
+    return response('OK', 200);
+});
 // Auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/login', [AuthController::class, 'index'])->name('login');
@@ -36,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/home', function () {
-        return redirect('/');
+        return redirect('/barang-stock');
     });
 
     // Dashboard
@@ -49,6 +53,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kelola-user/edit/{uuid}', [UserController::class, 'showEdit']);
     Route::put('/kelola-user/edit/{uuid}', [UserController::class, 'update']);
     Route::delete('/kelola-user/delete/{uuid}', [UserController::class, 'destroy']);
+
+    // Kelola Master Kategori
+    Route::get('/master/kategori', [KategoriController::class, 'index'])->middleware('permission:view-master-satuan');
+    Route::get('/master/kategori/create', [KategoriController::class, 'showCreate']);
+    Route::post('/master/kategori/create', [KategoriController::class, 'create']);
+    Route::get('/master/kategori/edit/{uuid}', [KategoriController::class, 'showEdit']);
+    Route::put('/master/kategori/edit/{uuid}', [KategoriController::class, 'update']);
+    Route::delete('/master/kategori/delete/{uuid}', [KategoriController::class, 'destroy']);
 
     // Kelola Master Satuan
     Route::get('/master/satuan', [SatuanController::class, 'index'])->middleware('permission:view-master-satuan');
@@ -81,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/barang-masuk/{uuid}', [BarangMasukController::class, 'showDetail']);
     Route::post('/barang-masuk/create', [BarangMasukController::class, 'create']);
     Route::delete('/barang-masuk/delete/{uuid}', [BarangMasukController::class, 'destroy']);
+    Route::put('/barang-masuk/{uuid}/approved', [BarangMasukController::class, 'verifikasi']);
 
     // Kelola Permintaan Barang Keluar
     Route::get('/permintaan-barang-keluar', [BarangKeluarController::class, 'index'])->middleware('permission:view-permintaan-barang-keluar');
@@ -109,8 +122,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/purchase-orders/{uuid}/reject', [PurchaseOrderController::class, 'tolak']);
     Route::delete('/purchase-orders/delete/{uuid}', [PurchaseOrderController::class, 'destroy']);
     Route::post('/purchase-orders/{id}/payments', [PembayaranPurchaseOrderController::class, 'create']);
+    Route::post('/purchase-orders/{uuid}/docs-dispatch', [PurchaseOrderController::class, 'saveDokumenPengiriman']);
     Route::put('/purchase-orders/{uuid}/arrived', [PurchaseOrderController::class, 'konfirmasiSampai']);
-
 
 
     // Kelola Laporan Deadstock
@@ -124,11 +137,5 @@ Route::middleware(['auth'])->group(function () {
     // Master Page
     Route::get('/master', function () {
         return redirect('/master/satuan');
-    });
-
-    Route::get('/master/kategori', function () {
-        return Inertia::render('Master/Kategori', [
-            'name' => 'Faisal',
-        ]);
     });
 });

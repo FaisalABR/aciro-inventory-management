@@ -57,9 +57,15 @@ class UserSeeder extends Seeder
             ],
             [
                 'name'       => 'Andreas',
-                'email'      => 'staffpengadaan@mail.com',
+                'email'      => 'adminpengadaan@mail.com',
                 'noWhatsapp' => '085511155566',
                 'password'   => Hash::make('pengadaan123'),
+            ],
+            [
+                'name'       => 'Rudiger',
+                'email'      => 'accounting@mail.com',
+                'noWhatsapp' => '085511155566',
+                'password'   => Hash::make('accounting123'),
             ],
         ];
 

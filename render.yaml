@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: aciro-project
+    env: docker
+    repo: https://github.com/FaisalABR/aciro-inventory-management
+    branch: skripsi-version
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        value: aciro-db
+
+  - type: worker
+    name: aciro-project-worker
+    env: docker
+    repo: https://github.com/FaisalABR/aciro-inventory-management
+    branch: skripsi-version
+    dockerfilePath: ./Dockerfile
+    startCommand: php artisan queue:work --sleep=3 --tries=3 --queue=default
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+
+cron_jobs:
+  - name: laravel-scheduler
+    schedule: "*/5 * * * *" # contoh tiap 5 menit; sesuaikan
+    command: php artisan schedule:run
+    repo: https://github.com/FaisalABR/aciro-inventory-management
+    branch: skripsi-version
+    env: docker
+    dockerfilePath: ./Dockerfile
+
+databases:
+  - name: aciro-db
+    region: singapore
+    plan: free
+    postgresVersion: 15
+
+addons:
+  - type: redis
+    name: my-redis
+    plan: free
+    region: singapore

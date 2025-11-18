@@ -26,6 +26,7 @@ import { CreateBarangMasukSchema } from "../../Shared/validation";
 import { TBarang } from "../../Types/entities";
 import { BaseOptionType } from "antd/es/select";
 import QrReader from "react-qr-reader-es6";
+import { formatRupiah, parser } from "../../Shared/utils";
 
 type TFormBarangMasukProps = {
     isUpdate: boolean;
@@ -161,6 +162,7 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                 const barangPO = data?.items?.map((item: any) => ({
                     barang_id: item.barang_id,
                     quantity: item.quantity,
+                    harga_beli: Number(item.harga_beli),
                 }));
                 fetchBarangBySupplier(data?.supplier?.id);
                 form.setFieldValue("items", barangPO);
@@ -301,13 +303,31 @@ const FormBarangMasuk: React.FC<TFormBarangMasukProps> = (props) => {
                                                 ]}
                                                 rules={[zodSync]}
                                             >
-                                                <InputNumber
-                                                    min={1}
-                                                    placeholder="10"
-                                                    style={{
-                                                        width: "100%",
-                                                    }}
+                                                <InputNumber<number>
+                                                    formatter={formatRupiah}
+                                                    parser={parser}
+                                                    style={{ width: "100%" }}
                                                 />
+                                            </Form.Item>
+                                            <Form.Item
+                                                label="Nomor Batch"
+                                                name={[
+                                                    field.name,
+                                                    "nomor_batch",
+                                                ]}
+                                                rules={[zodSync]}
+                                            >
+                                                <Input placeholder="AX21321" />
+                                            </Form.Item>
+                                            <Form.Item
+                                                label="Tanggal Expired"
+                                                name={[
+                                                    field.name,
+                                                    "tanggal_expired",
+                                                ]}
+                                                rules={[zodSync]}
+                                            >
+                                                <DatePicker />
                                             </Form.Item>
                                         </Card>
                                     ))}

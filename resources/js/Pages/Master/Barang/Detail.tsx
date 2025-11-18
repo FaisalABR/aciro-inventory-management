@@ -59,9 +59,13 @@ const Detail: React.FC<TBDetailBarangProps> = (props) => {
             children: data?.leadtime,
         },
         {
-            key: data?.safety_stock || "N/A",
+            key: data?.leadtime + 1 || "N/A",
             label: "Safety Stock",
-            children: data?.safety_stock,
+            children: Math.ceil(
+                1.65 *
+                    data?.rata_rata_permintaan_harian *
+                    Math.sqrt(data?.leadtime),
+            ),
         },
     ];
 

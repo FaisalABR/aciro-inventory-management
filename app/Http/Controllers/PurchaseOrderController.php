@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\ROPNotification;
 use App\Exceptions\Barang\BarangException;
 use App\Jobs\SendWhatsappJob;
+use App\Mail\NotifikasiPengirimanMail;
 use App\Models\PembayaranPurchaseOrder;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class PurchaseOrderController extends Controller
@@ -39,9 +41,10 @@ class PurchaseOrderController extends Controller
             'status',
             DB::raw('(SELECT COUNT (DISTINCT barang_id) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.purchase_order_id) as total_unique_items'),
             DB::raw('(SELECT SUM(quantity) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.purchase_order_id) as total_quantity'),
+            DB::raw('(SELECT SUM(quantity * harga_beli) FROM purchase_order_items WHERE purchase_order_id = purchase_orders.purchase_order_id) as total_pembelian')
         );
 
-        $formattedValue = $query->get()->map(function ($purchaseOrder) {
+        $formattedValue = $query->orderBy('created_at', 'desc')->get()->map(function ($purchaseOrder) {
             return [
                 'id'                 => $purchaseOrder->purchase_order_id,
                 'uuid'               => $purchaseOrder->uuid,
@@ -50,6 +53,7 @@ class PurchaseOrderController extends Controller
                 'total_quantity'     => $purchaseOrder->total_quantity,
                 'total_unique_items' => $purchaseOrder->total_unique_items,
                 'status'             => $purchaseOrder->status,
+                'total_pembelian'   => $purchaseOrder->total_pembelian,
                 'supplier'           => [
                     'id'   => $purchaseOrder->supplier->supplier_id,
                     'name' => $purchaseOrder->supplier->name,
@@ -103,6 +107,9 @@ class PurchaseOrderController extends Controller
         $po      = PurchaseOrder::where('uuid', $uuid)->with('supplier')->firstOrFail();
         $poItems = PurchaseOrderItem::where('purchase_order_id', $po->purchase_order_id)->with('barang')->get();
         $pembayaranPO = PembayaranPurchaseOrder::where('purchase_order_id', $po->purchase_order_id)->get();
+        $totalPembelian = $poItems->sum(function ($item) {
+            return $item->harga_beli * ($item->quantity ?? 1);
+        });
 
         $data = [
             'id'                           => $po->purchase_order_id,
@@ -123,6 +130,8 @@ class PurchaseOrderController extends Controller
             'catatan_penolakan_supplier' => $po->catatan_penolakan_supplier,
             'tanggal_sampai' => $po->tanggal_sampai,
             'pembayaran'                   => $pembayaranPO,
+            'dokumen_pengiriman' => $po->dokumen_pengiriman,
+            'total_pembelian' => $totalPembelian,
             'supplier'                     => [
                 'id'   => $po->supplier->supplier_id,
                 'name' => $po->supplier->name,
@@ -233,7 +242,7 @@ class PurchaseOrderController extends Controller
         return redirect('/purchase-orders')->with('success', 'PO berhasil diperbarui!');
     }
 
-    public function verifikasi(Request $request, $uuid)
+    public function verifikasi($uuid)
     {
         $PO = PurchaseOrder::with('supplier')->where('uuid', $uuid)->first();
 
@@ -279,7 +288,26 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
                 SendWhatsappJob::dispatch($PO->supplier->noWhatsapp, $text);
                 $PO->status = 'TERKIRIM';
-                event(new ROPNotification("Purchase Order dengan nomor {$PO->nomor_referensi} sudah diverifikasi dan sudah terkirim!", 'staff_pengadaan'));
+                // Kirim email ke supplier
+                // kirim email synchronous tapi aman
+                try {
+                    if ($PO->supplier && $PO->supplier->email) {
+                        Mail::to($PO->supplier->email)->send(new NotifikasiPengirimanMail($PO));
+                    }
+                    $emailSuccess = true;
+                } catch (\Exception $e) {
+                    Log::error('Gagal kirim email PO ke supplier: ' . $e->getMessage());
+                    $emailSuccess = false;
+                }
+
+                $PO->save();
+                event(new ROPNotification("Purchase Order dengan nomor {$PO->nomor_referensi} sudah diverifikasi dan sudah terkirim!", 'admin_pengadaan'));
+                // Pastikan selalu return responsenya
+                if ($emailSuccess) {
+                    return back()->with('success', 'Purchase Order berhasil diverifikasi dan email terkirim.');
+                } else {
+                    return back()->with('error', 'PO berhasil diverifikasi, tetapi email gagal dikirim.');
+                }
             }
         } else {
             $PO->status = 'VERIFIKASI SEBAGIAN';
@@ -287,7 +315,7 @@ Tim Procurement Koperasi Karya Bersama Aciro
 
         $PO->save();
 
-        return back()->with('success', 'Permintaan barang keluar disetujui');
+        return back()->with('success', 'Purchase order berhasil disetujui');
     }
 
     public function tolak(Request $request, $uuid)
@@ -410,20 +438,6 @@ Tim Procurement Koperasi Karya Bersama Aciro
                 // Kirim notifikasi (kalau perlu detail barang, bisa di-loop terpisah dari $validated['items'])
                 SendWhatsappJob::dispatch($user->noWhatsapp, $text);
             }
-        } else {
-            $PO->status = 'BARANG DIKIRIM';
-
-            foreach ($users as $user) {
-                $roles = $user->roles->pluck('name')
-                    ->map(fn($r) => ucwords(str_replace('_', ' ', $r)))
-                    ->implode(', ');
-
-                $text = "Halo {$user->name} ({$roles}),PO dengan nomor {$PO->nomor_referensi} sedang dalam pengiriman oleh {$PO->supplier->name} pada {$tanggalSekarang}.";
-
-                event(new ROPNotification("PO dengan nomor {$PO->nomor_referensi} sedang dalam pengirima noleh {$PO->supplier->name} pada {$tanggalSekarang}.", $user->roles->pluck('name')[0]));
-                // Kirim notifikasi (kalau perlu detail barang, bisa di-loop terpisah dari $validated['items'])
-                SendWhatsappJob::dispatch($user->noWhatsapp, $text);
-            }
         }
         $PO->save();
 
@@ -494,5 +508,25 @@ Tim Procurement Koperasi Karya Bersama Aciro
             Log::error("Gagal menghapus PO dengan ID {$uuid}" . $e->getMessage(), ['exception' => $e]);
             throw new BarangException('Terjadi kesalahan dalam menghapus PO. Silahkan coba lagi nanti');
         }
+    }
+
+    public function saveDokumenPengiriman(Request $request, $uuid)
+    {
+        $validated = $request->validate([
+            'dokumen_pengiriman' => 'nullable|file|mimes:jpg,png,pdf|max:2048',
+        ]);
+
+        $po = PurchaseOrder::where('uuid', $uuid)->first();
+
+
+        if ($request->hasFile('dokumen_pengiriman')) {
+            $validated['dokumen_pengiriman'] = $request->file('dokumen_pengiriman')->store('dokumen-pengiriman', 'public');
+            $po->dokumen_pengiriman = $validated['dokumen_pengiriman'];
+        }
+
+        $po->status = "BARANG DIKIRIM";
+        $po->save();
+
+        return back()->with('success', "Dokumen berhasil diupload, barang sedang dikirim!");
     }
 }

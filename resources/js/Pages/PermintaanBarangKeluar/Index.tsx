@@ -94,18 +94,20 @@ const Index: React.FC<TPermintaanBarangKeluarIndexProps> = (props) => {
             render: (_, record) => {
                 return (
                     <div style={{ display: "flex", gap: "0.25rem" }}>
-                        <Button
-                            onClick={() =>
-                                handleDelete(
-                                    record.uuid,
-                                    record.nomor_referensi,
-                                )
-                            }
-                            type="primary"
-                            danger
-                        >
-                            <DeleteOutlined />
-                        </Button>
+                        {userRole === "admin_sistem" && (
+                            <Button
+                                onClick={() =>
+                                    handleDelete(
+                                        record.uuid,
+                                        record.nomor_referensi,
+                                    )
+                                }
+                                type="primary"
+                                danger
+                            >
+                                <DeleteOutlined />
+                            </Button>
+                        )}
                         <Link
                             href={route(Route.PermintaanBarangKeluarDetail, {
                                 uuid: record.uuid,

@@ -227,7 +227,7 @@ class BarangKeluarController extends Controller
 
     public function indexEksekusi()
     {
-        $barangKeluar = BarangKeluar::with(['items.barangs', 'user'])->whereIn('status', ['Disetujui', 'Dieksekusi'])->get();
+        $barangKeluar = BarangKeluar::with(['items.barangs', 'user'])->whereIn('status', ['Disetujui', 'Dieksekusi'])->orderBy('created_at', 'desc')->get();
 
         return Inertia::render('BarangKeluar/Index', [
             'data' => $barangKeluar,
@@ -303,14 +303,14 @@ class BarangKeluarController extends Controller
                     $supplier = $item->barangs->supplier;
                     $totalPo  = PurchaseOrder::count();
 
-                    $po = PurchaseOrder::where('supplier_id', $supplier->supplier_id)->where('status', 'DRAFT')->first();
+                    $po = PurchaseOrder::where('supplier_id', $supplier->supplier_id)->where('status', 'BUTUH VERIFIKASI')->first();
 
                     if (!$po) {
                         $po = PurchaseOrder::create([
                             'nomor_referensi' => sprintf('PO-%s-%04d', now()->format('Ymd'), $totalPo + 1),
                             'tanggal_order'   => now(),
                             'supplier_id'     => $supplier->supplier_id,
-                            'status'          => 'DRAFT',
+                            'status'          => 'BUTUH VERIFIKASI',
                             'catatan'         => 'test',
                         ]);
                     }
@@ -318,7 +318,7 @@ class BarangKeluarController extends Controller
                     PurchaseOrderItem::create([
                         'purchase_order_id' => $po->purchase_order_id,
                         'barang_id'         => $item->barang_id,
-                        'quantity'          => $item->barangs->maximal_quantity - $stock->rop ?? 0,
+                        'quantity'          => $item->barangs->maximal_quantity,
                         'harga_beli'        => $item->barangs->hargaBeli,
                     ]);
                     event(new ROPNotification("Stok {$item->barangs->name} menyentuh ROP!", 'kepala_toko'));

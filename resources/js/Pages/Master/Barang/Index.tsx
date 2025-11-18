@@ -91,7 +91,7 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
             dataIndex: "supplier",
             key: "supplier",
             render: (_, record) => {
-                return <span>{record.supplier.name}</span>;
+                return <span>{record.supplier?.name}</span>;
             },
         },
         {
@@ -99,7 +99,15 @@ const Barang: React.FC<TBarangIndexProps> = ({ data, filters }) => {
             dataIndex: "satuan",
             key: "satuan",
             render: (_, record) => {
-                return <span>{record.satuan.name}</span>;
+                return <span>{record.satuan?.name}</span>;
+            },
+        },
+        {
+            title: "Kategori",
+            dataIndex: "kategori",
+            key: "kategori",
+            render: (_, record) => {
+                return <span>{record.kategori?.name}</span>;
             },
         },
         {

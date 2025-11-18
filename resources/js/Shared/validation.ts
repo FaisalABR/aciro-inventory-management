@@ -51,6 +51,8 @@ export const CreateSatuanSchema = z.object({
         .max(255, { message: "Deskripsi maximal dari 255 karakter" }),
 });
 
+export const CreateKategoriSchema = CreateSatuanSchema;
+
 export const CreateSupplierSchema = z.object({
     name: z
         .string({
@@ -99,6 +101,7 @@ export const CreateBarangSchema = z.object({
         .min(3, { message: "Nama minimal 3 karakter" }),
     supplier: z.string({ required_error: "Supplier harus diisi" }),
     satuan: z.string({ required_error: "Satuan harus diisi" }),
+    kategori: z.string({ required_error: "Kategori harus diisi" }),
     hargaJual: z
         .number({
             required_error: "Harga Jual wajib diisi",
@@ -124,11 +127,6 @@ export const CreateBarangSchema = z.object({
             required_error: "Lead time wajib diisi",
         })
         .min(0, { message: "Lead time tidak boleh 0" }),
-    safety_stock: z
-        .number({
-            required_error: "Safety stock wajib diisi",
-        })
-        .min(0, { message: "Safety stock tidak boleh 0" }),
 });
 
 export const CreateBarangMasukSchema = z.object({
@@ -150,6 +148,13 @@ export const CreateBarangMasukSchema = z.object({
                 quantity: z.number({ required_error: "quantity harus di isi" }),
                 harga_beli: z.number({
                     required_error: "Harga Beli harus di isi",
+                }),
+                nomor_batch: z.string({
+                    required_error: "Nomor batch harus diisi",
+                }),
+                tanggal_expired: z.coerce.date({
+                    invalid_type_error: "Tanggal expired tidak valid",
+                    required_error: "Tanggal expired harus diisi",
                 }),
             }),
         )

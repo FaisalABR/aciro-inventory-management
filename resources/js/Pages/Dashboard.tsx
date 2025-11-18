@@ -2,10 +2,17 @@ import { Button, Card, DatePicker, Flex, Space, Typography } from "antd";
 import React from "react";
 import Layout, { Content } from "antd/es/layout/layout";
 import RootLayout from "../Layouts/RootLayout";
-import { ProductOutlined } from "@ant-design/icons";
+import {
+    DownloadOutlined,
+    PrinterFilled,
+    ProductOutlined,
+} from "@ant-design/icons";
 import { Column } from "@ant-design/charts";
 import { router } from "@inertiajs/react";
 import { Route } from "../Common/Route";
+import { pdf } from "@react-pdf/renderer";
+import PDFLaporanBarangMasuk from "./PDFLaporanBarangMasuk";
+import PDFLaporanBarangKeluar from "./PDFLaporanBarangKeluar";
 const { RangePicker } = DatePicker;
 
 const { Title } = Typography;
@@ -22,6 +29,8 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
         value: Number(item.value), // pastikan number
     }));
 
+    console.log("barangMasuk", barangMasuk);
+
     const barangKeluar = data?.graph?.barangKeluar.map((item: any) => ({
         nama: item.nama,
         value: Number(item.value), // pastikan number
@@ -31,50 +40,74 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
         data: barangMasuk,
         xField: "nama", // sumbu X menampilkan nama barang
         yField: "value", // sumbu Y menampilkan jumlah masuk
-        label: {
-            position: "middle",
-            style: {
-                fill: "#FFFFFF",
-                opacity: 0.6,
-            },
-        },
-        tooltip: {
-            showMarkers: true,
-            formatter: (datum: any) => ({
-                name: datum.nama,
-                value: datum.value,
-            }),
-        },
-        meta: {
-            nama: { alias: "Nama Barang" },
-            value: { alias: "Jumlah Masuk" },
-        },
-        color: "#1890ff", // warna batang
+        colorField: "#1890ff", // warna batang
     };
 
     const barangKeluarConfig = {
         data: barangKeluar,
         xField: "nama", // sumbu X menampilkan nama barang
         yField: "value", // sumbu Y menampilkan jumlah masuk
-        label: {
-            position: "middle",
-            style: {
-                fill: "#FFFFFF",
-                opacity: 0.6,
-            },
-        },
-        tooltip: {
-            showMarkers: true,
-            formatter: (datum: any) => ({
-                name: datum.nama,
-                value: datum.value,
-            }),
-        },
-        meta: {
-            nama: { alias: "Nama Barang" },
-            value: { alias: "Jumlah Masuk" },
-        },
-        color: "#1890ff", // warna batang
+        colorField: "#FF0000", // warna batang
+    };
+
+    const handleDownload = async () => {
+        try {
+            const periodeMulai = dateRange?.[0]?.format("YYYY-MM-DD") ?? null;
+            const periodeAkhir = dateRange?.[1]?.format("YYYY-MM-DD") ?? null;
+
+            const blob = await pdf(
+                <PDFLaporanBarangMasuk
+                    data={data?.barangMasuk}
+                    title="Laporan Barang Masuk"
+                    periodeMulai={periodeMulai}
+                    periodeAkhir={periodeAkhir}
+                />,
+            ).toBlob();
+
+            // ✅ Nama file dinamis
+            const fileName = `Laporan_Barang_Masuk_${periodeMulai ?? "semua"}_${periodeAkhir ?? "semua"}.pdf`;
+
+            const url = URL.createObjectURL(blob);
+
+            // --- Opsi 2: Trigger download file juga ---
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName; // ✅ Nama file yang kamu tentukan
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error("Error generating PDF for print:", error);
+        }
+    };
+
+    const handleDownloadBarangKeluar = async () => {
+        const periodeMulai = dateRange?.[0]?.format("YYYY-MM-DD") ?? null;
+        const periodeAkhir = dateRange?.[1]?.format("YYYY-MM-DD") ?? null;
+        try {
+            const blob = await pdf(
+                <PDFLaporanBarangKeluar
+                    data={data?.barangKeluar}
+                    title="Laporan Barang Keluar"
+                    periodeMulai={periodeMulai}
+                    periodeAkhir={periodeAkhir}
+                />,
+            ).toBlob();
+            // ✅ Nama file dinamis
+            const fileName = `Laporan_Barang_Keluar_${periodeMulai ?? "semua"}_${periodeAkhir ?? "semua"}.pdf`;
+
+            const url = URL.createObjectURL(blob);
+
+            // --- Opsi 2: Trigger download file juga ---
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName; // ✅ Nama file yang kamu tentukan
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error("Error generating PDF for print:", error);
+        }
     };
 
     return (
@@ -172,9 +205,23 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
                         borderRadius: "12px",
                     }}
                 >
-                    <Title level={3} style={{ marginBottom: "2rem" }}>
-                        Barang Masuk
-                    </Title>
+                    <Flex
+                        align="center"
+                        justify="space-between"
+                        style={{ width: "100%", marginBottom: "2rem" }}
+                    >
+                        <Title level={3} style={{ marginBottom: "0" }}>
+                            Barang Masuk
+                        </Title>
+                        <Button
+                            type="default"
+                            size="large"
+                            icon={<DownloadOutlined />}
+                            onClick={handleDownload}
+                        >
+                            Download Laporan Barang Masuk
+                        </Button>
+                    </Flex>
                     <Column {...config} />
                 </Content>
                 <Content
@@ -185,9 +232,23 @@ const Home: React.FC<TDashboardProps> = ({ data }) => {
                         borderRadius: "12px",
                     }}
                 >
-                    <Title level={3} style={{ marginBottom: "2rem" }}>
-                        Barang Keluar
-                    </Title>
+                    <Flex
+                        align="center"
+                        justify="space-between"
+                        style={{ width: "100%", marginBottom: "2rem" }}
+                    >
+                        <Title level={3} style={{ marginBottom: "0" }}>
+                            Barang Keluar
+                        </Title>
+                        <Button
+                            type="default"
+                            size="large"
+                            icon={<DownloadOutlined />}
+                            onClick={handleDownloadBarangKeluar}
+                        >
+                            Download Laporan Barang Keluar
+                        </Button>
+                    </Flex>
                     <Column {...barangKeluarConfig} />
                 </Content>
             </Layout>

@@ -48,6 +48,7 @@ class Barang extends Model
         'name',
         'supplier_id',
         'satuan_id',
+        'kategori_id',
         'hargaJual',
         'hargaBeli',
         'maximal_quantity',
@@ -66,6 +67,11 @@ class Barang extends Model
         return $this->belongsTo(Satuan::class, 'satuan_id', 'satuan_id');
     }
 
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id', 'kategori_id');
+    }
+
     public function barangMasukItems()
     {
         return $this->hasMany(BarangMasukItem::class, 'barang_masuk_item_id', 'barang_masuk_item_id');
@@ -78,6 +84,6 @@ class Barang extends Model
 
     public function stock()
     {
-        return $this->hasOne(Stock::class, 'stock_id', 'stock_id');
+        return $this->hasOne(Stock::class, 'barang_id', 'barang_id');
     }
 }

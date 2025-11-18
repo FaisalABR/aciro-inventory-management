@@ -6,6 +6,7 @@ use App\Exceptions\Barang\BarangAlreadyExistsException;
 use App\Exceptions\Barang\BarangException;
 use App\Models\Barang;
 use App\Services\BarangServiceInterface;
+use App\Services\KategoriServiceInterface;
 use App\Services\SatuanServiceInterface;
 use App\Services\SupplierServiceInterface;
 use Illuminate\Http\Request;
@@ -20,11 +21,14 @@ class BarangController extends Controller
 
     private $supplierService;
 
-    public function __construct(BarangServiceInterface $barangService, SatuanServiceInterface $satuanService, SupplierServiceInterface $supplierService)
+    private $kategoriService;
+
+    public function __construct(BarangServiceInterface $barangService, SatuanServiceInterface $satuanService, SupplierServiceInterface $supplierService, KategoriServiceInterface $kategoriService)
     {
         $this->barangService   = $barangService;
         $this->satuanService   = $satuanService;
         $this->supplierService = $supplierService;
+        $this->kategoriService   = $kategoriService;
     }
 
     public function index(Request $request)
@@ -51,11 +55,13 @@ class BarangController extends Controller
     {
         $optionSatuan   = $this->satuanService->getOptions();
         $optionSupplier = $this->supplierService->getOptions();
+        $optionKategori = $this->kategoriService->getOptions();
 
         return Inertia::render('Master/Barang/FormBarang', [
             'isUpdate'       => false,
             'optionSatuan'   => $optionSatuan,
             'optionSupplier' => $optionSupplier,
+            'optionKategori' => $optionKategori,
         ]);
     }
 
@@ -65,12 +71,14 @@ class BarangController extends Controller
             $barang         = $this->barangService->getBarangByUUID($uuid);
             $optionSatuan   = $this->satuanService->getOptions();
             $optionSupplier = $this->supplierService->getOptions();
+            $optionKategori = $this->kategoriService->getOptions();
 
             return Inertia::render('Master/Barang/FormBarang', [
                 'isUpdate'       => true,
                 'data'           => $barang,
                 'optionSatuan'   => $optionSatuan,
                 'optionSupplier' => $optionSupplier,
+                'optionKategori' => $optionKategori,
             ]);
         } catch (BarangException $e) {
             return redirect('/master/barang')->with('error', $e->getMessage());
@@ -86,12 +94,12 @@ class BarangController extends Controller
                 'name'        => 'required',
                 'supplier_id' => 'required',
                 'satuan_id'   => 'required',
+                'kategori_id' => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
                 'maximal_quantity' => 'required',
                 'rata_rata_permintaan_harian' => 'required',
                 'leadtime' => 'required',
-                'safety_stock' => 'required',
             ]);
 
             $this->barangService->create($validated);
@@ -131,12 +139,12 @@ class BarangController extends Controller
                 'name'        => 'required',
                 'supplier_id' => 'required',
                 'satuan_id'   => 'required',
+                'kategori_id' => 'required',
                 'hargaJual'   => 'required',
                 'hargaBeli'   => 'required',
                 'maximal_quantity' => 'required',
                 'rata_rata_permintaan_harian' => 'required',
                 'leadtime' => 'required',
-                'safety_stock' => 'required',
             ]);
 
             $result = $this->barangService->update($validated, $uuid);
@@ -166,7 +174,7 @@ class BarangController extends Controller
 
     public function showDetail($uuid)
     {
-        $barang      = Barang::where('uuid', $uuid)->with(['supplier', 'satuan'])->firstOrFail();
+        $barang      = Barang::where('uuid', $uuid)->with(['supplier', 'satuan', 'kategori'])->firstOrFail();
 
         $data = [
             'id'                           => $barang->barang_id,
@@ -185,6 +193,10 @@ class BarangController extends Controller
             'satuan'                     => [
                 'id'   => $barang->satuan->satuan_id,
                 'name' => $barang->satuan->name,
+            ],
+            'kategori'                     => [
+                'id'   => $barang->kategori->kategori_id,
+                'name' => $barang->kategori->name,
             ],
         ];
 

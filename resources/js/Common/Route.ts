@@ -39,6 +39,7 @@ export enum Route {
     CreateBarangMasuk = "/barang-masuk/create",
     EditBarangMasuk = "/barang-masuk/edit/:uuid",
     DeleteBarangMasuk = "/barang-masuk/delete/:uuid",
+    VerifikasiBarangMasuk = "/barang-masuk/:uuid/approved",
 
     // Kelola User
     KelolaUser = "/kelola-user",
@@ -51,6 +52,12 @@ export enum Route {
     CreateMasterSatuan = "/master/satuan/create",
     EditMasterSatuan = "/master/satuan/edit/:uuid",
     DeleteMasterSatuan = "/master/satuan/delete/:uuid",
+
+    // Master Satuan
+    MasterKategori = "/master/kategori",
+    CreateMasterKategori = "/master/kategori/create",
+    EditMasterKategori = "/master/kategori/edit/:uuid",
+    DeleteMasterKategori = "/master/kategori/delete/:uuid",
 
     // Master Supplier
     MasterSupplier = "/master/supplier",
@@ -75,6 +82,7 @@ export enum Route {
     SampaiPurchaseOrder = "/purchase-orders/:uuid/arrived",
     TolakPurchaseOrder = "/purchase-orders/:uuid/reject",
     PembayaranPurchaseOrder = "/purchase-orders/:id/payments",
+    UploadDokumenPengirimanPO = "/purchase-orders/:uuid/docs-dispatch",
 
     // Kelola Laporan Deadstock
     LaporanDeadstock = "/laporan-deadstocks",
@@ -87,5 +95,4 @@ export enum Route {
     TolakPurchaseOrderSupplier = "/suppliers/:uuid/views/reject",
 
     RootMaster = "/master",
-    MasterKategori = "/master/kategori",
 }
